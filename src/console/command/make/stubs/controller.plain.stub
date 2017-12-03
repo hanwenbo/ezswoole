@@ -1,0 +1,10 @@
+<?php
+
+namespace {%namespace%};
+
+use fashop\Controller;
+
+class {%className%} extends Controller
+{
+    //
+}
