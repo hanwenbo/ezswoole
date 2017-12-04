@@ -5,6 +5,7 @@ fashop framework
 说明由thinkphp改造，为了学习以及适配swoole
 request外部传入、定义接口类
 response外部传入、定义接口类
+fetch请求握手的处理，把response的几个参数扔在conxxx.php里，返回什么需要封装在Response类里，还有就是getContent 和 setContent需要写 让外部可控
 配置外部传入
 Cache类基于php Cache预定义接口开发
 命令行更新fashop-framework功能
