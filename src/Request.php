@@ -399,7 +399,7 @@ class Request
 				// 判断url里面是否有兼容模式参数
 				$_server['path_info'] = $_get[config::get( 'var_pathinfo' )];
 				unset( $_get[config::get( 'var_pathinfo' )] );
-			} elseif( is_cli ){
+			} elseif(IS_CLI ){
 				// cli模式下 index.php module/controller/action/params/...
 				$_server['path_info'] = isset( $_server['argv'][1] ) ? $_server['argv'][1] : '';
 			}

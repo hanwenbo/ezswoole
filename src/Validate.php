@@ -41,6 +41,7 @@ class Validate
 			'boolean'     => ':attribute必须是布尔值',
 			'email'       => ':attribute格式不符',
 			'array'       => ':attribute必须是数组',
+			'arrayUnique'      => ':attribute不可有重复值',
 			'json'        => ':attribute不是json',
 			'phone'       => ':attribute格式不符',
 			'accepted'    => ':attribute必须是yes、on或者1',
@@ -613,6 +614,10 @@ class Validate
 		case 'array':
 			// 是否为数组
 			$result = is_array( $value );
+		break;
+		case 'arrayUnique':
+			// 数组不可重复
+			$result = (count($value) == count(array_unique($value)) ) ;
 		break;
 		case 'file':
 			$result = $value instanceof File;
