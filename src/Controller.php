@@ -59,10 +59,10 @@ abstract class Controller extends AbstractController {
 	}
 
 	function send($code = 0, $data = [], $message = null) {
-		$this->response()->withAddedHeader('Access-Control-Allow-Origin', EsConfig::getInstance()->getConf('access_control_allow_origin'));
+		$this->response()->withAddedHeader('Access-Control-Allow-Origin', EsConfig::getInstance()->getConf('response.access_control_allow_origin'));
 		$this->response()->withAddedHeader('Content-Type', 'application/json; charset=utf-8');
-		$this->response()->withAddedHeader('Access-Control-Allow-Headers', EsConfig::getInstance()->getConf('access_control_allow_headers'));
-		$this->response()->withAddedHeader('Access-Control-Allow-Methods', EsConfig::getInstance()->getConf('access_control_allow_methods'));
+		$this->response()->withAddedHeader('Access-Control-Allow-Headers', EsConfig::getInstance()->getConf('response.access_control_allow_headers'));
+		$this->response()->withAddedHeader('Access-Control-Allow-Methods', EsConfig::getInstance()->getConf('response.access_control_allow_methods'));
 		$this->response()->withStatus(200);
 		$content = [
 			"code"   => $code,
@@ -70,6 +70,7 @@ abstract class Controller extends AbstractController {
 			"msg"    => $message,
 		];
 		$this->response()->getBody()->write(json_encode($content, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+		$this->response()->end(); // 方式输出多份json
 	}
 
 	function getPageLimit() {
