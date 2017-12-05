@@ -19,6 +19,8 @@ php react环境下开发
 php首屏渲染react
 react在线打包
 定时任务完善
+image类引用接口
+
 
 发布到composer
 

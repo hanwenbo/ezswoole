@@ -73,7 +73,7 @@ class Image {
 		$this->preCall = $preCall;
 		ImageManage::configure(array('driver' => 'imagick'));
 		// todo 拓展
-		$this->targetFolder = $this->targetFolder . '/' . date('Ymd');
+		$this->targetFolder = ROOT.DS.$this->targetFolder.DS.date( 'Ymd' );
 	}
 
 	static function getInstance(callable $preCall = null) {
@@ -111,7 +111,7 @@ class Image {
 	 * return
 	 */
 	public function create($file) {
-		$this->domain = Config::get('domain') ? Config::get('domain') : \fashop\Request::instance()->domain();
+		$this->domain = Config::get('domain') ? Config::get('domain') : Request::instance()->domain();
 		// 创建文件 todo 第三方依赖不创建
 		$this->createTargetFloder();
 		// 文件上传

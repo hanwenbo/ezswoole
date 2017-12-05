@@ -172,11 +172,13 @@ abstract class Controller extends AbstractController
 				// 支持场景
 				list( $validate, $scene ) = explode( '.', $validate );
 			}
+
 			$v = Loader::validate( $validate );
 			if( !empty( $scene ) ){
 				$v->scene( $scene );
 			}
 		}
+
 		// 是否批量验证
 		if( $batch || $this->batchValidate ){
 			$v->batch( true );
@@ -189,7 +191,6 @@ abstract class Controller extends AbstractController
 		if( $callback && is_callable( $callback ) ){
 			call_user_func_array( $callback, [$v, &$data] );
 		}
-
 		if( !$v->check( $data ) ){
 			if( $this->failException ){
 				throw new ValidateException( $v->getError() );

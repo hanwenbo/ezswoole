@@ -262,6 +262,7 @@ class Validate
 
 		// 分析验证规则
 		$scene = $this->getScene( $scene );
+
 		if( is_array( $scene ) ){
 			// 处理场景验证字段
 			$change = [];
@@ -274,8 +275,12 @@ class Validate
 					$change[$k] = $val;
 				}
 			}
-		}
 
+		}
+		// 临时解决controller bug
+		if(empty($rules) && is_array( $scene )){
+			$rules = collect($this->getRules())->only(array_values($scene));
+		}
 		foreach( $rules as $key => $item ){
 			// field => rule1|rule2... field=>['rule1','rule2',...]
 			if( is_numeric( $key ) ){
@@ -1331,7 +1336,9 @@ class Validate
 		}
 		return $scene;
 	}
-
+	public function getRules(){
+		return $this->rules;
+	}
 	public static function __callStatic( $method, $params )
 	{
 		$class = self::make();
