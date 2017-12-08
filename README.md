@@ -20,7 +20,7 @@ php首屏渲染react
 react在线打包
 定时任务完善
 image类引用接口
-
+错误码默认定义几个，或者把controller的send拿走，再或者外部自定义去，还没想明白
 
 发布到composer
 
