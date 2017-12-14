@@ -940,13 +940,12 @@ class Request
 
 	public function raw( $raw = null )
 	{
-
 		if( is_null( $raw ) ){
 			$content = ESRequest::getInstance()->getBody()->__toString();
-			$raw     = (array) json_decode( $content, true );
-			return $raw;
+			 $raw     =  (array)json_decode( $content, true );
+			return (array) $raw;
 		} else{
-			return $this->raw = $raw;
+			return (array) $this->raw = $raw;
 		}
 	}
 

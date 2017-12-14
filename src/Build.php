@@ -17,7 +17,7 @@ class Build {
 		if (is_writable($lockfile)) {
 			return;
 		} elseif (!touch($lockfile)) {
-			throw new Exception('应用目录[' . APP_PATH . ']不可写，目录无法自动生成！<BR>请手动生成项目目录~', 10006);
+			trigger_error('应用目录[' . APP_PATH . ']不可写，目录无法自动生成！<BR>请手动生成项目目录~',E_USER_NOTICE);
 		}
 		foreach ($build as $module => $list) {
 			if ('__dir__' == $module) {

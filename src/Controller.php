@@ -46,12 +46,12 @@ abstract class Controller extends AbstractController
 
 	public function index()
 	{
-		return $this->send( - 1, [], "NOT FOUND" );
+		return $this->send( -1, [], "NOT FOUND" );
 	}
 
 	function actionNotFound( $actionName = null, $arguments = null )
 	{
-		return $this->send( - 1, [], "actionNotFound" );
+		return $this->send( -1, [], "actionNotFound" );
 	}
 
 	function shutdown()
@@ -61,7 +61,7 @@ abstract class Controller extends AbstractController
 
 	function router()
 	{
-		return $this->send( - 1, [], "your router not end" );
+		return $this->send( -1, [], "your router not end" );
 	}
 
 	function send( $code = 0, $data = [], $message = null )

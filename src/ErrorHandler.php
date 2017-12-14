@@ -5,7 +5,6 @@ namespace fashop;
 
 use Core\AbstractInterface\ErrorHandlerInterface;
 use Core\Http\Request as EsRequest;
-use ExceptionHandler;
 class ErrorHandler implements ErrorHandlerInterface
 {
 

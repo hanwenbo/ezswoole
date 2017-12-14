@@ -4,20 +4,22 @@ namespace fashop\db\exception;
 
 use fashop\exception\DbException;
 
-class DataNotFoundException extends DbException {
+class DataNotFoundException extends DbException
+{
 	protected $table;
 
 	/**
 	 * DbException constructor.
 	 * @param string $message
 	 * @param string $table
-	 * @param array $config
+	 * @param array  $config
 	 */
-	public function __construct($message, $table = '', array $config = []) {
+	public function __construct( $message, $table = '', array $config = [] )
+	{
+		parent::__construct( $message,  $config ,null,10500 );
 		$this->message = $message;
 		$this->table   = $table;
-
-		$this->setData('Database Config', $config);
+		$this->setData( 'Database Config', $config );
 	}
 
 	/**
@@ -25,7 +27,8 @@ class DataNotFoundException extends DbException {
 	 * @access public
 	 * @return string
 	 */
-	public function getTable() {
+	public function getTable()
+	{
 		return $this->table;
 	}
 }

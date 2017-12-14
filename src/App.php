@@ -3,7 +3,6 @@
 namespace fashop;
 
 use fashop\exception\HttpResponseException;
-
 /**
  * App 应用管理
  */
@@ -130,11 +129,13 @@ class App
 				}
 			}
 		}
+//		Error::register();
 		// 加载应用状态配置
 		if( Config::get( 'app_status' ) ){
 			Config::load( CONF_PATH.Config::get( 'app_status' ).CONF_EXT );
 		}
 		return Config::get();
 	}
+
 
 }
