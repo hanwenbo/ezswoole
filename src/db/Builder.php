@@ -211,6 +211,7 @@ abstract class Builder {
 			$binds    = $this->query->getFieldsBind($options['table']);
 			$whereStr = $whereStr ? '( ' . $whereStr . ' ) AND ' : '';
 			$whereStr = $whereStr . $this->parseWhereItem($field, $condition, '', $options, $binds);
+
 		}
 		return empty($whereStr) ? '' : ' WHERE ' . $whereStr;
 	}

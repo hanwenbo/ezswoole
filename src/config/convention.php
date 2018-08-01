@@ -169,6 +169,8 @@ return [
 		'path'                => LOG_PATH,
 		// 日志记录级别
 		'level'               => [],
+		//单个日志文件的大小限制，超过后会自动记录到第二个文件
+		'file_size'           => 2097152,
 		// 显示加载文件
 		'show_included_files' => false,
 	],

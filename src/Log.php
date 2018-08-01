@@ -30,7 +30,7 @@ class Log
 	// 配置参数
 	protected static $config = [];
 	// 日志类型
-	protected static $type = ['log', 'error', 'info', 'sql', 'notice', 'alert', 'debug'];
+	protected static $type = ['log', 'error', 'info', 'sql', 'notice', 'alert', 'debug' , 'request'];
 	// 日志写入驱动
 	protected static $driver;
 
@@ -116,16 +116,13 @@ class Log
 	 */
 	public static function save()
 	{
-
 		if( !empty( self::$log ) ){
 			if( is_null( self::$driver ) ){
 				self::init( Config::get( 'log' ) );
 			}
 			if( !self::check( self::$config ) ){
-				// 检测日志写入权限
 				return false;
 			}
-
 			if( empty( self::$config['level'] ) ){
 				// 获取全部日志
 				$log = self::$log;
@@ -133,7 +130,6 @@ class Log
 					unset( $log['debug'] );
 				}
 			} else{
-				// 记录允许级别
 				$log = [];
 				foreach( self::$config['level'] as $level ){
 					if( isset( self::$log[$level] ) ){

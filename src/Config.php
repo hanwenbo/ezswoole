@@ -103,7 +103,7 @@ class Config {
 
 			if (!isset(self::$config[$range][$name[0]])) {
 				// 动态载入额外配置
-				$module = Request::instance()->module();
+				$module = Request::getInstance()->module();
 				$file   = CONF_PATH . ($module ? $module . DS : '') . 'extra' . DS . $name[0] . CONF_EXT;
 
 				is_file($file) && self::load($file, $name[0]);

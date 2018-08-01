@@ -10,44 +10,27 @@
  * Time: 下午4:54
  *
  */
+
 namespace fashop;
-use Core\AbstractInterface\ExceptionHandlerInterface;
-use Core\Http\Request as EsRequest;
+
+use EasySwoole\Core\Http\AbstractInterface\ExceptionHandlerInterface;
+use EasySwoole\Core\Http\Request;
+use EasySwoole\Core\Http\Response;
 
 class ExceptionHandler implements ExceptionHandlerInterface
 {
-
-	function handler(\Exception $exception)
+	private $request;
+	private $response;
+	public function handle( \Throwable $exception, Request $request, Response $response )
 	{
-		// todo 这个方法干什么的
+		// todo 如果上线返回json
+		$this->request = $request;
+		$this->response = $response;
+		$error_exception = new \fashop\exception\ErrorException($exception->getCode(),$exception->getMessage(),$exception->getFile(),$exception->getLine());
+		$this->getExceptionHandler()->render( $error_exception );
 	}
-
-	function display(\Exception $exception)
+	private function getExceptionHandler()
 	{
-		if( !$exception instanceof \Exception ){
-			$exception = new \fashop\exception\ThrowableError( $exception );
-		}
-		Log::write($exception->getMessage(),'error');
-		if(EsRequest::getInstance()){
-			self::getExceptionHandler()->render( $exception );
-		} else{
-			// todo cli
-		}
-	}
-
-	function log(\Exception $exception)
-	{
-		Log::write($exception->getMessage()." ".$exception->getTraceAsString(),'error');
-	}
-
-	/**
-	 * Get an instance of the exception handler.
-	 *
-	 * @return Handle
-	 */
-	public static function getExceptionHandler()
-	{
-		// 异常处理handle
 		$class = \fashop\Config::get( 'exception_handle' );
 		if( $class && class_exists( $class ) && is_subclass_of( $class, "\\fashop\\exception\\Handle" ) ){
 			$handle = new $class;
@@ -55,8 +38,12 @@ class ExceptionHandler implements ExceptionHandlerInterface
 			$handle = new \fashop\exception\Handle;
 			if( $class instanceof \Closure ){
 				$handle->setRender( $class );
+			}else{
+				$handle->setRequest($this->request);
+				$handle->setResponse($this->response);
 			}
 		}
 		return $handle;
 	}
+
 }

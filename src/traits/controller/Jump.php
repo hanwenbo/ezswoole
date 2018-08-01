@@ -68,7 +68,7 @@ trait Jump {
 	 */
 	protected function error($msg = '', $url = null, $data = '', $wait = 3, array $header = []) {
 		if (is_null($url)) {
-			$url = Request::instance()->isAjax() ? '' : 'javascript:history.back(-1);';
+			$url = Request::getInstance()->isAjax() ? '' : 'javascript:history.back(-1);';
 		} elseif ('' !== $url) {
 			$url = (strpos($url, '://') || 0 === strpos($url, '/')) ? $url : Url::build($url);
 		}
@@ -136,7 +136,7 @@ trait Jump {
 	 * @return string
 	 */
 	protected function getResponseType() {
-		$isAjax = Request::instance()->isAjax();
+		$isAjax = Request::getInstance()->isAjax();
 		return $isAjax ? Config::get('default_ajax_return') : Config::get('default_return_type');
 	}
 }

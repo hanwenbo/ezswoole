@@ -9,17 +9,28 @@ use fashop\console\Output;
 use fashop\Lang;
 use fashop\Log;
 use fashop\Response;
+use EasySwoole\Core\Http\Request as EasySwooleRequest;
+use EasySwoole\Core\Http\Response as EasySwooleResponse;
 
 class Handle {
+	protected $request ;
+	/**
+	 * @var \EasySwoole\Core\Http\Response
+	 */
+	protected $response;
 	protected $render;
 	protected $ignoreReport = [
 		'\\fashop\\exception\\HttpException',
 	];
-
 	public function setRender($render) {
 		$this->render = $render;
 	}
-
+	public function setResponse( EasySwooleResponse $response ){
+		$this->response = $response;
+	}
+	public function setRequest(EasySwooleRequest $request){
+		$this->request = $request;
+	}
 	/**
 	 * Report or log an exception.
 	 *
@@ -75,7 +86,6 @@ class Handle {
 			}
 		}
 		if ($e instanceof HttpException) {
-
 			return $this->renderHttpException($e);
 		} else {
 			return $this->convertExceptionToResponse($e);
@@ -114,7 +124,6 @@ class Handle {
 	protected function convertExceptionToResponse(Exception $exception) {
 		// 收集异常数据
 		if (App::$debug) {
-			$request = \Core\Http\Request::getInstance();
 			// 调试模式，获取详细的错误信息
 			$data = [
 				'name'    => get_class($exception),
@@ -126,14 +135,7 @@ class Handle {
 				'source'  => $this->getSourceCode($exception),
 				'datas'   => $this->getExtendData($exception),
 				'tables'  => [
-					'GET Data'              => isset( $request->getSwooleRequest()->get ) ? $request->getSwooleRequest()->get : [],
-					'POST Data'             => isset( $request->getSwooleRequest()->post ) ? $request->getSwooleRequest()->post : [],
-					'Files'                 => isset( $request->getSwooleRequest()->files ) ? $request->getSwooleRequest()->files : [],
-					'Cookies'               => isset( $request->getSwooleRequest()->cookie ) ? $request->getSwooleRequest()->cookie : [],
-					'Session'               => isset( $request->getSwooleRequest()->session ) ? $request->getSwooleRequest()->session : [],
-					'Server/Request Data'   => isset( $request->getSwooleRequest()->server ) ? $request->getSwooleRequest()->server : [],
-					'Environment Variables' => $_ENV,
-					'FashopPHP Constants'    => $this->getConst(),
+
 				],
 			];
 		} else {
@@ -155,12 +157,15 @@ class Handle {
 		if (!isset($statusCode)) {
 			$statusCode = 500;
 		}
-		\Core\Http\Response::getInstance()->withStatus($statusCode);
-		\Core\Http\Response::getInstance()->write($content);
-		\Core\Http\Response::getInstance()->end();
+		$this->response->withStatus($statusCode);
+		$this->response->withAddedHeader('Content-Type','text/html;charset=utf-8');
 		if(ob_get_length()){
 			ob_end_clean();
 		}
+		$this->response->getSwooleResponse()->end($content);
+		// 抛出错误为了中断
+		throw $exception;
+
 	}
 
 	/**
@@ -236,13 +241,5 @@ class Handle {
 			$data = $exception->getData();
 		}
 		return $data;
-	}
-
-	/**
-	 * 获取常量列表
-	 * @return array 常量列表
-	 */
-	private static function getConst() {
-		return get_defined_constants(true)['user'];
 	}
 }

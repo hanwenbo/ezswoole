@@ -72,19 +72,7 @@ class Query
 	 */
 	public function __call( $method, $args )
 	{
-		$class_name = end( explode( '\\', $this->getModel() ) );
-		if(
-		in_array( $method, [
-			"add{$class_name}",
-			"add{$class_name}All",
-			"edit{$class_name}",
-			"del{$class_name}",
-			"get{$class_name}Info",
-			"get{$class_name}List",
-		] )
-		){
-			return call_user_func_array( [$this, "_".str_replace( $class_name, 'Model', $method )], $args );
-		} elseif( strtolower( substr( $method, 0, 5 ) ) == 'getby' ){
+		if( strtolower( substr( $method, 0, 5 ) ) == 'getby' ){
 			// 根据某个字段获取记录
 			$field         = Loader::parseName( substr( $method, 5 ) );
 			$where[$field] = $args[0];
@@ -101,90 +89,6 @@ class Query
 				Error::exception( $e );
 			}
 		}
-	}
-
-	/**
-	 * 添加
-	 * @datetime 2017-11-20 15:45:31
-	 * @author   韩文博
-	 * @param  array $data
-	 * @return int pk
-	 */
-	private function _addModel( $data = [] )
-	{
-		$data['create_time'] = time();
-		$result              = $this->allowField( true )->save( $data );
-		if( $result ){
-			return $this->getLastInsID();
-		}
-		return $result;
-	}
-
-	/**
-	 * 添加多条
-	 * @datetime 2017-11-20 15:45:31
-	 * @author   韩文博
-	 * @param array $data
-	 * @return boolean
-	 */
-	private function _addModelAll( $data )
-	{
-		return $this->insertAll( $data );
-	}
-
-	/**
-	 * 修改
-	 * @datetime 2017-11-20 15:45:31
-	 * @author   韩文博
-	 * @param    array $condition
-	 * @param    array $data
-	 * @return   boolean
-	 */
-	private function _editModel( $condition = [], $data = [] )
-	{
-		return $this->update( $data, $condition, true );
-	}
-
-	/**
-	 * 删除
-	 * @datetime 2017-11-20 15:45:31
-	 * @author   韩文博
-	 * @param    array $condition
-	 * @return   boolean
-	 */
-	private function _delModel( $condition = [] )
-	{
-		return $this->where( $condition )->delete();
-	}
-
-	/**
-	 * 单条数据
-	 * @datetime 2017-11-20 15:45:31
-	 * @author   韩文博
-	 * @param array  $condition 条件
-	 * @param string $field     字段
-	 * @return array | false
-	 */
-	private function _getModelInfo( $condition = [], $field = '*' )
-	{
-		$info = $this->where( $condition )->field( $field )->find();
-		return $info ? $info->toArray() : false;
-	}
-
-	/**
-	 * 列表
-	 * @datetime 2017-11-20 15:45:31
-	 * @author   韩文博
-	 * @param    array  $condition
-	 * @param    string $field
-	 * @param    string $order
-	 * @param    string $page
-	 * @return   array | false
-	 */
-	private function _getModelList( $condition = [], $field = '*', $order = 'id desc', $page = '1,10' )
-	{
-		$list = $this->where( $condition )->order( $order )->field( $field )->page( $page )->select();
-		return $list ? $list->toArray() : false;
 	}
 
 	/**
@@ -319,15 +223,15 @@ class Query
 	{
 		return $this->connection->query( $sql, $bind, $master, $class );
 	}
-
 	/**
 	 * 执行语句
 	 * @access public
 	 * @param string $sql  sql指令
 	 * @param array  $bind 参数绑定
 	 * @return int
-	 * @throws BindParamException
 	 * @throws PDOException
+	 * @throws \Exception
+	 * @author 韩文博
 	 */
 	public function execute( $sql, $bind = [] )
 	{
@@ -2532,9 +2436,11 @@ class Query
 	 * @access public
 	 * @param array|string|Query|\Closure $data
 	 * @return array|false|\PDOStatement|string|Model
-	 * @throws DbException
-	 * @throws ModelNotFoundException
 	 * @throws DataNotFoundException
+	 * @throws ModelNotFoundException
+	 * @throws PDOException
+	 * @throws \Exception
+	 * @author 韩文博
 	 */
 	public function find( $data = null )
 	{

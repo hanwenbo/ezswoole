@@ -13,130 +13,97 @@
 
 namespace fashop;
 
-use Core\AbstractInterface\AbstractController;
+use EasySwoole\Config as AppConfig;
+use EasySwoole\Core\Http\AbstractInterface\Controller as AbstractController;
+use EasySwoole\Core\Http\Request as EasySwooleRequest;
+use EasySwoole\Core\Http\Response as EasySwooleResponse;
 use fashop\exception\ValidateException;
-use Core\Swoole\Server;
-use Conf\Config as EsConfig;
+use EasySwoole\Core\Component\Spl\SplArray;
 
 abstract class Controller extends AbstractController
 {
 
 	protected $app;
+	protected $post;
+	protected $get;
+
 	/**
-	 * @var \fashop\View 视图类实例
-	 */
-	protected $view;
-	/**
-	 * @var \fashop\Request Request实例
+	 * @var Request
 	 */
 	protected $request;
 	// 验证失败是否抛出异常
 	protected $failException = false;
 	// 是否批量验证
 	protected $batchValidate = false;
+	private $validate;
 
-	function afterAction()
+	protected $view;
+
+	public function __construct( string $actionName, EasySwooleRequest $request, EasySwooleResponse $response )
 	{
-		// 初始化，目的清理上一次请求的static记录
-		\fashop\Request::instance()->clearInstance();
-		// 清理上一次请求的model关联static记录
-		\fashop\Loader::clearInstance();
+		parent::__construct( $actionName, $request, $response );
 
 	}
+
 
 	public function index()
 	{
-		return $this->send( -1, [], "NOT FOUND" );
+		return $this->send( - 1, [], "NOT FOUND" );
 	}
 
-	function actionNotFound( $actionName = null, $arguments = null )
+	protected function actionNotFound( $action = null ) : void
 	{
-		return $this->send( -1, [], "actionNotFound" );
+		$this->send( - 1, [], "actionNotFound" );
 	}
 
-	function shutdown()
+	protected function afterAction( $actionName ) : void
 	{
-		Server::getInstance()->getServer()->shutdown();
+		// 初始化，目的清理上一次请求的static记录
+		Request::getInstance()->clearInstance();
+		Response::getInstance()->clearInstance();
+		// 清理上一次请求的model关联static记录
+		Loader::clearInstance();
+		Log::clear();
 	}
 
-	function router()
+	protected function onRequest( $actionName ) : ?bool
 	{
-		return $this->send( -1, [], "your router not end" );
+		$this->request = Request::getInstance();
+		$this->get     = new SplArray( $this->request->get() );
+		$this->post    = new SplArray( $this->request->post() );
+		return null;
 	}
 
-	function send( $code = 0, $data = [], $message = null )
+
+	protected function router()
 	{
-		$this->response()->withAddedHeader( 'Access-Control-Allow-Origin', EsConfig::getInstance()->getConf( 'response.access_control_allow_origin' ) );
+		return $this->send( - 1, [], "your router not end" );
+	}
+
+	protected function send( $code = 0, $data = [], $message = null )
+	{
+		// todo 废除
+		$this->response()->withAddedHeader( 'Access-Control-Allow-Origin', AppConfig::getInstance()->getConf( 'response.access_control_allow_origin' ) );
 		$this->response()->withAddedHeader( 'Content-Type', 'application/json; charset=utf-8' );
-		$this->response()->withAddedHeader( 'Access-Control-Allow-Headers', EsConfig::getInstance()->getConf( 'response.access_control_allow_headers' ) );
-		$this->response()->withAddedHeader( 'Access-Control-Allow-Methods', EsConfig::getInstance()->getConf( 'response.access_control_allow_methods' ) );
+		$this->response()->withAddedHeader( 'Access-Control-Allow-Headers', AppConfig::getInstance()->getConf( 'response.access_control_allow_headers' ) );
+		$this->response()->withAddedHeader( 'Access-Control-Allow-Methods', AppConfig::getInstance()->getConf( 'response.access_control_allow_methods' ) );
 		$this->response()->withStatus( 200 );
 		$content = [
 			"code"   => $code,
 			"result" => $data,
 			"msg"    => $message,
 		];
-		$this->response()->getBody()->write( json_encode( $content, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) );
-		$this->response()->end();// 方式输出多份json
+		$this->response()->write( json_encode( $content, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) );
+		trace( $content, 'debug' );
 	}
 
-	function getPageLimit()
+	protected function getPageLimit()
 	{
-		$get  = input( 'get.' );
-		$page = isset( $get['page'] ) ? $get['page'] : 1;
-		$rows = isset( $get['rows'] ) ? $get['rows'] : 10;
+		$param = input( 'post.' );
+		$param = $param ? $param : input( 'get.' );
+		$page  = isset( $param['page'] ) ? $param['page'] : 1;
+		$rows  = isset( $param['rows'] ) ? $param['rows'] : 10;
 		return $page.','.$rows;
-	}
-
-	/**
-	 * 加载模板输出
-	 * @access protected
-	 * @param string $template 模板文件名
-	 * @param array  $vars     模板输出变量
-	 * @param array  $replace  模板替换
-	 * @param array  $config   模板参数
-	 * @return mixed
-	 */
-	protected function fetch( $template = '', $vars = [], $replace = [], $config = [] )
-	{
-		//		return $this->view->fetch($template, $vars, $replace, $config);
-	}
-
-	/**
-	 * 渲染内容输出
-	 * @access protected
-	 * @param string $content 模板内容
-	 * @param array  $vars    模板输出变量
-	 * @param array  $replace 替换内容
-	 * @param array  $config  模板参数
-	 * @return mixed
-	 */
-	protected function display( $content = '', $vars = [], $replace = [], $config = [] )
-	{
-		//		return $this->view->display($content, $vars, $replace, $config);
-	}
-
-	/**
-	 * 模板变量赋值
-	 * @access protected
-	 * @param mixed $name  要显示的模板变量
-	 * @param mixed $value 变量的值
-	 * @return void
-	 */
-	protected function assign( $name, $value = '' )
-	{
-		//		$this->view->assign($name, $value);
-	}
-
-	/**
-	 * 初始化模板引擎
-	 * @access protected
-	 * @param array|string $engine 引擎参数
-	 * @return void
-	 */
-	protected function engine( $engine )
-	{
-		//		$this->view->engine($engine);
 	}
 
 	/**
@@ -172,7 +139,6 @@ abstract class Controller extends AbstractController
 				// 支持场景
 				list( $validate, $scene ) = explode( '.', $validate );
 			}
-
 			$v = Loader::validate( $validate );
 			if( !empty( $scene ) ){
 				$v->scene( $scene );
@@ -195,6 +161,7 @@ abstract class Controller extends AbstractController
 			if( $this->failException ){
 				throw new ValidateException( $v->getError() );
 			} else{
+				$this->setValidate( $v );
 				return $v->getError();
 			}
 		} else{
@@ -202,5 +169,15 @@ abstract class Controller extends AbstractController
 		}
 	}
 
+
+	protected function getValidate() : Validate
+	{
+		return $this->validate;
+	}
+
+	protected function setValidate( Validate $instance ) : void
+	{
+		$this->validate = $instance;
+	}
 
 }
