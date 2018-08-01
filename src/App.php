@@ -2,12 +2,13 @@
 
 namespace fashop;
 
-use fashop\exception\HttpResponseException;
+
 /**
  * App 应用管理
  */
 class App
 {
+	private $config;
 	/**
 	 * @var bool 是否初始化过
 	 */
@@ -45,81 +46,94 @@ class App
 
 	protected static $dispatch;
 	protected static $file = [];
-
 	/**
-	 * 执行应用程序
-	 * @access public
-	 * @param Request $request Request对象
-	 * @return Response
-	 * @throws Exception
+	 * 容器对象实例
+	 * @var Container
 	 */
-	public static function run( Request $request = null )
-	{
-		try{
-			$config = self::initCommon();
-			// 默认语言
-			Lang::range( $config['default_lang'] );
-			if( $config['lang_switch_on'] ){
-				// 开启多语言机制 检测当前语言
-				Lang::detect();
-			}
+	protected $container;
 
-		} catch( HttpResponseException $exception ){
-			// $data = $exception->getResponse();
-		}
-		// 清空类的实例化
+	public function __construct()
+	{
+		$this->container = Container::getInstance();
+	}
+
+	public function run()
+	{
+		$this->initBase();
+		$this->initConfig();
+		$this->initApp();
 		Loader::clearInstance();
 	}
 
-	/**
-	 * 初始化应用
-	 */
-	public static function initCommon()
+	public function initBase()
 	{
-		if( empty( self::$init ) ){
-			self::$namespace = 'App';
-			// 初始化应用
-			$config       = self::init();
-			self::$suffix = $config['class_suffix'];
+		// 注册核心类到容器
+		Container::getInstance()->bind( [
+			'app'      => App::class,
+			'build'    => Build::class,
+			'cache'    => Cache::class,
+			'config'   => Config::class,
+			'debug'    => Debug::class,
+			'env'      => Env::class,
+			'lang'     => Lang::class,
+			'log'      => Log::class,
+			'request'  => Request::class,
+			'response' => Response::class,
+			'session'  => Session::class,
+			'validate' => Validate::class,
+		] );
+		// 注册核心类的静态代理
+		Facade::bind( [
+			facade\Lang::class => Lang::class,
+		] );
+		// 注册类库别名
+		Loader::addClassAlias( [
+			'Db'     => Db::class,
+			'Facade' => Facade::class,
+			'Lang'   => facade\Lang::class,
+		] );
 
-			// 应用调试模式
-			self::$debug = Env::get( 'app_debug', Config::get( 'app_debug' ) );
-			if( !self::$debug ){
-				ini_set( 'display_errors', 'Off' );
-			}
+	}
 
-			if( !empty( $config['root_namespace'] ) ){
-				Loader::addNamespace( $config['root_namespace'] );
-			}
+	public function initApp()
+	{
+		self::$namespace = 'App';
 
-			// 加载额外文件
-			if( !empty( $config['extra_file_list'] ) ){
-				foreach( $config['extra_file_list'] as $file ){
-					$file = strpos( $file, '.' ) ? $file : APP_PATH.$file.EXT;
-					if( is_file( $file ) && !isset( self::$file[$file] ) ){
-						include $file;
-						self::$file[$file] = true;
-					}
+		self::$debug = Env::get( 'app_debug', Config::get( 'app_debug' ) );
+		if( !self::$debug ){
+			ini_set( 'display_errors', 'Off' );
+		}
+
+		$providerName = "\\".self::$namespace."\\Provider";
+		$provider     = new $providerName();
+
+		$this->container->bind( $provider->get() );
+
+		if( !empty( $this->config['root_namespace'] ) ){
+			Loader::addNamespace( $this->config['root_namespace'] );
+		}
+
+		if( !empty( $this->config['extra_file_list'] ) ){
+			foreach( $this->config['extra_file_list'] as $file ){
+				$file = (strpos( $file, '.' ) !== false) ? $file : APP_PATH.$file.EXT;
+				if( is_file( $file ) && !isset( self::$file[$file] ) ){
+					include $file;
+					self::$file[$file] = true;
 				}
 			}
-			// 设置系统时区
-			date_default_timezone_set( $config['default_timezone'] );
-			self::$init = true;
 		}
+		date_default_timezone_set( $this->config['default_timezone'] );
+		self::$init = true;
+
+
 		return Config::get();
 	}
 
-	/**
-	 * 初始化应用或模块
-	 * @access public
-	 * @param string $module 模块名
-	 * @return array
-	 */
-	private static function init()
+
+	private function initConfig()
 	{
-		$server_config = \Conf\Config::getInstance()->getConf( "*" );
+		$server_config = \EasySwoole\Config::getInstance()->getConf( "." );
 		foreach( $server_config as $key => $_config ){
-			if( Config::has( $key ) ){
 				if( isset( $_config[$key] ) && is_array( $_config[$key] ) ){
 					foreach( $_config[$key] as $k => $v ){
 						Config::set( "{$key}.{$k}", $v );
@@ -127,14 +141,11 @@ class App
 				} else{
 					Config::set( "{$key}", $_config );
 				}
-			}
 		}
-//		Error::register();
-		// 加载应用状态配置
 		if( Config::get( 'app_status' ) ){
 			Config::load( CONF_PATH.Config::get( 'app_status' ).CONF_EXT );
 		}
-		return Config::get();
+		$this->config = Config::get();
 	}
 
 

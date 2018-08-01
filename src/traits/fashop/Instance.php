@@ -17,7 +17,16 @@ trait Instance {
 		}
 		return self::$instance;
 	}
-
+	/**
+	 * @param array $options
+	 * @return static
+	 */
+	public static function getInstance($options = []) {
+		if (is_null(self::$instance)) {
+			self::$instance = new self($options);
+		}
+		return self::$instance;
+	}
 	// 静态调用
 	public static function __callStatic($method, $params) {
 		if (is_null(self::$instance)) {

@@ -5,6 +5,7 @@ namespace fashop\exception;
 class ThrowableError extends \ErrorException {
 	public function __construct(\Throwable $e) {
 
+		var_dump("ThrowableError");
 		if ($e instanceof \ParseError) {
 			$message  = 'Parse error: ' . $e->getMessage();
 			$severity = E_PARSE;

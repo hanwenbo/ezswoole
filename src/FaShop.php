@@ -17,7 +17,7 @@ class FaShop
 {
 	public static function register()
 	{
-		define( 'FASHOP_VERSION', '1.0' );
+		defined( 'FASHOP_VERSION' ) or define( 'FASHOP_VERSION','1.0' );
 		define( 'FASHOP_START_TIME', microtime( true ) );
 		define( 'FASHOP_START_MEM', memory_get_usage() );
 		define( 'EXT', '.php' );
@@ -26,7 +26,7 @@ class FaShop
 		define( 'LIB_PATH', FASHOP_PATH );
 		define( 'CORE_PATH', LIB_PATH );
 		define( 'TRAIT_PATH', LIB_PATH.'traits'.DS );
-		defined( 'APP_PATH' ) or define( 'APP_PATH', ROOT.DS."App".DS );
+		defined( 'APP_PATH' ) or define( 'APP_PATH', __DIR__.DS."..".DS."App".DS );
 		defined( 'ROOT_PATH' ) or define( 'ROOT_PATH', dirname( realpath( APP_PATH ) ).DS );
 		defined( 'EXTEND_PATH' ) or define( 'EXTEND_PATH', ROOT_PATH.'Extend'.DS );
 		defined( 'VENDOR_PATH' ) or define( 'VENDOR_PATH', ROOT_PATH.'vendor'.DS );
@@ -62,16 +62,14 @@ class FaShop
 		}
 
 		// 注册自动加载
-		\fashop\Loader::register();
-
-		// 注册错误和异常处理机制
-		//\fashop\Error::register();
+		Loader::register();
 
 		// 加载惯例配置文件
 		\fashop\Config::set( include LIB_PATH.'config/convention'.EXT );
 
 		// 执行应用
-		App::run();
+		$app = new App();
+		$app->run();
 
 	}
 }

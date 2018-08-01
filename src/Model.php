@@ -92,6 +92,11 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	protected $resultSetType;
 	// 关联自动写入
 	protected $relationWrite;
+	/**
+	 * 保存的状态
+	 * @var bool
+	 */
+	protected $saveResult;
 
 	/**
 	 * 初始化过的模型.
@@ -1264,6 +1269,79 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	}
 
 	/**
+	 * 批量添加
+	 * @param array $datas
+	 * @return bool|mixed
+	 * @throws \Exception
+	 * @throws exception\PDOException
+	 * @author 韩文博
+	 */
+	public function addAll( array $datas = [] )
+	{
+		if( !empty( $datas ) ){
+			if( !is_array( $datas[0] ) ){
+				return false;
+			}
+			$fields    = array_keys( $datas[0] );
+			$db        = $this->getQuery();
+			$tableName = $db->getTable();
+			$values    = [];
+			foreach( $datas as $data ){
+				$value = [];
+				foreach( $data as $key => $val ){
+					if( is_string( $val ) ){
+						$val = '"'.addslashes( $val ).'"';
+					} elseif( is_bool( $val ) ){
+						$val = $val ? '1' : '0';
+					} elseif( is_null( $val ) ){
+						$val = 'null';
+					}
+					if( is_scalar( $val ) ){
+						$value[] = $val;
+					}
+				}
+				$values[] = '('.implode( ',', $value ).')';
+			}
+			$sql = 'INSERT INTO '.$tableName.' ('.implode( ',', $fields ).') VALUES '.implode( ',', $values );
+			return $db->execute( $sql );
+		} else{
+			return false;
+		}
+	}
+
+	/**
+	 * 批量修改
+	 * @param array $multipleData
+	 * @return bool|mixed
+	 * @throws \Exception
+	 * @throws exception\PDOException
+	 * @author 韩文博
+	 */
+	public function updateAll( array $multipleData = [] )
+	{
+		if( !empty( $multipleData ) ){
+			$db           = $this->getQuery();
+			$pk           = $this->getPk();
+			$tableName    = $db->getTable();
+			$updateColumn = array_keys( $multipleData[0] );
+			unset( $updateColumn[0] );
+			$sql = "UPDATE ".$tableName." SET ";
+			$pks = array_column( $multipleData, $pk );
+			foreach( $updateColumn as $uColumn ){
+				$sql .= $uColumn." = CASE ";
+				foreach( $multipleData as $data ){
+					$sql .= "WHEN ".$pk." = ".$data[$pk]." THEN '".$data[$uColumn]."' ";
+				}
+				$sql .= "ELSE ".$uColumn." END, ";
+			}
+			$sql = rtrim( $sql, ", " )." WHERE ".$pk." IN (".implode( ",", $pks ).")";
+			return $db->execute( $sql );
+		} else{
+			return false;
+		}
+	}
+
+	/**
 	 * 设置允许写入的字段
 	 * @access public
 	 * @param mixed $field 允许写入的字段 如果为true只允许写入数据表字段
@@ -1536,7 +1614,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 		if( !empty( $field ) ){
 			$model->allowField( $field );
 		}
-		$result = $model->isUpdate( true )->save( $data, $where );
+		$model->saveResult = $model->isUpdate( true )->save( $data, $where );
 		return $model;
 	}
 

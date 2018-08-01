@@ -2,7 +2,6 @@
 
 namespace fashop;
 
-use Core\Http\Response;
 use fashop\exception\ClassNotFoundException;
 use fashop\response\Redirect;
 
@@ -142,32 +141,16 @@ class Debug {
 	 * @return void|string
 	 */
 	public static function dump($var, $echo = true, $label = null, $flags = ENT_SUBSTITUTE) {
-		$response = Response::getInstance();
-//		$label    = (null === $label) ? '' : rtrim($label) . ':';
-		// if (IS_CLI) {
-		// 	$output = PHP_EOL . $label . $output . PHP_EOL;
-		// } else {
-		// 	if (!extension_loaded('xdebug')) {
-		// 		$output = htmlspecialchars($output, $flags);
-		// 	}
-		// 	$output = '<pre>' . $label . $output . '</pre>';
-		// }
-//		if ($echo) {
+		$response = Response::getInstance()->getResponse();
 		$response->write('<pre>');
-
 		$response->write(var_export($var,true));
 		$response->write('</pre>');
-		$response->end();
-		return;
-//		} else {
-//			return $output;
-//		}
 	}
 
 	public static function inject(Response $response, &$content) {
 		$config  = Config::get('trace');
 		$type    = isset($config['type']) ? $config['type'] : 'Html';
-		$request = Request::instance();
+		$request = Request::getInstance();
 		$class   = false !== strpos($type, '\\') ? $type : '\\fashop\\debug\\' . ucwords($type);
 		unset($config['type']);
 		if (class_exists($class)) {

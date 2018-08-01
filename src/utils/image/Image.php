@@ -1,21 +1,17 @@
 <?php
 
-namespace fashop;
+namespace fashop\utils\image;
 
-use Core\Utility\File;
-use Core\Utility\Random;
+use EasySwoole\Core\Utility\File;
+use EasySwoole\Core\Utility\Random;
 use Intervention\Image\ImageManagerStatic as ImageManage;
 
 /**
- * todo 拓展oss上传
- * todo 根据bean的写法再优化下 有些代码不规范
  * 如果出现第三方存储需要规范接口文件 定义 抽象类
  */
 class Image
 {
 	protected static $instance;
-	// 预处理
-	private $preCall;
 	/**
 	 * 裁剪配置
 	 * 值分别为 宽，高，圆角，背景色....等等未来再拓展
@@ -25,14 +21,12 @@ class Image
 			'bmid'  => [440, null],
 			'thumb' => [220, null],
 		];
-	// 域名
-	private $domain = '';
 	// 裁剪列表
 	private $cropImages = [];
 	// 原图
 	private $originFileInfo = [];
 	// 存放目录
-	private $targetFolder = 'Upload';
+	private $targetFolder;
 	// 图片后缀
 	private $ext;
 	// 错误提示
@@ -54,6 +48,11 @@ class Image
 	// 支持类型
 	private $allowFileType = ['gif', 'jpg', 'jpeg', 'bmp', 'png'];
 
+	private $config
+		= [
+			'target_folder' => '',
+		];
+
 	/**
 	 * 最终返回
 	 *
@@ -74,18 +73,24 @@ class Image
 	 * 默认自动创建年月日文件夹todo 拓展
 	 * @author   韩文博
 	 */
-	function __construct( $preCall )
+	function __construct( array $config = null )
 	{
-		$this->preCall = $preCall;
 		ImageManage::configure( ['driver' => 'imagick'] );
-		// todo 拓展
-		$this->targetFolder = ROOT.DS.$this->targetFolder.DS.date( 'Ymd' );
+		if( $config ){
+			$this->config = array_merge( $this->config, $config );
+		}
+
+		if( !isset( $this->config['target_folder'] ) || empty( $this->config['target_folder'] ) ){
+			$this->targetFolder = EASYSWOOLE_ROOT.DS.'Upload'.DS.date( 'Ymd' );
+		} else{
+			$this->targetFolde = $this->config['target_folder'];
+		}
 	}
 
-	static function getInstance( callable $preCall = null )
+	static function getInstance( array $config = null ) : Image
 	{
-		if( !isset( self::$instance ) ){
-			self::$instance = new static( $preCall );
+		if( !isset( self::$instance ) || !empty( $config ) ){
+			self::$instance = new static( $config );
 		}
 		return self::$instance;
 	}
@@ -96,12 +101,12 @@ class Image
 	 * @author   韩文博
 	 * @param    string $path
 	 */
-	public function setTargetFloder( string $path )
+	public function setTargetFloder( string $path ) : void
 	{
 		$this->targetFolder = $path;
 	}
 
-	private function createTargetFloder()
+	private function createTargetFloder() : void
 	{
 		File::createDir( $this->targetFolder );
 	}
@@ -111,7 +116,7 @@ class Image
 	 * @datetime 2017-11-01T16:51:04+0800
 	 * @author   韩文博
 	 */
-	public function setAllowFileType( array $types )
+	public function setAllowFileType( array $types ) : Image
 	{
 		$this->setAllowFileType( $types );
 		return $this;
@@ -122,21 +127,22 @@ class Image
 	 * @datetime 2017-11-01T14:42:22+0800
 	 * @author   韩文博
 	 * @param mixed $file stream Core\Http\Message\UploadFile | string base64_content
-	 *                    return
+	 * @throws \Exception
 	 */
-	public function create( $file )
+	public function create( $file ) : Image
 	{
-		$this->domain = Config::get( 'domain' ) ? Config::get( 'domain' ) : Request::instance()->domain();
-		// 创建文件 todo 第三方依赖不创建
-		$this->createTargetFloder();
+		// 创建文件夹
+		if( !file_exists( $this->targetFolder ) ){
+			$this->createTargetFloder();
+		}
 		// 文件上传
-		if( $file instanceof \Core\Http\Message\UploadFile ){
-			$this->fileUpload( $file );
+		if( isset( $file['tmp_name'] ) ){
+			$this->fileUpload( new \EasySwoole\Core\Http\Message\UploadFile( $file['tmp_name'], $file['size'], $file['error'], $file['name'], $file['type'] ) );
 		} elseif( is_string( $file ) && strstr( $file, "data:image" ) && strstr( $file, ";base64" ) ){
 			// base64上传
 			$this->base64Upload( $file );
 		} else{
-			trigger_error( "文件格式不对" );
+			throw new \Exception( "文件格式不对" );
 		}
 		return $this;
 	}
@@ -147,7 +153,7 @@ class Image
 	 * @author   韩文博
 	 * @return   string
 	 */
-	public function getMediaType()
+	public function getMediaType() : string
 	{
 		return $this->mediaType;
 	}
@@ -156,15 +162,15 @@ class Image
 	 * Stream上传
 	 * @datetime 2017-11-01T18:19:06+0800
 	 * @author   韩文博
-	 * @param    \Core\Http\Message\UploadFile $file
+	 * @param    \EasySwoole\Core\Http\Message\UploadFile $file
+	 * @throws \Exception
 	 */
-	private function fileUpload( \Core\Http\Message\UploadFile $file )
+	private function fileUpload( \EasySwoole\Core\Http\Message\UploadFile $file ) : void
 	{
 		$this->file = $file;
 
-		// todo 细想想是否有问题
 		if( $file->getError() ){
-			trigger_error( $file->getError() );
+			throw new \Exception( $file->getError() );
 		}
 
 		$this->mediaType  = $file->getClientMediaType();
@@ -172,7 +178,7 @@ class Image
 		$this->originName = $file->getClientFilename();
 
 		if( !in_array( $this->ext, $this->allowFileType ) ){
-			trigger_error( "不支持该类型" );
+			throw new \Exception( "不支持该类型" );
 		}
 
 		// 生成随机名字
@@ -188,7 +194,7 @@ class Image
 		$this->originFileInfo = $this->getImageInfoFormatData( $target_file_name );
 
 		if( $move_result == false ){
-			trigger_error( "移动文件失败" );
+			throw new \Exception( "移动文件失败" );
 		}
 	}
 
@@ -197,9 +203,10 @@ class Image
 	 * @datetime 2017-11-01T14:46:58+0800
 	 * @author   韩文博
 	 * @param    string $base64_content
+	 * @throws \Exception
 	 *
 	 */
-	public function base64Upload( string $base64_content )
+	public function base64Upload( string $base64_content ) : Image
 	{
 		$this->file = $base64_content;
 
@@ -209,7 +216,7 @@ class Image
 		$this->ext        = strtolower( explode( '/', $this->mediaType )[1] ); // todo 单独来个方法设置
 		$this->originName = "base64";
 		if( !in_array( $this->ext, $this->allowFileType ) ){
-			trigger_error( "不支持该类型" );
+			throw new \Exception( "不支持该类型" );
 		}
 
 		// 生成随机名字
@@ -221,7 +228,7 @@ class Image
 		// 移动原图到存放目录
 		$move_result = file_put_contents( $target_file_name, base64_decode( $content ) );
 		if( $move_result == false ){
-			trigger_error( "移动文件失败" );
+			throw new \Exception( "移动文件失败" );
 		}
 		// 源文件信息
 		$this->originFileInfo = $this->getImageInfoFormatData( $target_file_name );
@@ -241,11 +248,12 @@ class Image
 	 *                       ]
 	 * @datetime 2017-11-01T14:44:46+0800
 	 * @author   韩文博
+	 * @throws \Exception
 	 */
-	public function crop( array $options = [] )
+
+	public function crop( array $options = [] ) : Image
 	{
-		// todo 不允许键值为origin
-		$this->cropOption = empty( $options ) ?: $options;
+		$this->cropOption = empty( $options ) ? $this->cropOption : $options;
 		// 裁剪
 		$img = ImageManage::make( $this->originFileInfo['path'] );
 		foreach( $this->cropOption as $suffix => $option ){
@@ -263,7 +271,7 @@ class Image
 			$img->save( $target_file_name );
 
 			// 记录裁剪图片的信息
-			$this->cropImages[$suffix] = $this->getImageInfoFormatData( str_replace( ROOT.DS, '', $target_file_name ) );
+			$this->cropImages[$suffix] = $this->getImageInfoFormatData( $target_file_name );
 		}
 		return $this;
 	}
@@ -274,27 +282,27 @@ class Image
 	 * @author   韩文博
 	 * @param    string $path
 	 * @param    int    $size
+	 * @throws \Exception
 	 */
-	private function getImageInfoFormatData( string $path )
+	private function getImageInfoFormatData( string $path ) : array
 	{
 		if( !file_exists( $path ) ){
-			trigger_error( "该文件不存在" );
+			throw new \Exception( "该文件不存在" );
 		}
-		// todo 有第三方存储再说
 		$data         = [
+			// 纯名字
+			'name' => '',
 			// 相对路径
 			'path' => '',
 			// 文件字节
 			'size' => 0,
 			// 媒体类型
 			'type' => '',
-			// 链接地址
-			'url'  => '',
 		];
+		$data['name'] = $this->fileName;
 		$data['path'] = $path;
 		$data['size'] = filesize( $path );
 		$data['type'] = $this->mediaType;
-		$data['url']  = "{$this->domain}/{$path}";
 		return $data;
 	}
 
@@ -316,11 +324,16 @@ class Image
 	 * @author   韩文博
 	 * @return   array
 	 */
-	public function getImages()
+	public function getImages() : array
 	{
-		return array_merge( [
+		$list = array_merge( [
 			'origin' => $this->getOriginImage(),
 		], $this->getCropImages() );
+		foreach( $list as $key => $image ){
+			$image['path'] = str_replace( ROOT_PATH, '', $image['path'] );
+			$list[$key]    = $image;
+		}
+		return $list;
 	}
 
 	/**
@@ -329,7 +342,7 @@ class Image
 	 * @author   韩文博
 	 * @return array
 	 */
-	public function getCropImages()
+	public function getCropImages() : array
 	{
 		return $this->cropImages;
 	}
@@ -340,20 +353,10 @@ class Image
 	 * @author   韩文博
 	 * @return array
 	 */
-	public function getOriginImage()
+	public function getOriginImage() : array
 	{
 		return $this->originFileInfo;
 	}
 
-	/**
-	 * 设置域名
-	 * @datetime 2017-11-01T21:25:23+0800
-	 * @author   韩文博
-	 * todo 约束url格式
-	 */
-	public function setDomain( string $url )
-	{
-		$this->domain = $url;
-		return $this;
-	}
+
 }

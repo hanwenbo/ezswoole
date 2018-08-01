@@ -2,14 +2,14 @@
 
 namespace fashop;
 
-use Core\Http\Request as ESRequest;
+use EasySwoole\Core\Http\Request as EasySwooleRequest;
 
 class Request
 {
 	/**
 	 * @var object 对象实例
 	 */
-	protected static $instance;
+	private static $instance;
 
 	protected $method;
 	/**
@@ -67,13 +67,15 @@ class Request
 	// 当前语言集
 	protected $langset;
 
+
+	protected $esRequest;
+
 	/**
 	 * @var array 请求参数
 	 */
 	protected $param = [];
 	protected $get = [];
 	protected $post = [];
-	protected $request = [];
 	protected $route = [];
 	protected $put;
 	protected $session = [];
@@ -117,154 +119,33 @@ class Request
 	// 缓存是否检查
 	protected $isCheckCache;
 
-	/**
-	 * 构造函数
-	 * @access protected
-	 * @param array $options 参数
-	 */
-	protected function __construct( $options = [] )
+	final protected function __construct( EasySwooleRequest $request )
 	{
-		foreach( $options as $name => $item ){
-			if( property_exists( $this, $name ) ){
-				$this->$name = $item;
-			}
-		}
-		if( is_null( $this->filter ) ){
-			$this->filter = Config::get( 'default_filter' );
-		}
-
+		$this->esRequest = $request;
+		$this->get       = $request->getSwooleRequest()->get ? $request->getSwooleRequest()->get : [];
+		$this->post      = $request->getSwooleRequest()->post ? $request->getSwooleRequest()->post : [];
+		$this->file      = $request->getSwooleRequest()->files ? $request->getSwooleRequest()->files : [];
+		$this->header    = $request->getSwooleRequest()->header;
+		$this->cookie    = $request->getSwooleRequest()->cookie ? $request->getSwooleRequest()->cookie : [];
+		$this->server    = $request->getSwooleRequest()->server;
 	}
 
-	public function __call( $method, $args )
+	final public static function getInstance( EasySwooleRequest $request = null )
 	{
-		if( array_key_exists( $method, self::$hook ) ){
-			array_unshift( $args, $this );
-			return call_user_func_array( self::$hook[$method], $args );
-		} else{
-			throw new Exception( 'method not exists:'.__CLASS__.'->'.$method );
-		}
-	}
-
-	/**
-	 * Hook 方法注入
-	 * @access public
-	 * @param string|array $method   方法名
-	 * @param mixed        $callback callable
-	 * @return void
-	 */
-	public static function hook( $method, $callback = null )
-	{
-		if( is_array( $method ) ){
-			self::$hook = array_merge( self::$hook, $method );
-		} else{
-			self::$hook[$method] = $callback;
-		}
-	}
-
-	/**
-	 * 初始化 todo 干掉
-	 * @access public
-	 * @param array $options 参数
-	 * @return \fashop\Request
-	 */
-	public static function instance( $options = [] )
-	{
-		if( is_null( self::$instance ) ){
-			self::$instance = new static( $options );
+		if( $request ){
+			self::$instance = new static( $request );
 		}
 		return self::$instance;
 	}
-	/**
-	 * 初始化
-	 * @access public
-	 * @param array $options 参数
-	 * @return \fashop\Request
-	 */
-	public static function getInstance( $options = [] )
+
+	final public static function clearInstance() : void
 	{
-		return self::instance($options);
-	}
-	public function clearInstance(){
 		self::$instance = null;
-		return true;
 	}
-	/**
-	 * 创建一个URL请求
-	 * @access public
-	 * @param string $uri    URL地址
-	 * @param string $method 请求类型
-	 * @param array  $params 请求参数
-	 * @param array  $cookie
-	 * @param array  $files
-	 * @param array  $server
-	 * @param string $content
-	 * @return \fashop\Request
-	 */
-	public static function create( $uri, $method = 'GET', $params = [], $cookie = [], $files = [], $server = [], $content = null )
-	{
-		$server['PATH_INFO']      = '';
-		$server['REQUEST_METHOD'] = strtoupper( $method );
-		$info                     = parse_url( $uri );
-		if( isset( $info['host'] ) ){
-			$server['SERVER_NAME'] = $info['host'];
-			$server['HTTP_HOST']   = $info['host'];
-		}
-		if( isset( $info['scheme'] ) ){
-			if( 'https' === $info['scheme'] ){
-				$server['HTTPS']       = 'on';
-				$server['SERVER_PORT'] = 443;
-			} else{
-				unset( $server['HTTPS'] );
-				$server['SERVER_PORT'] = 80;
-			}
-		}
-		if( isset( $info['port'] ) ){
-			$server['SERVER_PORT'] = $info['port'];
-			$server['HTTP_HOST']   = $server['HTTP_HOST'].':'.$info['port'];
-		}
-		if( isset( $info['user'] ) ){
-			$server['PHP_AUTH_USER'] = $info['user'];
-		}
-		if( isset( $info['pass'] ) ){
-			$server['PHP_AUTH_PW'] = $info['pass'];
-		}
-		if( !isset( $info['path'] ) ){
-			$info['path'] = '/';
-		}
-		$options                        = [];
-		$options[strtolower( $method )] = $params;
-		$queryString                    = '';
-		if( isset( $info['query'] ) ){
-			parse_str( html_entity_decode( $info['query'] ), $query );
-			if( !empty( $params ) ){
-				$params      = array_replace( $query, $params );
-				$queryString = http_build_query( $query, '', '&' );
-			} else{
-				$params      = $query;
-				$queryString = $info['query'];
-			}
-		} elseif( !empty( $params ) ){
-			$queryString = http_build_query( $params, '', '&' );
-		}
-		if( $queryString ){
-			parse_str( $queryString, $get );
-			$options['get'] = isset( $options['get'] ) ? array_merge( $get, $options['get'] ) : $get;
-		}
 
-		$server['REQUEST_URI']  = $info['path'].('' !== $queryString ? '?'.$queryString : '');
-		$server['QUERY_STRING'] = $queryString;
-		$options['cookie']      = $cookie;
-		$options['param']       = $params;
-		$options['file']        = $files;
-		$options['server']      = $server;
-		$options['url']         = $server['REQUEST_URI'];
-		$options['baseUrl']     = $info['path'];
-		$options['pathinfo']    = '/' == $info['path'] ? '/' : ltrim( $info['path'], '/' );
-		$options['method']      = $server['REQUEST_METHOD'];
-		$options['domain']      = isset( $info['scheme'] ) ? $info['scheme'].'://'.$server['HTTP_HOST'] : '';
-		$options['content']     = $content;
-		self::$instance         = new self( $options );
-		return self::$instance;
+	final public function getEsRequest()
+	{
+		return $this->esRequest;
 	}
 
 	/**
@@ -292,7 +173,7 @@ class Request
 	 */
 	public function url( $url = null )
 	{
-		$server = ESRequest::getInstance()->getServerParams();
+		$server = $this->esRequest->getServerParams();
 		if( !is_null( $url ) && true !== $url ){
 			$this->url = $url;
 			return $this;
@@ -344,7 +225,7 @@ class Request
 		} elseif( !$this->baseFile ){
 			$url = '';
 			if( !IS_CLI ){
-				$_server = ESRequest::getInstance()->getServerParams();
+				$_server     = $this->esRequest->getServerParams();
 				$script_name = basename( $_server['script_filename'] );
 				if( basename( $_server['script_name'] ) === $script_name ){
 					$url = $_server['script_name'];
@@ -393,20 +274,20 @@ class Request
 	public function pathinfo()
 	{
 		if( is_null( $this->pathinfo ) ){
-			$_server = ESRequest::getInstance()->getServerParams();
-			$_get    = ESRequest::getInstance()->getQueryParams();
-			if( isset( $_get[config::get( 'var_pathinfo' )] ) ){
+			$_server = $this->esRequest->getServerParams();
+			$_get    = $this->esRequest->getQueryParams();
+			if( isset( $_get[Config::get( 'var_pathinfo' )] ) ){
 				// 判断url里面是否有兼容模式参数
-				$_server['path_info'] = $_get[config::get( 'var_pathinfo' )];
-				unset( $_get[config::get( 'var_pathinfo' )] );
-			} elseif(IS_CLI ){
+				$_server['path_info'] = $_get[Config::get( 'var_pathinfo' )];
+				unset( $_get[Config::get( 'var_pathinfo' )] );
+			} elseif( IS_CLI ){
 				// cli模式下 index.php module/controller/action/params/...
 				$_server['path_info'] = isset( $_server['argv'][1] ) ? $_server['argv'][1] : '';
 			}
 
 			// 分析pathinfo信息
 			if( !isset( $_server['path_info'] ) ){
-				foreach( config::get( 'pathinfo_fetch' ) as $type ){
+				foreach( Config::get( 'pathinfo_fetch' ) as $type ){
 					if( !empty( $_server[$type] ) ){
 						$_server['path_info'] = (0 === strpos( $_server[$type], $_server['script_name'] )) ? substr( $_server[$type], strlen( $_server['script_name'] ) ) : $_server[$type];
 						break;
@@ -425,21 +306,7 @@ class Request
 	 */
 	public function path()
 	{
-//			if( is_null( $this->path ) ){
-//				$suffix   = Config::get( 'url_html_suffix' );
-//				$pathinfo = $this->pathinfo();
-//				if( false === $suffix ){
-//					// 禁止伪静态访问
-//					$this->path = $pathinfo;
-//				} elseif( $suffix ){
-//					// 去除正常的URL后缀
-//					$this->path = preg_replace( '/\.('.ltrim( $suffix, '.' ).')$/i', '', $pathinfo );
-//				} else{
-//					// 允许任何后缀访问
-//					$this->path = preg_replace( '/\.'.$this->ext().'$/i', '', $pathinfo );
-//				}
-//			}
-		return ESRequest::getInstance()->getUri()->getPath();
+		return $this->esRequest->getUri()->getPath();
 	}
 
 	/**
@@ -460,7 +327,7 @@ class Request
 	 */
 	public function time( $float = false )
 	{
-		$_server = ESRequest::getInstance()->getServerParams();
+		$_server = $this->esRequest->getServerParams();
 		return $float ? $_server['request_time_float'] : $_server['request_time'];
 	}
 
@@ -512,19 +379,18 @@ class Request
 	 */
 	public function method( $method = false )
 	{
-		$_server = ESRequest::getInstance()->getServerParams();
-		$_post   = ESRequest::getInstance()->getParsedBody();
+
 		if( true === $method ){
 			// 获取原始请求类型
-			return IS_CLI ? 'GET' : (isset( $this->server['request_method'] ) ? $this->server['request_method'] : $_server['request_method']);
+			return IS_CLI ? 'GET' : (isset( $this->server['request_method'] ) ?? $this->server['request_method']);
 		} elseif( !$this->method ){
-			if( isset( $_post[config::get( 'var_method' )] ) ){
-				$this->method = strtoupper( $_post[config::get( 'var_method' )] );
-				$this->{$this->method}( $_post );
-			} elseif( isset( $_server['http_x_http_method_override'] ) ){
-				$this->method = strtoupper( $_server['http_x_http_method_override'] );
+			if( isset( $this->post[Config::get( 'var_method' )] ) ){
+				$this->method = strtoupper( $this->post[Config::get( 'var_method' )] );
+				$this->{$this->method}( $this->post );
+			} elseif( isset( $_server['http_x_method_override'] ) ){
+				$this->method = strtoupper( $this->server['http_x_method_override'] );
 			} else{
-				$this->method = strtoupper( (isset( $this->server['request_method'] ) ? $this->server['request_method'] : $_server['request_method']));
+				$this->method = strtoupper( isset( $this->server['request_method'] ) ? $this->server['request_method'] : null );
 			}
 		}
 		return $this->method;
@@ -684,9 +550,6 @@ class Request
 	 */
 	public function get( $name = '', $default = null, $filter = '' )
 	{
-		if( empty( $this->get ) ){
-			$this->get = ESRequest::getInstance()->getQueryParams();
-		}
 		if( is_array( $name ) ){
 			$this->param = [];
 			return $this->get = array_merge( $this->get, $name );
@@ -706,7 +569,7 @@ class Request
 	{
 
 		if( empty( $this->post ) ){
-			$_post = ESRequest::getInstance()->getParsedBody();
+			$_post = $this->esRequest->getParsedBody();
 			if( empty( $_post ) && false !== strpos( $this->contentType(), 'application/json' ) ){
 				$this->post = $this->raw();
 			} else{
@@ -779,17 +642,14 @@ class Request
 	 * @param string|array $filter  过滤方法
 	 * @return mixed
 	 */
-	public function request( $name = '', $default = null, $filter = '' )
-	{
-		if( empty( $this->request ) ){
-			$this->request = ESRequest::getInstance()->getRequestParam();
-		}
-		if( is_array( $name ) ){
-			$this->param = [];
-			return $this->request = array_merge( $this->request, $name );
-		}
-		return $this->input( $this->request, $name, $default, $filter );
-	}
+	//	public function request( $name = '', $default = null, $filter = '' )
+	//	{
+	//		if( is_array( $name ) ){
+	//			$this->param = [];
+	//			return $this->esRequest = array_merge( $this->esRequest, $name );
+	//		}
+	//		return $this->input( $this->esRequest, $name, $default, $filter );
+	//	}
 
 	/**
 	 * 获取session数据
@@ -855,10 +715,6 @@ class Request
 	 */
 	public function server( $name = '', $default = null, $filter = '' )
 	{
-		if( empty( $this->server ) ){
-			$this->server = ESRequest::getInstance()->getServerParams();
-		}
-
 		if( is_array( $name ) ){
 			return $this->server = array_merge( $this->server, $name );
 		}
@@ -873,12 +729,6 @@ class Request
 	 */
 	public function file( $name = '' )
 	{
-
-		$_files = ESRequest::getInstance()->getUploadedFiles();
-
-		if( empty( $this->file ) ){
-			$this->file = isset( $_files ) ? $_files : [];
-		}
 		if( is_array( $name ) ){
 			return $this->file = array_merge( $this->file, $name );
 		}
@@ -890,7 +740,7 @@ class Request
 				return $files[$name];
 			}
 		}
-		return;
+		return null;
 	}
 
 	/**
@@ -902,9 +752,6 @@ class Request
 	 */
 	public function env( $name = '', $default = null, $filter = '' )
 	{
-		if( empty( $this->env ) ){
-			$this->env = $_ENV;
-		}
 		if( is_array( $name ) ){
 			return $this->env = array_merge( $this->env, $name );
 		}
@@ -916,18 +763,10 @@ class Request
 	 * @access public
 	 * @param string|array $name    header名称
 	 * @param string       $default 默认值
-	 * @return string
+	 * @return mixed
 	 */
 	public function header( $name = '', $default = null )
 	{
-		if( empty( $this->header ) ){
-			$header  = [];
-			$_header = ESRequest::getInstance()->getHeaders();
-			foreach( $_header as $key => $val ){
-				$header[$key] = $val;
-			}
-			$this->header = $header;
-		}
 		if( is_array( $name ) ){
 			return $this->header = array_merge( $this->header, $name );
 		}
@@ -941,11 +780,11 @@ class Request
 	public function raw( $raw = null )
 	{
 		if( is_null( $raw ) ){
-			$content = ESRequest::getInstance()->getBody()->__toString();
-			 $raw     =  (array)json_decode( $content, true );
-			return (array) $raw;
+			$content = $this->esRequest->getBody()->__toString();
+			$raw     = (array)json_decode( $content, true );
+			return (array)$raw;
 		} else{
-			return (array) $this->raw = $raw;
+			return (array)$this->raw = $raw;
 		}
 	}
 
@@ -1066,7 +905,7 @@ class Request
 				}
 			}
 		}
-		return $this->filterExp( $value );
+		 $this->filterExp( $value );
 	}
 
 	/**
@@ -1080,7 +919,6 @@ class Request
 		if( is_string( $value ) && preg_match( '/^(EXP|NEQ|GT|EGT|LT|ELT|OR|XOR|LIKE|NOTLIKE|NOT LIKE|NOT BETWEEN|NOTBETWEEN|BETWEEN|NOTIN|NOT IN|IN)$/i', $value ) ){
 			$value .= ' ';
 		}
-		// TODO 其他安全过滤
 	}
 
 	/**
@@ -1195,9 +1033,9 @@ class Request
 	 */
 	public function isSsl()
 	{
-		$_server = ESRequest::getInstance()->getServerParams();
-		$server  = array_merge( $_server, $this->server );
-		if( isset( $server['https'] ) && ('1' == $server['https'] || 'on' == strtolower( $server['HTTPS'] )) ){
+		$server = $this->server;
+		$header = $this->header;
+		if( isset( $header['https'] ) && ('1' == $header['https'] || 'on' == strtolower( $header['https'] )) ){
 			return true;
 		} elseif( isset( $server['request_scheme'] ) && 'https' == $server['request_scheme'] ){
 			return true;
@@ -1252,7 +1090,7 @@ class Request
 	 */
 	public function ip( $type = 0, $adv = false )
 	{
-		$_server = ESRequest::getInstance()->getServerParams();
+		$_server = $this->server;
 		$type    = $type ? 1 : 0;
 		static $ip = null;
 		if( null !== $ip ){
@@ -1288,67 +1126,42 @@ class Request
 	 */
 	public function isMobile()
 	{
-		$_server = ESRequest::getInstance()->getServerParams();
+		$server = $this->server;
 
-		if( isset( $_server['http_via'] ) && stristr( $_server['http_via'], "wap" ) ){
+		if( isset( $server['http_via'] ) && stristr( $server['http_via'], "wap" ) ){
 			return true;
-		} elseif( isset( $_server['http_accept'] ) && strpos( strtoupper( $_server['http_accept'] ), "vnd.wap.wml" ) ){
+		} elseif( isset( $server['http_accept'] ) && strpos( strtoupper( $server['http_accept'] ), "vnd.wap.wml" ) ){
 			return true;
-		} elseif( isset( $_server['http_x_wap_profile'] ) || isset( $_server['http_profile'] ) ){
+		} elseif( isset( $server['http_x_wap_profile'] ) || isset( $server['http_profile'] ) ){
 			return true;
-		} elseif( isset( $_server['http_user_agent'] ) && preg_match( '/(blackberry|configuration\/cldc|hp |hp-|htc |htc_|htc-|iemobile|kindle|midp|mmp|motorola|mobile|nokia|opera mini|opera |Googlebot-Mobile|YahooSeeker\/M1A1-R2D2|android|iphone|ipod|mobi|palm|palmos|pocket|portalmmm|ppc;|smartphone|sonyericsson|sqh|spv|symbian|treo|up.browser|up.link|vodafone|windows ce|xda |xda_)/i', $_server['http_user_agent'] ) ){
+		} elseif( isset( $server['http_user_agent'] ) && preg_match( '/(blackberry|configuration\/cldc|hp |hp-|htc |htc_|htc-|iemobile|kindle|midp|mmp|motorola|mobile|nokia|opera mini|opera |Googlebot-Mobile|YahooSeeker\/M1A1-R2D2|android|iphone|ipod|mobi|palm|palmos|pocket|portalmmm|ppc;|smartphone|sonyericsson|sqh|spv|symbian|treo|up.browser|up.link|vodafone|windows ce|xda |xda_)/i', $server['http_user_agent'] ) ){
 			return true;
 		} else{
 			return false;
 		}
 	}
 
-	/**
-	 * 当前URL地址中的scheme参数
-	 * @access public
-	 * @return string
-	 */
-	public function scheme()
+	public function scheme() : string
 	{
 		return $this->isSsl() ? 'https' : 'http';
 	}
 
-	/**
-	 * 当前请求URL地址中的query参数
-	 * @access public
-	 * @return string
-	 */
-	public function query()
+	public function query() : string
 	{
-		return $this->server( 'query_string' );
+		return $this->esRequest->getUri()->getQuery();
 	}
 
-	/**
-	 * 当前请求的host
-	 * @access public
-	 * @return string
-	 */
-	public function host()
+	public function host() : string
 	{
-		return ESRequest::getInstance()->getUri()->getHost();
+		return $this->esRequest->getUri()->getHost();
 	}
 
-	/**
-	 * 当前请求URL地址中的port参数
-	 * @access public
-	 * @return integer
-	 */
-	public function port()
+	public function port() : int
 	{
-		return ESRequest::getInstance()->getUri()->getPort();
+		return $this->esRequest->getUri()->getPort();
 	}
 
-	/**
-	 * 当前请求 SERVER_PROTOCOL
-	 * @access public
-	 * @return integer
-	 */
-	public function protocol()
+	public function protocol() : int
 	{
 		return $this->server( 'server_protocol' );
 	}
@@ -1370,18 +1183,20 @@ class Request
 	 */
 	public function contentType()
 	{
-		$contentType = \Core\Http\Request::getInstance()->getHeader( 'content-type' );
-		if( !empty( $contentType ) ){
-			$contentType = $contentType[0];
-			// todo 废弃一部分
-			if( strpos( $contentType, ';' ) ){
-				list( $type ) = explode( ';', $contentType );
-			} else{
-				$type = $contentType;
+		if( isset( $this->header['content-type'] ) ){
+			$contentType = $this->header['content-type'];
+			if( !empty( $contentType ) ){
+				if( strpos( $contentType, ';' ) ){
+					list( $type ) = explode( ';', $contentType );
+				} else{
+					$type = $contentType;
+				}
+				return trim( $type );
 			}
-			return trim( $type );
+		} else{
+			return '';
 		}
-		return '';
+
 	}
 
 	/**
@@ -1484,17 +1299,14 @@ class Request
 		}
 	}
 
-	/**
-	 * 设置或者获取当前请求的content
-	 * @access public
-	 * @return string
-	 */
-	public function getContent()
+	public function getContent() : ? string
 	{
-		if( is_null( $this->content ) ){
-			$this->content = $this->raw();
+		$content = $this->esRequest->getSwooleRequest()->rawContent();
+		if( is_null( $content ) ){
+			return $content;
+		} else{
+			return null;
 		}
-		return $this->content;
 	}
 
 	/**
@@ -1502,11 +1314,10 @@ class Request
 	 * @access public
 	 * @return string
 	 */
-	public function getInput()
+	public function getInput() : ? string
 	{
-		return $this->raw();
+		return $this->getEsRequest()->getSwooleRequest()->rawContent();
 	}
-
 	/**
 	 * 生成请求令牌
 	 * @access public
@@ -1516,7 +1327,7 @@ class Request
 	 */
 	public function token( $name = '__token__', $type = 'md5' )
 	{
-		$_server = ESRequest::getInstance()->getServerParams();
+		$_server = $this->server;
 
 		$type  = is_callable( $type ) ? $type : 'md5';
 		$token = call_user_func( $type, $_server['request_time_float'] );
@@ -1538,7 +1349,7 @@ class Request
 	 */
 	public function cache( $key, $expire = null, $except = [], $tag = null )
 	{
-		$_server = ESRequest::getInstance()->getServerParams();
+		$_server = $this->server;
 
 		if( !is_array( $except ) ){
 			$tag    = $except;
@@ -1617,6 +1428,28 @@ class Request
 	{
 		return $this->cache;
 	}
+	static function clearGlobalVariables(  )
+	{
+		$_GET    = null;
+		$_POST   = null;
+		$_COOKIE = null;
+		$_FILES  = null;
+		$_SERVER = null;
+	}
+	static function setGlobalVariables( EasySwooleRequest $request )
+	{
+		$_GET    = isset( $request->getSwooleRequest()->get ) ? $request->getSwooleRequest()->get : [];
+		$_POST   = isset( $request->getSwooleRequest()->post ) ? $request->getSwooleRequest()->post : [];
+		$_COOKIE = isset( $request->getSwooleRequest()->cookie ) ? $request->getSwooleRequest()->cookie : [];
+		$_FILES  = isset( $request->getSwooleRequest()->files ) ? $request->getSwooleRequest()->files : [];
+		$server  = $request->getSwooleRequest()->server;
+		$_SERVER = [];
+		if( isset( $server ) ){
+			foreach( $server as $key => $value ){
+				$_SERVER[strtoupper( $key )] = $value;
+			}
+		}
+	}
 
 	/**
 	 * 设置当前请求绑定的对象实例
@@ -1648,4 +1481,37 @@ class Request
 	{
 		return isset( $this->bind[$name] );
 	}
+
+	/**
+	 * @param $method
+	 * @param $args
+	 * @return mixed
+	 * @throws Exception
+	 */
+	public function __call( $method, $args )
+	{
+		if( array_key_exists( $method, self::$hook ) ){
+			array_unshift( $args, $this );
+			return call_user_func_array( self::$hook[$method], $args );
+		} else{
+			throw new Exception( 'method not exists:'.__CLASS__.'->'.$method );
+		}
+	}
+
+	/**
+	 * Hook 方法注入
+	 * @access public
+	 * @param string|array $method   方法名
+	 * @param mixed        $callback callable
+	 * @return void
+	 */
+	public static function hook( $method, $callback = null )
+	{
+		if( is_array( $method ) ){
+			self::$hook = array_merge( self::$hook, $method );
+		} else{
+			self::$hook[$method] = $callback;
+		}
+	}
+
 }

@@ -9,8 +9,8 @@ use fashop\Exception;
 use fashop\exception\PDOException;
 use fashop\Log;
 use PDO;
-use Core\Component\Di;
-use Core\Component\Logger;
+use EasySwoole\Core\Component\Di;
+use EasySwoole\Core\Component\Logger;
 
 /**
  * Class Connection
