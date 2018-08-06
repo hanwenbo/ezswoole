@@ -30,7 +30,7 @@ class Log
 	// 配置参数
 	protected static $config = [];
 	// 日志类型
-	protected static $type = ['log', 'error', 'info', 'sql', 'notice', 'alert', 'debug' , 'request'];
+	protected static $type = ['log', 'error', 'info', 'sql', 'notice', 'alert', 'debug', 'request'];
 	// 日志写入驱动
 	protected static $driver;
 

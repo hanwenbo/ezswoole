@@ -2,6 +2,8 @@
 
 namespace fashop;
 
+use EasySwoole\Core\Http\Request;
+use EasySwoole\Core\Http\Response;
 
 /**
  * App 应用管理
@@ -65,10 +67,17 @@ class App
 		Loader::clearInstance();
 	}
 
+	static $hooks = [];
+	const HOOK_INIT          = 1; //初始化
+	const HOOK_ROUTE         = 2; //URL路由
+	const HOOK_CLEAN         = 3; //清理
+	const HOOK_BEFORE_ACTION = 4;
+	const HOOK_AFTER_ACTION  = 5;
+
 	public function initBase()
 	{
 		// 注册核心类到容器
-		Container::getInstance()->bind( [
+		$this->container->bind( [
 			'app'      => App::class,
 			'build'    => Build::class,
 			'cache'    => Cache::class,
@@ -124,23 +133,20 @@ class App
 		}
 		date_default_timezone_set( $this->config['default_timezone'] );
 		self::$init = true;
-
-
 		return Config::get();
 	}
-
 
 	private function initConfig()
 	{
 		$server_config = \EasySwoole\Config::getInstance()->getConf( "." );
 		foreach( $server_config as $key => $_config ){
-				if( isset( $_config[$key] ) && is_array( $_config[$key] ) ){
-					foreach( $_config[$key] as $k => $v ){
-						Config::set( "{$key}.{$k}", $v );
-					}
-				} else{
-					Config::set( "{$key}", $_config );
+			if( isset( $_config[$key] ) && is_array( $_config[$key] ) ){
+				foreach( $_config[$key] as $k => $v ){
+					Config::set( "{$key}.{$k}", $v );
 				}
+			} else{
+				Config::set( "{$key}", $_config );
+			}
 		}
 		if( Config::get( 'app_status' ) ){
 			Config::load( CONF_PATH.Config::get( 'app_status' ).CONF_EXT );
@@ -148,5 +154,60 @@ class App
 		$this->config = Config::get();
 	}
 
+	static function addHook( $type, $func )
+	{
+		self::$hooks[$type][] = $func;
+	}
 
+	/**
+	 * 执行Hook函数列表
+	 * @param $type
+	 * @param $subtype
+	 */
+	static function callHook( $type, $subtype = false )
+	{
+		if( $subtype and isset( self::$hooks[$type][$subtype] ) ){
+			foreach( self::$hooks[$type][$subtype] as $f ){
+				if( !is_callable( $f ) ){
+					trigger_error( "hook function[$f] is not callable." );
+					continue;
+				}
+				$f();
+			}
+		} elseif( isset( self::$hooks[$type] ) ){
+			foreach( self::$hooks[$type] as $f ){
+				//has subtype
+				if( is_array( $f ) and !is_callable( $f ) ){
+					foreach( $f as $subtype => $ff ){
+						if( !is_callable( $ff ) ){
+							trigger_error( "hook function[$ff] is not callable." );
+							continue;
+						}
+						$ff();
+					}
+				} else{
+					if( !is_callable( $f ) ){
+						trigger_error( "hook function[$f] is not callable." );
+						continue;
+					}
+					$f();
+				}
+			}
+		}
+	}
+
+	static function afterAction( Request $request, Response $response ) : void
+	{
+		\fashop\Request::clearGlobalVariables();
+		self::callHook( self::HOOK_AFTER_ACTION );
+		self::$hooks = [];
+	}
+
+	static function onRequest( Request $request, Response $response ) : void
+	{
+		\fashop\Request::clearGlobalVariables();
+		\fashop\Request::getInstance( $request );
+		\fashop\Response::getInstance( $response );
+		\fashop\Request::setGlobalVariables( $request );
+	}
 }

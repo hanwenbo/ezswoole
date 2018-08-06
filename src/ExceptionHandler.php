@@ -23,7 +23,6 @@ class ExceptionHandler implements ExceptionHandlerInterface
 	private $response;
 	public function handle( \Throwable $exception, Request $request, Response $response )
 	{
-		// todo 如果上线返回json
 		$this->request = $request;
 		$this->response = $response;
 		$error_exception = new \fashop\exception\ErrorException($exception->getCode(),$exception->getMessage(),$exception->getFile(),$exception->getLine());

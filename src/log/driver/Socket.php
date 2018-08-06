@@ -1,6 +1,6 @@
 <?php
 /**
- * josn log
+ * Socket log
  *
  *
  *
@@ -14,9 +14,8 @@
 
 namespace fashop\log\driver;
 
-use EasySwoole\EasySwooleEvent;
 use fashop\App;
-use EasySwoole\Core\Swoole\ServerManager;
+
 /**
  * 本地化调试输出到文件
  */
@@ -55,8 +54,7 @@ class Socket
 	 */
 	public function save( array $log = [] )
 	{
-		$cli         = IS_CLI ? '_cli' : '';
-		$destination = $this->config['path'].date( 'Ym' ).DS.date( 'd' ).$cli.'.log';
+		$destination = $this->config['path'].date( 'Ym' ).DS.date( 'd' ).'.log';
 		$path        = dirname( $destination );
 		!is_dir( $path ) && mkdir( $path, 0755, true );
 		$info = [];
@@ -69,25 +67,12 @@ class Socket
 	}
 
 	/**
-	 * @param string $message - 发送的消息
+	 * @param      $message
+	 * @param      $destination
+	 * @param bool $apart
 	 * @return bool
+	 * @author 韩文博
 	 */
-	protected function send( $message = '' )
-	{
-		$server =  ServerManager::getInstance()->getServer();
-		if( !empty( $server->connections ) ){
-			foreach( $server->connections as $fd ){
-				$info = $server->connection_info( $fd );
-				if( isset( $info['websocket_status'] ) && $info['websocket_status'] === 3 ){
-					$server->push( $fd, $message );
-				}
-			}
-			return true;
-		} else{
-			return false;
-		}
-	}
-
 	protected function write( $message, $destination, $apart = false )
 	{
 		//检测日志文件大小，超过配置大小则备份日志文件重新生成
@@ -95,55 +80,11 @@ class Socket
 			rename( $destination, dirname( $destination ).DS.time().'-'.basename( $destination ) );
 			$this->writed[$destination] = false;
 		}
-
 		if( App::$debug && !$apart ){
 			$this->writed[$destination] = true;
-			$message                    = $this->object2array( $message );
-			$json_message               = json_encode( $message );
-			if( in_array( $message['type'], $this->config['send_type'] ) ){
-
-				$this->send( $json_message );
-			}
+			wsdebug()->send( $message, 'log' );
 		}
-		return error_log( $json_message."\r\n", 3, $destination );
+		return error_log( is_array( $message ) ? json_encode( $message ) : $message."\r\n", 3, $destination );
 	}
 
-	/**
-	 * Convert encoding.
-	 *
-	 * @param array  $array
-	 * @param string $to_encoding
-	 * @param string $from_encoding
-	 *
-	 * @return array
-	 */
-	private function encoding( $array, $to_encoding = 'UTF-8', $from_encoding = 'GBK' )
-	{
-		$encoded = [];
-		foreach( $array as $key => $value ){
-			if( is_array( $value ) ){
-				$encoded[$key] = $this->encoding( $value, $to_encoding, $from_encoding );
-			} elseif( is_bool( $value ) ){
-				$encoded[$key] = $value;
-			} elseif( is_string( $value ) && mb_detect_encoding( $value, 'UTF-8', true ) ){
-				$encoded[$key] = $value;
-			} else{
-				$encoded[$key] = mb_convert_encoding( $value, $to_encoding, $from_encoding );
-			}
-		}
-		return $encoded;
-	}
-
-	private function object2array( $object )
-	{
-		if( is_object( $object ) ){
-			$object = (array)$object;
-		}
-		if( is_array( $object ) ){
-			foreach( $object as $key => $value ){
-				$object[$key] = $this->object2array( $value );
-			}
-		}
-		return $object;
-	}
 }

@@ -150,10 +150,12 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 		$this->initialize();
 	}
 
+
 	/**
 	 * 创建模型的查询对象
-	 * @access protected
-	 * @return Query
+	 * @return mixed
+	 * @throws Exception
+	 * @author 韩文博
 	 */
 	protected function buildQuery()
 	{
@@ -1758,12 +1760,12 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 
 	/**
 	 * 根据关联条件查询当前模型
-	 * @access public
-	 * @param string  $relation 关联方法名
-	 * @param mixed   $operator 比较操作符
-	 * @param integer $count    个数
-	 * @param string  $id       关联表的统计字段
-	 * @return Relation|Query
+	 * @param        $relation -关联方法名
+	 * @param string $operator 比较操作符
+	 * @param int    $count 个数
+	 * @param string $id 关联表的统计字段
+	 * @return mixed
+	 * @author 韩文博
 	 */
 	public static function has( $relation, $operator = '>=', $count = 1, $id = '*' )
 	{

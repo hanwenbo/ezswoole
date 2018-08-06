@@ -11,7 +11,7 @@ class Validate
 	protected static $instance;
 
 	// 自定义的验证类型
-	protected static $type = ['phone'=>'phone'];
+//	protected static $type = ['phone'=>'phone'];
 
 	// 验证类型别名
 	protected $alias
@@ -1414,21 +1414,21 @@ class Validate
 	}
 
 
-	// /**
-	//  * 手机格式
-	//  * @access protected
-	//  * @param mixed $value 字段值
-	//  * @param mixed $rule  验证规则
-	//  * @return bool
-	//  */
-	// protected function phone( $value, $rule = 'zh' )
-	// {
-	// 	if( preg_match( "/^1[34578]{1}\d{9}$/", $value ) ){
-	// 		return true;
-	// 	} else{
-	// 		return false;
-	// 	}
-	// }
+	 /**
+	  * 手机格式
+	  * @access protected
+	  * @param mixed $value 字段值
+	  * @param mixed $rule  验证规则
+	  * @return bool
+	  */
+	 protected function phone( $value, $rule = 'zh' )
+	 {
+	 	if( preg_match( "/^1[34578]{1}\d{9}$/", $value ) ){
+	 		return true;
+	 	} else{
+	 		return false;
+	 	}
+	 }
 
 	/**
 	 * 数组是否有重复值

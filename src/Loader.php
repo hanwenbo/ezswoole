@@ -339,7 +339,7 @@ class Loader
 			return self::$instance[$guid];
 		}
 
-			$class = self::parseClass( '', $layer, $name, $appendSuffix );
+		$class = self::parseClass( '', $layer, $name, $appendSuffix );
 
 		if( class_exists( $class ) ){
 			$model = new $class();
@@ -355,36 +355,6 @@ class Loader
 		return $model;
 	}
 
-	/**
-	 * 实例化（分层）控制器 格式：[模块名/]控制器名
-	 * @param string $name         资源地址
-	 * @param string $layer        控制层名称
-	 * @param bool   $appendSuffix 是否添加类名后缀
-	 * @param string $empty        空控制器名称
-	 * @return object
-	 * @throws ClassNotFoundException
-	 */
-	public static function controller( $name, $layer = 'Controller', $appendSuffix = false, $empty = '' )
-	{
-		if( false !== strpos( $name, '\\' ) ){
-			$class  = $name;
-			$module = Request::getInstance()->module();
-		} else{
-			if( strpos( $name, '/' ) ){
-				list( $module, $name ) = explode( '/', $name );
-			} else{
-				$module = Request::getInstance()->module();
-			}
-			$class = self::parseClass( $module, $layer, $name, $appendSuffix );
-		}
-		if( class_exists( $class ) ){
-			return App::invokeClass( $class );
-		} elseif( $empty && class_exists( $emptyClass = self::parseClass( $module, $layer, $empty, $appendSuffix ) ) ){
-			return new $emptyClass( Request::getInstance() );
-		} else{
-			throw new ClassNotFoundException( 'class not exists:'.$class, $class );
-		}
-	}
 
 	/**
 	 * 实例化验证类
@@ -405,11 +375,7 @@ class Loader
 			return self::$instance[$guid];
 		}
 		$module = '';
-//		if( strpos( $name, '/' ) ){
-//			list( $module, $name ) = explode( '/', $name );
-//		}else{
-//			$module = '';
-//		}
+
 		$class = self::parseClass( $module, $layer, $name, $appendSuffix );
 
 		if( class_exists( $class ) ){
@@ -428,41 +394,16 @@ class Loader
 
 	/**
 	 * 数据库初始化 并取得数据库类实例
-	 * @param mixed       $config 数据库配置
-	 * @param bool|string $name   连接标识 true 强制重新连接
-	 * @return \fashop\Db\Connection
+	 * @param array $config
+	 * @param bool  $name
+	 * @return db\Connection
+	 * @throws Exception
 	 */
 	public static function db( $config = [], $name = false )
 	{
 		return Db::connect( $config, $name );
 	}
 
-	/**
-	 * todo 废除
-	 * 远程调用模块的操作方法 参数格式 [模块/控制器/]操作
-	 * @param string       $url          调用地址
-	 * @param string|array $vars         调用参数 支持字符串和数组
-	 * @param string       $layer        要调用的控制层名称
-	 * @param bool         $appendSuffix 是否添加类名后缀
-	 * @return mixed
-	 */
-	public static function action( $url, $vars = [], $layer = 'Controller', $appendSuffix = false )
-	{
-		$info   = pathinfo( $url );
-		$action = $info['basename'];
-		$module = '.' != $info['dirname'] ? $info['dirname'] : Request::getInstance()->controller();
-		$class  = self::controller( $module, $layer, $appendSuffix );
-		if( $class ){
-			if( is_scalar( $vars ) ){
-				if( strpos( $vars, '=' ) ){
-					parse_str( $vars, $vars );
-				} else{
-					$vars = [$vars];
-				}
-			}
-			return App::invokeMethod( [$class, $action.Config::get( 'action_suffix' )], $vars );
-		}
-	}
 
 	/**
 	 * 字符串命名风格转换
@@ -509,12 +450,13 @@ class Loader
 	{
 		self::$instance = [];
 	}
+
 	// 注册类别名
-	public static function addClassAlias($alias, $class = null)
+	public static function addClassAlias( $alias, $class = null )
 	{
-		if (is_array($alias)) {
-			self::$classAlias = array_merge(self::$classAlias, $alias);
-		} else {
+		if( is_array( $alias ) ){
+			self::$classAlias = array_merge( self::$classAlias, $alias );
+		} else{
 			self::$classAlias[$alias] = $class;
 		}
 	}
