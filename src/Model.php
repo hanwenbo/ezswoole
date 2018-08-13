@@ -1337,7 +1337,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 				$sql .= "ELSE ".$uColumn." END, ";
 			}
 			$sql = rtrim( $sql, ", " )." WHERE ".$pk." IN (".implode( ",", $pks ).")";
-			return $db->execute( $sql );
+			return $db->execute( $sql ) ?? false;
 		} else{
 			return false;
 		}
