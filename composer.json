@@ -2,19 +2,19 @@
   "name": "hanwenbo/ezswoole",
   "description": "ezswoole",
   "type": "library",
+  "keywords" : ["swoole", "framework", "async","easyswoole","ezswoole"],
   "require": {
-    "php": "^7.2",
+    "php": ">=7.2",
     "easyswoole/easyswoole": "v2.1.1",
     "phpFastCache/phpFastCache": "^6.0"
   },
-  "license": "MIT",
+  "license" : "Apache-2.0",
   "authors": [
     {
       "name": "韩文博",
       "email": "9476400@qq.com"
     }
   ],
-  "minimum-stability": "stable",
   "autoload": {
     "psr-4": {
       "ezswoole\\": "src/"
