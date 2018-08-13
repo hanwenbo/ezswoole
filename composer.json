@@ -13,5 +13,11 @@
             "name": "韩文博",
             "email": "9476400@qq.com"
         }
-    ]
+    ],
+    "autoload": {
+        "psr-4": {
+            "ezswoole\\": "src/"
+        }
+    }
+
 }
