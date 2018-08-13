@@ -11,11 +11,11 @@
  *
  */
 
-namespace fashop\facade;
-use fashop\Facade;
+namespace ezswoole\facade;
+use ezswoole\Facade;
 /**
- * @see \fashop\Lang
- * @mixin \fashop\Lang
+ * @see \ezswoole\Lang
+ * @mixin \ezswoole\Lang
  * @method mixed range($range = '') static 设定当前的语言
  * @method mixed set(mixed $name, string $value = null, string $range = '') static 设置语言定义
  * @method array load(mixed $file, string $range = '') static 加载语言定义

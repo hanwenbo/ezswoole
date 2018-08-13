@@ -1,14 +1,14 @@
 <?php
 
-namespace fashop\model;
+namespace ezswoole\model;
 
-use fashop\db\Query;
-use fashop\Exception;
-use fashop\Model;
+use ezswoole\db\Query;
+use ezswoole\Exception;
+use ezswoole\Model;
 
 /**
  * Class Relation
- * @package fashop\model
+ * @package ezswoole\model
  *
  * @mixin Query
  */

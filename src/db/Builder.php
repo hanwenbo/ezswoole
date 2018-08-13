@@ -1,9 +1,9 @@
 <?php
 
-namespace fashop\db;
+namespace ezswoole\db;
 
 use BadMethodCallException;
-use fashop\Exception;
+use ezswoole\Exception;
 use PDO;
 
 abstract class Builder {
@@ -178,8 +178,8 @@ abstract class Builder {
 		$item = [];
 		foreach ((array) $tables as $key => $table) {
 			if (!is_numeric($key)) {
-				if (strpos($key, '@fashop')) {
-					$key = strstr($key, '@fashop', true);
+				if (strpos($key, '@ezswoole')) {
+					$key = strstr($key, '@ezswoole', true);
 				}
 				$key    = $this->parseSqlTable($key);
 				$item[] = $this->parseKey($key) . ' ' . (isset($options['alias'][$table]) ? $this->parseKey($options['alias'][$table]) : $this->parseKey($table));

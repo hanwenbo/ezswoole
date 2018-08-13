@@ -1,13 +1,13 @@
 <?php
 
-namespace fashop;
+namespace ezswoole;
 
-use fashop\db\Connection;
-use fashop\db\Query;
+use ezswoole\db\Connection;
+use ezswoole\db\Query;
 
 /**
  * Class Db
- * @package fashop
+ * @package ezswoole
  * @method Query table(string $table) static 指定数据表（含前缀）
  * @method Query name(string $name) static 指定数据表（不含前缀）
  * @method Query where(mixed $field, string $op = null, mixed $condition = null) static 查询条件
@@ -67,7 +67,7 @@ class Db {
 			if (empty($options['type'])) {
 				throw new \InvalidArgumentException('Undefined db type');
 			}
-			$class = false !== strpos($options['type'], '\\') ? $options['type'] : '\\fashop\\db\\connector\\' . ucwords($options['type']);
+			$class = false !== strpos($options['type'], '\\') ? $options['type'] : '\\ezswoole\\db\\connector\\' . ucwords($options['type']);
 			// 记录初始化信息
 			if (App::$debug) {
 				Log::record('[ DB ] INIT ' . $options['type'], 'info');

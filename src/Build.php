@@ -1,6 +1,6 @@
 <?php
 
-namespace fashop;
+namespace ezswoole;
 
 class Build {
 	/**
@@ -123,7 +123,7 @@ class Build {
 						$content = "<?php\nnamespace {$space};\n\nclass {$class}\n{\n\n}";
 						break;
 					case 'Model': // 模型
-						$content = "<?php\nnamespace {$space};\n\nuse fashop\Model;\n\nclass {$class} extends Model\n{\n\n}";
+						$content = "<?php\nnamespace {$space};\n\nuse ezswoole\Model;\n\nclass {$class} extends Model\n{\n\n}";
 						break;
 					case 'view': // 视图
 						$filename = $modulePath . $path . DS . $val . '.html';

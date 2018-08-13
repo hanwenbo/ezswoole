@@ -1,6 +1,6 @@
 <?php
 
-namespace fashop\exception;
+namespace ezswoole\exception;
 
 class ClassNotFoundException extends \RuntimeException {
 	protected $class;

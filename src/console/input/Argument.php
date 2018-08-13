@@ -1,6 +1,6 @@
 <?php
 
-namespace fashop\console\input;
+namespace ezswoole\console\input;
 
 class Argument {
 

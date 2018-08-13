@@ -1,21 +1,21 @@
 <?php
 
-use fashop\Cache;
-use fashop\Config;
-use fashop\Db;
-use fashop\Debug;
-use fashop\exception\HttpException;
-use fashop\exception\HttpResponseException;
-use fashop\Loader;
-use fashop\Log;
-use fashop\Model;
-use fashop\Request;
-use fashop\Cookie;
-use fashop\Session;
+use ezswoole\Cache;
+use ezswoole\Config;
+use ezswoole\Db;
+use ezswoole\Debug;
+use ezswoole\exception\HttpException;
+use ezswoole\exception\HttpResponseException;
+use ezswoole\Loader;
+use ezswoole\Log;
+use ezswoole\Model;
+use ezswoole\Request;
+use ezswoole\Cookie;
+use ezswoole\Session;
 use Jenssegers\Blade\Blade;
 use EasySwoole\Core\Component\Di;
-use fashop\Response;
-use fashop\WsDebug;
+use ezswoole\Response;
+use ezswoole\WsDebug;
 
 if( !function_exists( 'load_trait' ) ){
 	/**
@@ -42,7 +42,7 @@ if( !function_exists( 'exception' ) ){
 	 */
 	function exception( $msg, $code = 0, $exception = '' )
 	{
-		$e = $exception ?: '\fashop\Exception';
+		$e = $exception ?: '\ezswoole\Exception';
 		throw new $e( $msg, $code );
 	}
 }
@@ -92,7 +92,7 @@ if( !function_exists( 'lang' ) ){
 	 */
 	function lang( $name, $vars = [], $lang = '' )
 	{
-		return \fashop\facade\Lang::get( $name, $vars, $lang );
+		return \ezswoole\facade\Lang::get( $name, $vars, $lang );
 	}
 }
 if( !function_exists( 'config' ) ){
@@ -202,8 +202,8 @@ if( !function_exists( 'db' ) ){
 	 * @param string       $name   操作的数据表名称（不含前缀）
 	 * @param array|string $config 数据库配置参数
 	 * @param bool         $force  是否强制重新连接
-	 * @throws \fashop\Exception
-	 * @return \fashop\db\Query
+	 * @throws \ezswoole\Exception
+	 * @return \ezswoole\db\Query
 	 */
 
 	function db( $name = '', $config = [], $force = false )
@@ -332,9 +332,9 @@ if( !function_exists( 'trace' ) ){
 	 * @param string $level 日志级别
 	 * @return null|array
 	 */
-	function trace( $log = '[fashop]', $level = 'trace' ) : ?array
+	function trace( $log = '[ezswoole]', $level = 'trace' ) : ?array
 	{
-		if( '[fashop]' === $log ){
+		if( '[ezswoole]' === $log ){
 			return Log::getLog();
 		} else{
 			Log::write( $log, $level );
@@ -367,12 +367,12 @@ if( !function_exists( 'response' ) ){
 
 if( !function_exists( 'json' ) ){
 	/**
-	 * 获取\fashop\response\Json对象实例
+	 * 获取\ezswoole\response\Json对象实例
 	 * @param mixed   $data    返回的数据
 	 * @param integer $code    状态码
 	 * @param array   $header  头部
 	 * @param array   $options 参数
-	 * @return \fashop\response\Json
+	 * @return \ezswoole\response\Json
 	 */
 	function json( $data = [], $code = 200, $header = [], $options = [] )
 	{
@@ -382,12 +382,12 @@ if( !function_exists( 'json' ) ){
 
 if( !function_exists( 'jsonp' ) ){
 	/**
-	 * 获取\fashop\response\Jsonp对象实例
+	 * 获取\ezswoole\response\Jsonp对象实例
 	 * @param mixed   $data    返回的数据
 	 * @param integer $code    状态码
 	 * @param array   $header  头部
 	 * @param array   $options 参数
-	 * @return \fashop\response\Jsonp
+	 * @return \ezswoole\response\Jsonp
 	 */
 	function jsonp( $data = [], $code = 200, $header = [], $options = [] )
 	{
@@ -397,12 +397,12 @@ if( !function_exists( 'jsonp' ) ){
 
 if( !function_exists( 'xml' ) ){
 	/**
-	 * 获取\fashop\response\Xml对象实例
+	 * 获取\ezswoole\response\Xml对象实例
 	 * @param mixed   $data    返回的数据
 	 * @param integer $code    状态码
 	 * @param array   $header  头部
 	 * @param array   $options 参数
-	 * @return \fashop\response\Xml
+	 * @return \ezswoole\response\Xml
 	 */
 	function xml( $data = [], $code = 200, $header = [], $options = [] )
 	{
@@ -448,15 +448,15 @@ if( !function_exists( 'collection' ) ){
 	/**
 	 * 数组转换为数据集对象
 	 * @param array $resultSet 数据集数组
-	 * @return \fashop\model\Collection|\fashop\Collection
+	 * @return \ezswoole\model\Collection|\ezswoole\Collection
 	 */
 	function collection( $resultSet )
 	{
 		$item = current( $resultSet );
 		if( $item instanceof Model ){
-			return \fashop\model\Collection::make( $resultSet );
+			return \ezswoole\model\Collection::make( $resultSet );
 		} else{
-			return \fashop\Collection::make( $resultSet );
+			return \ezswoole\Collection::make( $resultSet );
 		}
 	}
 }

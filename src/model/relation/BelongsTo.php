@@ -1,10 +1,10 @@
 <?php
 
-namespace fashop\model\relation;
+namespace ezswoole\model\relation;
 
-use fashop\db\Query;
-use fashop\Loader;
-use fashop\Model;
+use ezswoole\db\Query;
+use ezswoole\Loader;
+use ezswoole\Model;
 
 class BelongsTo extends OneToOne {
 	/**

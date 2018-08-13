@@ -1,6 +1,6 @@
 <?php
 
-namespace fashop;
+namespace ezswoole;
 
 class Config {
 	// 配置参数
@@ -29,7 +29,7 @@ class Config {
 		if (empty($type)) {
 			$type = pathinfo($config, PATHINFO_EXTENSION);
 		}
-		$class = false !== strpos($type, '\\') ? $type : '\\fashop\\config\\driver\\' . ucwords($type);
+		$class = false !== strpos($type, '\\') ? $type : '\\ezswoole\\config\\driver\\' . ucwords($type);
 		return self::set((new $class())->parse($config), $name, $range);
 	}
 

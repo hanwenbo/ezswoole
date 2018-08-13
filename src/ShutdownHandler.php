@@ -11,7 +11,7 @@
  *
  */
 
-namespace fashop;
+namespace ezswoole;
 
 
 class ShutdownHandler
@@ -19,7 +19,7 @@ class ShutdownHandler
 	static function handle()
 	{
 		if( !is_null( $error = error_get_last() ) && ErrorHandler::isFatal( $error['type'] ) ){
-			$exception = new \fashop\exception\ErrorException( $error['type'], $error['message'], $error['file'], $error['line'] );
+			$exception = new \ezswoole\exception\ErrorException( $error['type'], $error['message'], $error['file'], $error['line'] );
 			$handler   = ErrorHandler::getExceptionHandler();
 			$handler->report( $exception );
 			$handler->render( $exception );

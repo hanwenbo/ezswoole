@@ -1,11 +1,11 @@
 <?php
-namespace fashop\console\command\optimize;
+namespace ezswoole\console\command\optimize;
 
-use fashop\Config as FashopConfig;
-use fashop\console\Command;
-use fashop\console\Input;
-use fashop\console\input\Argument;
-use fashop\console\Output;
+use ezswoole\Config as FashopConfig;
+use ezswoole\console\Command;
+use ezswoole\console\Input;
+use ezswoole\console\input\Argument;
+use ezswoole\console\Output;
 
 class Config extends Command {
 	/** @var  Output */
@@ -66,7 +66,7 @@ class Config extends Command {
 		}
 
 
-		$content .= '\fashop\Config::set(' . var_export(FashopConfig::get(), true) . ');';
+		$content .= '\ezswoole\Config::set(' . var_export(FashopConfig::get(), true) . ');';
 		return $content;
 	}
 }

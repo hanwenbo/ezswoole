@@ -1,6 +1,6 @@
 <?php
 
-namespace fashop\utils\image;
+namespace ezswoole\utils\image;
 
 use EasySwoole\Core\Utility\File;
 use EasySwoole\Core\Utility\Random;

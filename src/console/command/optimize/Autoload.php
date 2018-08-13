@@ -1,11 +1,11 @@
 <?php
-namespace fashop\console\command\optimize;
+namespace ezswoole\console\command\optimize;
 
-use fashop\App;
-use fashop\Config;
-use fashop\console\Command;
-use fashop\console\Input;
-use fashop\console\Output;
+use ezswoole\App;
+use ezswoole\Config;
+use ezswoole\console\Command;
+use ezswoole\console\Input;
+use ezswoole\console\Output;
 
 class Autoload extends Command {
 
@@ -28,7 +28,7 @@ EOF;
 
 		$namespacesToScan = [
 			App::$namespace . '\\' => realpath(rtrim(APP_PATH)),
-			'fashop\\'             => LIB_PATH . 'fashop',
+			'ezswoole\\'             => LIB_PATH . 'ezswoole',
 			'behavior\\'           => LIB_PATH . 'behavior',
 			'traits\\'             => LIB_PATH . 'traits',
 			''                     => realpath(rtrim(EXTEND_PATH)),

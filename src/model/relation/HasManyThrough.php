@@ -1,12 +1,12 @@
 <?php
 
-namespace fashop\model\relation;
+namespace ezswoole\model\relation;
 
-use fashop\db\Query;
-use fashop\Exception;
-use fashop\Loader;
-use fashop\Model;
-use fashop\model\Relation;
+use ezswoole\db\Query;
+use ezswoole\Exception;
+use ezswoole\Loader;
+use ezswoole\Model;
+use ezswoole\model\Relation;
 
 class HasManyThrough extends Relation {
 	// 中间关联表外键
@@ -38,7 +38,7 @@ class HasManyThrough extends Relation {
 	 * 延迟获取关联数据
 	 * @param string   $subRelation 子关联名
 	 * @param \Closure $closure     闭包查询条件
-	 * @return false|\PDOStatement|string|\fashop\Collection
+	 * @return false|\PDOStatement|string|\ezswoole\Collection
 	 */
 	public function getRelation($subRelation = '', $closure = null) {
 		if ($closure) {

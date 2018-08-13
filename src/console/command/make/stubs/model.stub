@@ -2,7 +2,7 @@
 
 namespace {%namespace%};
 
-use fashop\Model;
+use ezswoole\Model;
 
 class {%className%} extends Model
 {

@@ -11,13 +11,13 @@
  *
  */
 
-namespace fashop;
+namespace ezswoole;
 
 use EasySwoole\Config as AppConfig;
 use EasySwoole\Core\Http\AbstractInterface\Controller as AbstractController;
 use EasySwoole\Core\Http\Request as EasySwooleRequest;
 use EasySwoole\Core\Http\Response as EasySwooleResponse;
-use fashop\exception\ValidateException;
+use ezswoole\exception\ValidateException;
 use EasySwoole\Core\Component\Spl\SplArray;
 
 abstract class Controller extends AbstractController

@@ -1,25 +1,25 @@
 <?php
 
-namespace fashop;
+namespace ezswoole;
 
 use BadMethodCallException;
-use fashop\db\Query;
-use fashop\exception\ValidateException;
-use fashop\model\Collection as ModelCollection;
-use fashop\model\Relation;
-use fashop\model\relation\BelongsTo;
-use fashop\model\relation\BelongsToMany;
-use fashop\model\relation\HasMany;
-use fashop\model\relation\HasManyThrough;
-use fashop\model\relation\HasOne;
-use fashop\model\relation\MorphMany;
-use fashop\model\relation\MorphOne;
-use fashop\model\relation\MorphTo;
+use ezswoole\db\Query;
+use ezswoole\exception\ValidateException;
+use ezswoole\model\Collection as ModelCollection;
+use ezswoole\model\Relation;
+use ezswoole\model\relation\BelongsTo;
+use ezswoole\model\relation\BelongsToMany;
+use ezswoole\model\relation\HasMany;
+use ezswoole\model\relation\HasManyThrough;
+use ezswoole\model\relation\HasOne;
+use ezswoole\model\relation\MorphMany;
+use ezswoole\model\relation\MorphOne;
+use ezswoole\model\relation\MorphTo;
 use InvalidArgumentException;
 
 /**
  * Class Model
- * @package fashop
+ * @package ezswoole
  * @mixin Query
  */
 abstract class Model implements \JsonSerializable, \ArrayAccess
@@ -860,8 +860,8 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	/**
 	 * 转换当前模型数据集为数据集对象
 	 * @access public
-	 * @param array|\fashop\Collection $collection 数据集
-	 * @return \fashop\Collection
+	 * @param array|\ezswoole\Collection $collection 数据集
+	 * @return \ezswoole\Collection
 	 */
 	public function toCollection( $collection )
 	{

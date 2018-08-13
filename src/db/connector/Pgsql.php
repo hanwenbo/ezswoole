@@ -1,15 +1,15 @@
 <?php
 
-namespace fashop\db\connector;
+namespace ezswoole\db\connector;
 
-use fashop\db\Connection;
+use ezswoole\db\Connection;
 use PDO;
 
 /**
  * Pgsql数据库驱动
  */
 class Pgsql extends Connection {
-	protected $builder = '\\fashop\\db\\builder\\Pgsql';
+	protected $builder = '\\ezswoole\\db\\builder\\Pgsql';
 
 	/**
 	 * 解析pdo连接的dsn信息

@@ -79,7 +79,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title><?php echo \fashop\Container::get('lang')->get('System Error'); ?></title>
+    <title><?php echo \ezswoole\Container::get('lang')->get('System Error'); ?></title>
     <meta name="robots" content="noindex,nofollow" />
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <style>
@@ -313,7 +313,7 @@
     <div class="echo">
         <?php // echo $echo;?>
     </div>
-    <?php if(\fashop\App::$debug) { ?>
+    <?php if(\ezswoole\App::$debug) { ?>
     <div class="exception">
     <div class="message">
 
@@ -443,7 +443,7 @@
         <a title="官方网站" href="http://www.fashop.cn">FaShop</a>
         <span>V<?php echo FASHOP_VERSION; ?></span>
     </div>
-    <?php if(\fashop\App::$debug) { ?>
+    <?php if(\ezswoole\App::$debug) { ?>
     <script>
         var LINE = <?php echo $line; ?>;
 

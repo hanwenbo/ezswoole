@@ -1,9 +1,9 @@
 <?php
 
-namespace fashop;
+namespace ezswoole;
 
-use fashop\exception\ClassNotFoundException;
-use fashop\response\Redirect;
+use ezswoole\exception\ClassNotFoundException;
+use ezswoole\response\Redirect;
 
 class Debug {
 	// 区间时间信息
@@ -151,7 +151,7 @@ class Debug {
 		$config  = Config::get('trace');
 		$type    = isset($config['type']) ? $config['type'] : 'Html';
 		$request = Request::getInstance();
-		$class   = false !== strpos($type, '\\') ? $type : '\\fashop\\debug\\' . ucwords($type);
+		$class   = false !== strpos($type, '\\') ? $type : '\\ezswoole\\debug\\' . ucwords($type);
 		unset($config['type']);
 		if (class_exists($class)) {
 			$trace = new $class($config);

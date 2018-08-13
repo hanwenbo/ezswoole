@@ -1,6 +1,6 @@
 <?php
 
-namespace fashop;
+namespace ezswoole;
 
 use ArrayAccess;
 use ArrayIterator;

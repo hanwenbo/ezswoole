@@ -1,6 +1,6 @@
 <?php
 
-namespace fashop;
+namespace ezswoole;
 class Error
 {
 	public static function error()

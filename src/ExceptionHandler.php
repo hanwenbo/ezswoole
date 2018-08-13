@@ -11,7 +11,7 @@
  *
  */
 
-namespace fashop;
+namespace ezswoole;
 
 use EasySwoole\Core\Http\AbstractInterface\ExceptionHandlerInterface;
 use EasySwoole\Core\Http\Request;
@@ -25,16 +25,16 @@ class ExceptionHandler implements ExceptionHandlerInterface
 	{
 		$this->request = $request;
 		$this->response = $response;
-		$error_exception = new \fashop\exception\ErrorException($exception->getCode(),$exception->getMessage(),$exception->getFile(),$exception->getLine());
+		$error_exception = new \ezswoole\exception\ErrorException($exception->getCode(),$exception->getMessage(),$exception->getFile(),$exception->getLine());
 		$this->getExceptionHandler()->render( $error_exception );
 	}
 	private function getExceptionHandler()
 	{
-		$class = \fashop\Config::get( 'exception_handle' );
-		if( $class && class_exists( $class ) && is_subclass_of( $class, "\\fashop\\exception\\Handle" ) ){
+		$class = \ezswoole\Config::get( 'exception_handle' );
+		if( $class && class_exists( $class ) && is_subclass_of( $class, "\\ezswoole\\exception\\Handle" ) ){
 			$handle = new $class;
 		} else{
-			$handle = new \fashop\exception\Handle;
+			$handle = new \ezswoole\exception\Handle;
 			if( $class instanceof \Closure ){
 				$handle->setRender( $class );
 			}else{

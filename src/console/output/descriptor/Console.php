@@ -1,9 +1,9 @@
 <?php
 
-namespace fashop\console\output\descriptor;
+namespace ezswoole\console\output\descriptor;
 
-use fashop\Console as FashopConsole;
-use fashop\console\Command;
+use ezswoole\Console as FashopConsole;
+use ezswoole\console\Command;
 
 class Console {
 

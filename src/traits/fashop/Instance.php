@@ -1,8 +1,8 @@
 <?php
 
-namespace traits\fashop;
+namespace traits\ezswoole;
 
-use fashop\Exception;
+use ezswoole\Exception;
 
 trait Instance {
 	protected static $instance = null;

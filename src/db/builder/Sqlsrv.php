@@ -1,14 +1,14 @@
 <?php
 
-namespace fashop\db\builder;
+namespace ezswoole\db\builder;
 
-use fashop\db\Builder;
+use ezswoole\db\Builder;
 
 /**
  * Sqlsrv数据库驱动
  */
 class Sqlsrv extends Builder {
-	protected $selectSql       = 'SELECT T1.* FROM (SELECT fashopphp.*, ROW_NUMBER() OVER (%ORDER%) AS ROW_NUMBER FROM (SELECT %DISTINCT% %FIELD% FROM %TABLE%%JOIN%%WHERE%%GROUP%%HAVING%) AS fashopphp) AS T1 %LIMIT%%COMMENT%';
+	protected $selectSql       = 'SELECT T1.* FROM (SELECT ezswoolephp.*, ROW_NUMBER() OVER (%ORDER%) AS ROW_NUMBER FROM (SELECT %DISTINCT% %FIELD% FROM %TABLE%%JOIN%%WHERE%%GROUP%%HAVING%) AS ezswoolephp) AS T1 %LIMIT%%COMMENT%';
 	protected $selectInsertSql = 'SELECT %DISTINCT% %FIELD% FROM %TABLE%%JOIN%%WHERE%%GROUP%%HAVING%';
 	protected $updateSql       = 'UPDATE %TABLE% SET %SET% FROM %TABLE% %JOIN% %WHERE% %LIMIT% %LOCK%%COMMENT%';
 	protected $deleteSql       = 'DELETE FROM %TABLE%  %USING% FROM %TABLE%  %JOIN% %WHERE% %LIMIT% %LOCK%%COMMENT%';

@@ -1,8 +1,8 @@
 <?php
 
-namespace fashop\db\builder;
+namespace ezswoole\db\builder;
 
-use fashop\db\Builder;
+use ezswoole\db\Builder;
 
 /**
  * mysql数据库驱动

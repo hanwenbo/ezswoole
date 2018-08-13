@@ -1,8 +1,8 @@
 <?php
 
-namespace fashop\db\connector;
+namespace ezswoole\db\connector;
 
-use fashop\db\Connection;
+use ezswoole\db\Connection;
 use PDO;
 
 /**
@@ -10,7 +10,7 @@ use PDO;
  */
 class Sqlite extends Connection {
 
-	protected $builder = '\\fashop\\db\\builder\\Sqlite';
+	protected $builder = '\\ezswoole\\db\\builder\\Sqlite';
 
 	/**
 	 * 解析pdo连接的dsn信息

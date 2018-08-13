@@ -1,6 +1,6 @@
 <?php
 
-namespace fashop\console\output;
+namespace ezswoole\console\output;
 
 class Question {
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace fashop\exception;
+namespace ezswoole\exception;
 
 class TemplateNotFoundException extends \RuntimeException {
 	protected $template;

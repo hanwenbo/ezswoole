@@ -1,6 +1,6 @@
 <?php
 
-namespace fashop;
+namespace ezswoole;
 class ErrorHandler
 {
 	public static function handle($errorCode, $description, $file = null, $line = null)
@@ -17,18 +17,18 @@ class ErrorHandler
 
 	public static function error( $errno, $errstr, $errfile = '', $errline = 0, $errcontext = [] )
 	{
-		$exception = new \fashop\exception\ErrorException( $errno, $errstr, $errfile, $errline, $errcontext );
+		$exception = new \ezswoole\exception\ErrorException( $errno, $errstr, $errfile, $errline, $errcontext );
 		self::getExceptionHandler()->render( $exception );
 	}
 
 
 	public static function getExceptionHandler()
 	{
-		$class = \fashop\Config::get( 'exception_handle' );
-		if( $class && class_exists( $class ) && is_subclass_of( $class, "\\fashop\\exception\\Handle" ) ){
+		$class = \ezswoole\Config::get( 'exception_handle' );
+		if( $class && class_exists( $class ) && is_subclass_of( $class, "\\ezswoole\\exception\\Handle" ) ){
 			$handle = new $class;
 		} else{
-			$handle = new \fashop\exception\Handle;
+			$handle = new \ezswoole\exception\Handle;
 			if( $class instanceof \Closure ){
 				$handle->setRender( $class );
 			}

@@ -1,25 +1,25 @@
 <?php
 
-namespace fashop\console;
+namespace ezswoole\console;
 
 use Exception;
-use fashop\console\output\Ask;
-use fashop\console\output\Descriptor;
-use fashop\console\output\driver\Buffer;
-use fashop\console\output\driver\Console;
-use fashop\console\output\driver\Nothing;
-use fashop\console\output\Question;
-use fashop\console\output\question\Choice;
-use fashop\console\output\question\Confirmation;
+use ezswoole\console\output\Ask;
+use ezswoole\console\output\Descriptor;
+use ezswoole\console\output\driver\Buffer;
+use ezswoole\console\output\driver\Console;
+use ezswoole\console\output\driver\Nothing;
+use ezswoole\console\output\Question;
+use ezswoole\console\output\question\Choice;
+use ezswoole\console\output\question\Confirmation;
 
 /**
  * Class Output
- * @package fashop\console
+ * @package ezswoole\console
  *
- * @see     \fashop\console\output\driver\Console::setDecorated
+ * @see     \ezswoole\console\output\driver\Console::setDecorated
  * @method void setDecorated($decorated)
  *
- * @see     \fashop\console\output\driver\Buffer::fetch
+ * @see     \ezswoole\console\output\driver\Buffer::fetch
  * @method string fetch()
  *
  * @method void info($message)
@@ -55,7 +55,7 @@ class Output {
 	];
 
 	public function __construct($driver = 'console') {
-		$class = '\\fashop\\console\\output\\driver\\' . ucwords($driver);
+		$class = '\\ezswoole\\console\\output\\driver\\' . ucwords($driver);
 
 		$this->handle = new $class($this);
 	}

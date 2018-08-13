@@ -11,7 +11,7 @@
  *
  */
 
-namespace fashop;
+namespace ezswoole;
 
 use EasySwoole\Core\Http\Response as EasySwooleResponse;
 

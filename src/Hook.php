@@ -1,6 +1,6 @@
 <?php
 
-namespace fashop;
+namespace ezswoole;
 
 use EasySwoole\Core\Swoole\ServerManager;
 use EasySwoole\Core\Utility\Random;

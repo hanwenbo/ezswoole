@@ -1,12 +1,12 @@
 <?php
 
-namespace fashop;
+namespace ezswoole;
 
-use fashop\exception\ClassNotFoundException;
+use ezswoole\exception\ClassNotFoundException;
 
 /**
  * Class Log
- * @package fashop
+ * @package ezswoole
  *
  * @method void log($msg) static
  * @method void error($msg) static
@@ -44,7 +44,7 @@ class Log
 	public static function init( $config = [] )
 	{
 		$type         = isset( $config['type'] ) ? $config['type'] : 'File';
-		$class        = false !== strpos( $type, '\\' ) ? $type : '\\fashop\\log\\driver\\'.ucwords( $type );
+		$class        = false !== strpos( $type, '\\' ) ? $type : '\\ezswoole\\log\\driver\\'.ucwords( $type );
 		self::$config = $config;
 		unset( $config['type'] );
 		if( class_exists( $class ) ){
@@ -188,7 +188,7 @@ class Log
 	{
 		if( in_array( $method, self::$type ) ){
 			array_push( $args, $method );
-			return call_user_func_array( '\\fashop\\Log::record', $args );
+			return call_user_func_array( '\\ezswoole\\Log::record', $args );
 		}
 	}
 

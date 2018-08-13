@@ -1,9 +1,9 @@
 <?php
 
-namespace fashop\console\output\driver;
+namespace ezswoole\console\output\driver;
 
-use fashop\console\Output;
-use fashop\console\output\Formatter;
+use ezswoole\console\Output;
+use ezswoole\console\output\Formatter;
 
 class Console {
 

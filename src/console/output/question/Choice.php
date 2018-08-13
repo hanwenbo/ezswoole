@@ -1,8 +1,8 @@
 <?php
 
-namespace fashop\console\output\question;
+namespace ezswoole\console\output\question;
 
-use fashop\console\output\Question;
+use ezswoole\console\output\Question;
 
 class Choice extends Question {
 

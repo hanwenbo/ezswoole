@@ -11,7 +11,7 @@
  *
  */
 
-namespace fashop;
+namespace ezswoole;
 
 
 use Closure;

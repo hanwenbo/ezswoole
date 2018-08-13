@@ -1,12 +1,12 @@
 <?php
-namespace fashop\console\command\optimize;
+namespace ezswoole\console\command\optimize;
 
-use fashop\App;
-use fashop\console\Command;
-use fashop\console\Input;
-use fashop\console\input\Option;
-use fashop\console\Output;
-use fashop\Db;
+use ezswoole\App;
+use ezswoole\console\Command;
+use ezswoole\console\Input;
+use ezswoole\console\input\Option;
+use ezswoole\console\Output;
+use ezswoole\Db;
 
 class Schema extends Command {
 	/** @var  Output */
@@ -52,7 +52,7 @@ class Schema extends Command {
 		} elseif ($input->hasOption('db')) {
 			$dbName = $input->getOption('db');
 			$tables = Db::connect($config)->getTables($dbName);
-		} elseif (!\fashop\Config::get('app_multi_module')) {
+		} elseif (!\ezswoole\Config::get('app_multi_module')) {
 			$app  = App::$namespace;
 			$list = scandir(APP_PATH . 'Model');
 			foreach ($list as $file) {
@@ -76,7 +76,7 @@ class Schema extends Command {
 
 	protected function buildModelSchema($class) {
 		$reflect = new \ReflectionClass($class);
-		if (!$reflect->isAbstract() && $reflect->isSubclassOf('\fashop\Model')) {
+		if (!$reflect->isAbstract() && $reflect->isSubclassOf('\ezswoole\Model')) {
 			$table   = $class::getTable();
 			$dbName  = $class::getConfig('database');
 			$content = '<?php ' . PHP_EOL . 'return ';

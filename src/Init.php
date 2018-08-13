@@ -1,6 +1,6 @@
 <?php
 
-namespace fashop;
+namespace ezswoole;
 /**
  *
  * Copyright  FaShop
@@ -13,7 +13,7 @@ namespace fashop;
  *
  */
 
-class FaShop
+class Init
 {
 	public static function register()
 	{
@@ -65,7 +65,7 @@ class FaShop
 		Loader::register();
 
 		// 加载惯例配置文件
-		\fashop\Config::set( include LIB_PATH.'config/convention'.EXT );
+		\ezswoole\Config::set( include LIB_PATH.'config/convention'.EXT );
 
 		// 执行应用
 		$app = new App();

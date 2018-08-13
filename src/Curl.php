@@ -11,7 +11,7 @@
  *
  */
 
-namespace fashop;
+namespace ezswoole;
 
 use EasySwoole\Core\Utility\Curl\Response;
 use EasySwoole\Core\Utility\Curl\Request;

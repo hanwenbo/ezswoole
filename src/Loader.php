@@ -1,8 +1,8 @@
 <?php
 
-namespace fashop;
+namespace ezswoole;
 
-use fashop\exception\ClassNotFoundException;
+use ezswoole\exception\ClassNotFoundException;
 
 class Loader
 {
@@ -210,7 +210,7 @@ class Loader
 	public static function register( $autoload = '' )
 	{
 		// 注册系统自动加载
-		spl_autoload_register( $autoload ?: 'fashop\\Loader::autoload', true, true );
+		spl_autoload_register( $autoload ?: 'ezswoole\\Loader::autoload', true, true );
 		// 注册命名空间定义
 		self::addNamespace( [
 			'behavior' => LIB_PATH.'behavior'.DS,

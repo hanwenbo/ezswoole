@@ -1,16 +1,16 @@
 <?php
 
-namespace fashop\model\relation;
+namespace ezswoole\model\relation;
 
-use fashop\db\Query;
-use fashop\Exception;
-use fashop\Loader;
-use fashop\Model;
-use fashop\model\Relation;
+use ezswoole\db\Query;
+use ezswoole\Exception;
+use ezswoole\Loader;
+use ezswoole\Model;
+use ezswoole\model\Relation;
 
 /**
  * Class OneToOne
- * @package fashop\model\relation
+ * @package ezswoole\model\relation
  *
  */
 abstract class OneToOne extends Relation {

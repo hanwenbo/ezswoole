@@ -1,6 +1,6 @@
 <?php
 
-namespace fashop;
+namespace ezswoole;
 
 use EasySwoole\Core\Swoole\ServerManager;
 use EasySwoole\Core\Utility\Random;
@@ -35,7 +35,7 @@ class Cron
 	 * 初始化
 	 * @access public
 	 * @param array $options 参数
-	 * @return \fashop\Cron
+	 * @return \ezswoole\Cron
 	 */
 	public static function getInstance( $options = [] )
 	{
@@ -78,9 +78,9 @@ class Cron
 
 						if( $current_time > ($last_time + $interval_time) ){
 							// 检测是否可执行
-							if( \fashop\Cron::checkTask( $name, $option ) === true ){
+							if( \ezswoole\Cron::checkTask( $name, $option ) === true ){
 								\EasySwoole\Core\Swoole\Task\TaskManager::async( function() use (  $name, $option ){
-									\fashop\Cron::exec( $name, $option );
+									\ezswoole\Cron::exec( $name, $option );
 									return true;
 								});
 								// 设置最后一次执行时间

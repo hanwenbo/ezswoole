@@ -1,8 +1,8 @@
 <?php
 
-namespace fashop\exception;
+namespace ezswoole\exception;
 
-use fashop\Exception;
+use ezswoole\Exception;
 
 /**
  * Database相关异常处理类

@@ -1,6 +1,6 @@
 <?php
 
-namespace fashop;
+namespace ezswoole;
 
 use EasySwoole\Core\Http\Request as EasySwooleRequest;
 
@@ -707,7 +707,7 @@ class Request
 	 * 获取上传的文件信息
 	 * @access public
 	 * @param string|array $name 名称
-	 * @return null|array|\fashop\File
+	 * @return null|array|\ezswoole\File
 	 */
 	public function file( $name = '' )
 	{
@@ -1391,11 +1391,11 @@ class Request
 			if( strtotime( $this->server( 'http_if_modified_since' ) ) + $expire > $_server['request_time'] ){
 				// 读取缓存
 				$response = Response::create()->code( 304 );
-				throw new \fashop\exception\HttpResponseException( $response );
+				throw new \ezswoole\exception\HttpResponseException( $response );
 			} elseif( Cache::getInstance()->has( $key ) ){
 				list( $content, $header ) = Cache::getInstance()->get( $key );
 				$response = Response::create( $content )->header( $header );
-				throw new \fashop\exception\HttpResponseException( $response );
+				throw new \ezswoole\exception\HttpResponseException( $response );
 			} else{
 				$this->cache = [$key, $expire, $tag];
 			}

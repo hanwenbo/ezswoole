@@ -1,11 +1,11 @@
 <?php
 
-namespace fashop\console\output;
+namespace ezswoole\console\output;
 
-use fashop\console\Input;
-use fashop\console\Output;
-use fashop\console\output\question\Choice;
-use fashop\console\output\question\Confirmation;
+use ezswoole\console\Input;
+use ezswoole\console\Output;
+use ezswoole\console\output\question\Choice;
+use ezswoole\console\output\question\Confirmation;
 
 class Ask {
 	private static $stty;

@@ -1,11 +1,11 @@
 <?php
 
-namespace fashop\console;
+namespace ezswoole\console;
 
-use fashop\Console;
-use fashop\console\input\Argument;
-use fashop\console\input\Definition;
-use fashop\console\input\Option;
+use ezswoole\Console;
+use ezswoole\console\input\Argument;
+use ezswoole\console\input\Definition;
+use ezswoole\console\input\Option;
 
 class Command {
 

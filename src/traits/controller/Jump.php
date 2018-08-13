@@ -14,13 +14,13 @@
  */
 namespace traits\controller;
 
-use fashop\Config;
-use fashop\exception\HttpResponseException;
-use fashop\Request;
-use fashop\Response;
-use fashop\response\Redirect;
-use fashop\Url;
-use fashop\View as ViewTemplate;
+use ezswoole\Config;
+use ezswoole\exception\HttpResponseException;
+use ezswoole\Request;
+use ezswoole\Response;
+use ezswoole\response\Redirect;
+use ezswoole\Url;
+use ezswoole\View as ViewTemplate;
 
 trait Jump {
 	/**

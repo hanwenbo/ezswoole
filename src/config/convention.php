@@ -92,7 +92,7 @@ return [
 	'url_route_must'         => false,
 	// 域名部署
 	'url_domain_deploy'      => false,
-	// 域名根，如fashopphp.cn
+	// 域名根，如ezswoolephp.cn
 	'url_domain_root'        => '',
 	// 是否自动转换URL中的控制器和操作名
 	'url_convert'            => true,
@@ -116,7 +116,7 @@ return [
 	// +----------------------------------------------------------------------
 
 	'template'              => [
-		// 模板引擎类型 支持 php fashop 支持扩展
+		// 模板引擎类型 支持 php ezswoole 支持扩展
 		'type'         => 'Fashop',
 		// 视图基础目录，配置目录为所有模块的视图起始目录
 		'view_base'    => '',
@@ -147,13 +147,13 @@ return [
 	// +----------------------------------------------------------------------
 
 	// 异常页面的模板文件
-	'exception_tmpl'        => FASHOP_PATH.'tpl'.DS.'fashop_exception.tpl',
+	'exception_tmpl'        => FASHOP_PATH.'tpl'.DS.'ezswoole_exception.tpl',
 
 	// 错误显示信息,非调试模式有效
 	'error_message'         => '页面错误！请稍后再试～',
 	// 显示错误信息
 	'show_error_msg'        => false,
-	// 异常处理handle类 留空使用 \fashop\exception\Handle
+	// 异常处理handle类 留空使用 \ezswoole\exception\Handle
 	'exception_handle'      => '',
 	// 是否记录trace信息到日志
 	'record_trace'          => false,
@@ -205,7 +205,7 @@ return [
 		// SESSION_ID的提交变量,解决flash上传跨域
 		'var_session_id' => '',
 		// SESSION 前缀
-		'prefix'         => 'fashop',
+		'prefix'         => 'ezswoole',
 		// 驱动方式 支持redis memcache memcached
 		'type'           => '',
 		// 是否自动开启 SESSION

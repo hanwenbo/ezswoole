@@ -1,8 +1,8 @@
 <?php
 
-namespace fashop\model;
+namespace ezswoole\model;
 
-use fashop\Model;
+use ezswoole\Model;
 
 class Pivot extends Model {
 

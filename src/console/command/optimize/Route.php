@@ -1,10 +1,10 @@
 <?php
 
-namespace fashop\console\command\optimize;
+namespace ezswoole\console\command\optimize;
 
-use fashop\console\Command;
-use fashop\console\Input;
-use fashop\console\Output;
+use ezswoole\console\Command;
+use ezswoole\console\Input;
+use ezswoole\console\Output;
 
 class Route extends Command {
 	/** @var  Output */
@@ -21,16 +21,16 @@ class Route extends Command {
 	}
 
 	protected function buildRouteCache() {
-		$files = \fashop\Config::get('route_config_file');
+		$files = \ezswoole\Config::get('route_config_file');
 		foreach ($files as $file) {
 			if (is_file(CONF_PATH . $file . CONF_EXT)) {
 				$config = include CONF_PATH . $file . CONF_EXT;
 				if (is_array($config)) {
-					\fashop\Route::import($config);
+					\ezswoole\Route::import($config);
 				}
 			}
 		}
-		$rules = \fashop\Route::rules(true);
+		$rules = \ezswoole\Route::rules(true);
 		array_walk_recursive($rules, [$this, 'buildClosure']);
 		$content = '<?php ' . PHP_EOL . 'return ';
 		$content .= var_export($rules, true) . ';';

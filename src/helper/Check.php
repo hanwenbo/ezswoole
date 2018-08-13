@@ -11,7 +11,7 @@
  *
  */
 
-namespace fashop\helper;
+namespace ezswoole\helper;
 
 
 class Check

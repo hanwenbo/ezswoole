@@ -1,6 +1,6 @@
 <?php
 
-namespace fashop\exception;
+namespace ezswoole\exception;
 
 /**
  * PDO异常处理类

@@ -1,11 +1,11 @@
 <?php
 
-namespace fashop\model\relation;
+namespace ezswoole\model\relation;
 
-use fashop\Exception;
-use fashop\Loader;
-use fashop\Model;
-use fashop\model\Relation;
+use ezswoole\Exception;
+use ezswoole\Loader;
+use ezswoole\Model;
+use ezswoole\model\Relation;
 
 class MorphTo extends Relation {
 	// 多态字段

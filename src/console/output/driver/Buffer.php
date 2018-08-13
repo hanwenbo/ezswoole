@@ -1,8 +1,8 @@
 <?php
 
-namespace fashop\console\output\driver;
+namespace ezswoole\console\output\driver;
 
-use fashop\console\Output;
+use ezswoole\console\Output;
 
 class Buffer {
 	/**

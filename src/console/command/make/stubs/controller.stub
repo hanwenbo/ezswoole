@@ -2,15 +2,15 @@
 
 namespace {%namespace%};
 
-use fashop\Controller;
-use fashop\Request;
+use ezswoole\Controller;
+use ezswoole\Request;
 
 class {%className%} extends Controller
 {
     /**
      * 显示资源列表
      *
-     * @return \fashop\Response
+     * @return \ezswoole\Response
      */
     public function index()
     {
@@ -20,7 +20,7 @@ class {%className%} extends Controller
     /**
      * 显示创建资源表单页.
      *
-     * @return \fashop\Response
+     * @return \ezswoole\Response
      */
     public function create()
     {
@@ -30,8 +30,8 @@ class {%className%} extends Controller
     /**
      * 保存新建的资源
      *
-     * @param  \fashop\Request  $request
-     * @return \fashop\Response
+     * @param  \ezswoole\Request  $request
+     * @return \ezswoole\Response
      */
     public function save(Request $request)
     {
@@ -42,7 +42,7 @@ class {%className%} extends Controller
      * 显示指定的资源
      *
      * @param  int  $id
-     * @return \fashop\Response
+     * @return \ezswoole\Response
      */
     public function read($id)
     {
@@ -53,7 +53,7 @@ class {%className%} extends Controller
      * 显示编辑资源表单页.
      *
      * @param  int  $id
-     * @return \fashop\Response
+     * @return \ezswoole\Response
      */
     public function edit($id)
     {
@@ -63,9 +63,9 @@ class {%className%} extends Controller
     /**
      * 保存更新的资源
      *
-     * @param  \fashop\Request  $request
+     * @param  \ezswoole\Request  $request
      * @param  int  $id
-     * @return \fashop\Response
+     * @return \ezswoole\Response
      */
     public function update(Request $request, $id)
     {
@@ -76,7 +76,7 @@ class {%className%} extends Controller
      * 删除指定资源
      *
      * @param  int  $id
-     * @return \fashop\Response
+     * @return \ezswoole\Response
      */
     public function delete($id)
     {

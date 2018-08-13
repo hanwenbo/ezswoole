@@ -1,13 +1,13 @@
 <?php
 
-namespace fashop\exception;
+namespace ezswoole\exception;
 
-use fashop\Exception;
+use ezswoole\Exception;
 
 /**
  * FashopPHP错误异常
  * 主要用于封装 set_error_handler 和 register_shutdown_function 得到的错误
- * 除开从 fashop\Exception 继承的功能
+ * 除开从 ezswoole\Exception 继承的功能
  * 其他和PHP系统\ErrorException功能基本一样
  */
 class ErrorException extends Exception {

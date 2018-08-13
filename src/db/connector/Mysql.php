@@ -1,9 +1,9 @@
 <?php
 
-namespace fashop\db\connector;
+namespace ezswoole\db\connector;
 
-use fashop\db\Connection;
-use fashop\Log;
+use ezswoole\db\Connection;
+use ezswoole\Log;
 use PDO;
 
 /**
@@ -11,7 +11,7 @@ use PDO;
  */
 class Mysql extends Connection {
 
-	protected $builder = '\\fashop\\db\\builder\\Mysql';
+	protected $builder = '\\ezswoole\\db\\builder\\Mysql';
 
 	/**
 	 * 解析pdo连接的dsn信息

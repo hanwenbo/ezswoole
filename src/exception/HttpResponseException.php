@@ -1,8 +1,8 @@
 <?php
 
-namespace fashop\exception;
+namespace ezswoole\exception;
 
-use fashop\Response;
+use ezswoole\Response;
 
 class HttpResponseException extends \RuntimeException {
 	/**

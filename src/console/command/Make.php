@@ -1,13 +1,13 @@
 <?php
 
-namespace fashop\console\command;
+namespace ezswoole\console\command;
 
-use fashop\App;
-use fashop\Config;
-use fashop\console\Command;
-use fashop\console\Input;
-use fashop\console\input\Argument;
-use fashop\console\Output;
+use ezswoole\App;
+use ezswoole\Config;
+use ezswoole\console\Command;
+use ezswoole\console\Input;
+use ezswoole\console\input\Argument;
+use ezswoole\console\Output;
 
 abstract class Make extends Command {
 

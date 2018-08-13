@@ -1,9 +1,9 @@
 <?php
 
-namespace fashop;
+namespace ezswoole;
 
-use fashop\exception\ClassNotFoundException;
-use fashop\validate\ValidateRule;
+use ezswoole\exception\ClassNotFoundException;
+use ezswoole\validate\ValidateRule;
 
 class Validate
 {

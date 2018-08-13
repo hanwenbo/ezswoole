@@ -1,10 +1,10 @@
 <?php
 
-namespace fashop\console\command\make;
+namespace ezswoole\console\command\make;
 
-use fashop\Config;
-use fashop\console\command\Make;
-use fashop\console\input\Option;
+use ezswoole\Config;
+use ezswoole\console\command\Make;
+use ezswoole\console\input\Option;
 
 class Controller extends Make {
 

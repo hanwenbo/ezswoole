@@ -1,14 +1,14 @@
 <?php
 
-namespace fashop\console\output;
+namespace ezswoole\console\output;
 
-use fashop\Console;
-use fashop\console\Command;
-use fashop\console\input\Argument as InputArgument;
-use fashop\console\input\Definition as InputDefinition;
-use fashop\console\input\Option as InputOption;
-use fashop\console\Output;
-use fashop\console\output\descriptor\Console as ConsoleDescription;
+use ezswoole\Console;
+use ezswoole\console\Command;
+use ezswoole\console\input\Argument as InputArgument;
+use ezswoole\console\input\Definition as InputDefinition;
+use ezswoole\console\input\Option as InputOption;
+use ezswoole\console\Output;
+use ezswoole\console\output\descriptor\Console as ConsoleDescription;
 
 class Descriptor {
 

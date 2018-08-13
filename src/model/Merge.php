@@ -1,10 +1,10 @@
 <?php
 
-namespace fashop\model;
+namespace ezswoole\model;
 
-use fashop\Db;
-use fashop\db\Query;
-use fashop\Model;
+use ezswoole\Db;
+use ezswoole\db\Query;
+use ezswoole\Model;
 
 class Merge extends Model {
 
@@ -32,7 +32,7 @@ class Merge extends Model {
 	 * @param mixed        $data  主键值或者查询条件（闭包）
 	 * @param string|array $with  关联预查询
 	 * @param bool         $cache 是否缓存
-	 * @return \fashop\Model
+	 * @return \ezswoole\Model
 	 */
 	public static function get($data = null, $with = [], $cache = false) {
 		$query = self::parseQuery($data, $with, $cache);
@@ -43,8 +43,8 @@ class Merge extends Model {
 	/**
 	 * 附加查询表达式
 	 * @access protected
-	 * @param \fashop\db\Query $query 查询对象
-	 * @return \fashop\db\Query
+	 * @param \ezswoole\db\Query $query 查询对象
+	 * @return \ezswoole\db\Query
 	 */
 	protected static function attachQuery($query) {
 		$class  = new static();
@@ -65,7 +65,7 @@ class Merge extends Model {
 	/**
 	 * 获取关联模型的字段 并解决混淆
 	 * @access protected
-	 * @param \fashop\db\Query $query  查询对象
+	 * @param \ezswoole\db\Query $query  查询对象
 	 * @param string          $name   模型名称
 	 * @param string          $table  关联表名称
 	 * @param array           $map    字段映射

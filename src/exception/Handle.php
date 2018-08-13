@@ -1,14 +1,14 @@
 <?php
 
-namespace fashop\exception;
+namespace ezswoole\exception;
 
 use Exception;
-use fashop\App;
-use fashop\Config;
-use fashop\console\Output;
-use fashop\Lang;
-use fashop\Log;
-use fashop\Response;
+use ezswoole\App;
+use ezswoole\Config;
+use ezswoole\console\Output;
+use ezswoole\Lang;
+use ezswoole\Log;
+use ezswoole\Response;
 use EasySwoole\Core\Http\Request as EasySwooleRequest;
 use EasySwoole\Core\Http\Response as EasySwooleResponse;
 
@@ -22,7 +22,7 @@ class Handle
 	protected $render;
 	protected $ignoreReport
 		= [
-			'\\fashop\\exception\\HttpException',
+			'\\ezswoole\\exception\\HttpException',
 		];
 
 	public function setRender( $render )
@@ -268,7 +268,7 @@ class Handle
 	protected function getExtendData( Exception $exception )
 	{
 		$data = [];
-		if( $exception instanceof \fashop\Exception ){
+		if( $exception instanceof \ezswoole\Exception ){
 			$data = $exception->getData();
 		}
 		return $data;

@@ -1,12 +1,12 @@
 <?php
 
-namespace fashop\console\command;
+namespace ezswoole\console\command;
 
-use fashop\console\Command;
-use fashop\console\Input;
-use fashop\console\input\Argument as InputArgument;
-use fashop\console\input\Option as InputOption;
-use fashop\console\Output;
+use ezswoole\console\Command;
+use ezswoole\console\Input;
+use ezswoole\console\input\Argument as InputArgument;
+use ezswoole\console\input\Option as InputOption;
+use ezswoole\console\Output;
 
 class Help extends Command {
 

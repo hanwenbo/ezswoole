@@ -11,7 +11,7 @@
  *
  */
 
-namespace fashop\utils;
+namespace ezswoole\utils;
 
 class RandomKey
 {

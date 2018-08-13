@@ -1,19 +1,19 @@
 <?php
 
-namespace fashop\db;
+namespace ezswoole\db;
 
-use fashop\Db;
-use fashop\db\exception\BindParamException;
-use fashop\Debug;
-use fashop\Exception;
-use fashop\exception\PDOException;
-use fashop\Log;
+use ezswoole\Db;
+use ezswoole\db\exception\BindParamException;
+use ezswoole\Debug;
+use ezswoole\Exception;
+use ezswoole\exception\PDOException;
+use ezswoole\Log;
 use PDO;
 use EasySwoole\Core\Component\Logger;
 
 /**
  * Class Connection
- * @package fashop
+ * @package ezswoole
  * @method Query table(string $table) 指定数据表（含前缀）
  * @method Query name(string $name) 指定数据表（不含前缀）
  *
@@ -97,7 +97,7 @@ abstract class Connection
 			// Builder类
 			'builder'         => '',
 			// Query类
-			'query'           => '\\fashop\\db\\Query',
+			'query'           => '\\ezswoole\\db\\Query',
 			// 是否需要断线重连
 			'break_reconnect' => true,
 		];
@@ -148,7 +148,7 @@ abstract class Connection
 		if( !empty( $this->builder ) ){
 			return $this->builder;
 		} else{
-			return $this->getConfig( 'builder' ) ?: '\\fashop\\db\\builder\\'.ucfirst( $this->getConfig( 'type' ) );
+			return $this->getConfig( 'builder' ) ?: '\\ezswoole\\db\\builder\\'.ucfirst( $this->getConfig( 'type' ) );
 		}
 	}
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace fashop;
+namespace ezswoole;
 
 use EasySwoole\Core\Http\Request;
 use EasySwoole\Core\Http\Response;
@@ -198,16 +198,16 @@ class App
 
 	static function afterAction( Request $request, Response $response ) : void
 	{
-		\fashop\Request::clearGlobalVariables();
+		\ezswoole\Request::clearGlobalVariables();
 		self::callHook( self::HOOK_AFTER_ACTION );
 		self::$hooks = [];
 	}
 
 	static function onRequest( Request $request, Response $response ) : void
 	{
-		\fashop\Request::clearGlobalVariables();
-		\fashop\Request::getInstance( $request );
-		\fashop\Response::getInstance( $response );
-		\fashop\Request::setGlobalVariables( $request );
+		\ezswoole\Request::clearGlobalVariables();
+		\ezswoole\Request::getInstance( $request );
+		\ezswoole\Response::getInstance( $response );
+		\ezswoole\Request::setGlobalVariables( $request );
 	}
 }

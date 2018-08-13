@@ -1,8 +1,8 @@
 <?php
 
-namespace fashop\console\command\make;
+namespace ezswoole\console\command\make;
 
-use fashop\console\command\Make;
+use ezswoole\console\command\Make;
 
 class Model extends Make {
 	protected $type = "Model";

@@ -1,24 +1,24 @@
 <?php
 
-namespace fashop\db;
+namespace ezswoole\db;
 
-use fashop\App;
-use fashop\Cache;
-use fashop\Collection;
-use fashop\Config;
-use fashop\Db;
-use fashop\db\exception\DataNotFoundException;
-use fashop\db\exception\ModelNotFoundException;
-use fashop\Exception;
-use fashop\exception\DbException;
-use fashop\exception\PDOException;
-use fashop\Loader;
-use fashop\Model;
-use fashop\model\Relation;
-use fashop\model\relation\OneToOne;
-use fashop\Paginator;
+use ezswoole\App;
+use ezswoole\Cache;
+use ezswoole\Collection;
+use ezswoole\Config;
+use ezswoole\Db;
+use ezswoole\db\exception\DataNotFoundException;
+use ezswoole\db\exception\ModelNotFoundException;
+use ezswoole\Exception;
+use ezswoole\exception\DbException;
+use ezswoole\exception\PDOException;
+use ezswoole\Loader;
+use ezswoole\Model;
+use ezswoole\model\Relation;
+use ezswoole\model\relation\OneToOne;
+use ezswoole\Paginator;
 use PDO;
-use fashop\Error;
+use ezswoole\Error;
 
 class Query
 {
@@ -724,7 +724,7 @@ class Query
 		}
 		if( isset( $alias ) ){
 			if( isset( $this->options['alias'][$table] ) ){
-				$table = $table.'@fashop'.uniqid();
+				$table = $table.'@ezswoole'.uniqid();
 			}
 			$table = [$table => $alias];
 			$this->alias( $table );
@@ -1306,7 +1306,7 @@ class Query
 	 *                            var_page:分页变量,
 	 *                            list_rows:每页数量
 	 *                            type:分页类名
-	 * @return \fashop\Paginator
+	 * @return \ezswoole\Paginator
 	 * @throws DbException
 	 */
 	public function paginate( $listRows = null, $simple = false, $config = [] )
@@ -1324,7 +1324,7 @@ class Query
 		}
 
 		/** @var Paginator $class */
-		$class = false !== strpos( $config['type'], '\\' ) ? $config['type'] : '\\fashop\\paginator\\driver\\'.ucwords( $config['type'] );
+		$class = false !== strpos( $config['type'], '\\' ) ? $config['type'] : '\\ezswoole\\paginator\\driver\\'.ucwords( $config['type'] );
 		$page  = isset( $config['page'] ) ? (int)$config['page'] : call_user_func( [
 			$class,
 			'getCurrentPage',
@@ -2197,7 +2197,7 @@ class Query
 			if( is_string( $pk ) && isset( $data[$pk] ) ){
 				$where[$pk] = $data[$pk];
 				if( !isset( $key ) ){
-					$key = 'fashop:'.$options['table'].'|'.$data[$pk];
+					$key = 'ezswoole:'.$options['table'].'|'.$data[$pk];
 				}
 				unset( $data[$pk] );
 			} elseif( is_array( $pk ) ){
@@ -2424,7 +2424,7 @@ class Query
 		}
 		if( isset( $data ) ){
 			// todo cache tag
-			return 'fashop_'.(is_array( $options['table'] ) ? key( $options['table'] ) : $options['table']).'|'.$data;
+			return 'ezswoole_'.(is_array( $options['table'] ) ? key( $options['table'] ) : $options['table']).'|'.$data;
 		} else{
 			return md5( serialize( $options ).serialize( $bind ) );
 		}
@@ -2469,7 +2469,7 @@ class Query
 			// 判断查询缓存
 			$cache = $options['cache'];
 			if( true === $cache['key'] && !is_null( $data ) && !is_array( $data ) ){
-				$key = 'fashop:'.(is_array( $options['table'] ) ? key( $options['table'] ) : $options['table']).'|'.$data;
+				$key = 'ezswoole:'.(is_array( $options['table'] ) ? key( $options['table'] ) : $options['table']).'|'.$data;
 			} elseif( is_string( $cache['key'] ) ){
 				$key = $cache['key'];
 			} elseif( !isset( $key ) ){
@@ -2685,7 +2685,7 @@ class Query
 		if( !is_null( $data ) && true !== $data ){
 			if( !isset( $key ) && !is_array( $data ) ){
 				// 缓存标识
-				$key = 'fashop:'.$options['table'].'|'.$data;
+				$key = 'ezswoole:'.$options['table'].'|'.$data;
 			}
 			// AR模式分析主键条件
 			$this->parsePkWhere( $data, $options );

@@ -1,8 +1,8 @@
 <?php
 
-namespace fashop\db\exception;
+namespace ezswoole\db\exception;
 
-use fashop\exception\DbException;
+use ezswoole\exception\DbException;
 
 class ModelNotFoundException extends DbException {
 	protected $model;

@@ -1,6 +1,6 @@
 <?php
 
-namespace fashop\log\driver;
+namespace ezswoole\log\driver;
 
 /**
  * 模拟测试输出

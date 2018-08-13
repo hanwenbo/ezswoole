@@ -12,7 +12,7 @@
  * @author     hanwenbo <9476400@qq.com>
  */
 
-namespace fashop;
+namespace ezswoole;
 
 use EasySwoole\Core\Swoole\ServerManager;
 

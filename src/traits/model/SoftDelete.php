@@ -2,7 +2,7 @@
 
 namespace traits\model;
 
-use fashop\db\Query;
+use ezswoole\db\Query;
 
 trait SoftDelete
 {

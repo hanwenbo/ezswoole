@@ -1,6 +1,6 @@
 <?php
 
-namespace fashop;
+namespace ezswoole;
 
 class Lang
 {
@@ -23,7 +23,7 @@ class Lang
 	 * 多语言cookie变量
 	 * @var string
 	 */
-	protected $langCookieVar = 'fashop_var';
+	protected $langCookieVar = 'ezswoole_var';
 	/**
 	 * 允许的多语言列表
 	 * @var array

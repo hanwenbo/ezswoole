@@ -1,6 +1,6 @@
 <?php
 
-namespace fashop;
+namespace ezswoole;
 class Cookie
 {
 	public static $path = '/';

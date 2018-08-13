@@ -12,9 +12,9 @@
  * @author     hanwenbo <9476400@qq.com>
  */
 
-namespace fashop\log\driver;
+namespace ezswoole\log\driver;
 
-use fashop\App;
+use ezswoole\App;
 
 /**
  * 本地化调试输出到文件

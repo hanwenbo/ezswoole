@@ -1,11 +1,11 @@
 <?php
 
-namespace fashop\console\command;
+namespace ezswoole\console\command;
 
-use fashop\console\Command;
-use fashop\console\Input;
-use fashop\console\input\Option;
-use fashop\console\Output;
+use ezswoole\console\Command;
+use ezswoole\console\Input;
+use ezswoole\console\input\Option;
+use ezswoole\console\Output;
 
 class Build extends Command {
 
@@ -23,7 +23,7 @@ class Build extends Command {
 
 	protected function execute(Input $input, Output $output) {
 		if ($input->hasOption('module')) {
-			\fashop\Build::module($input->getOption('module'));
+			\ezswoole\Build::module($input->getOption('module'));
 			$output->writeln("Successed");
 			return;
 		}
@@ -37,7 +37,7 @@ class Build extends Command {
 			$output->writeln("Build Config Is Empty");
 			return;
 		}
-		\fashop\Build::run($build);
+		\ezswoole\Build::run($build);
 		$output->writeln("Successed");
 
 	}

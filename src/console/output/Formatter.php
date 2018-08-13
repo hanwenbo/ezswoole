@@ -1,8 +1,8 @@
 <?php
-namespace fashop\console\output;
+namespace ezswoole\console\output;
 
-use fashop\console\output\formatter\Stack as StyleStack;
-use fashop\console\output\formatter\Style;
+use ezswoole\console\output\formatter\Stack as StyleStack;
+use ezswoole\console\output\formatter\Style;
 
 class Formatter {
 

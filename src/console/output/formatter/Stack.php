@@ -1,6 +1,6 @@
 <?php
 
-namespace fashop\console\output\formatter;
+namespace ezswoole\console\output\formatter;
 
 class Stack {
 

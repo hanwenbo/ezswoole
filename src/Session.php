@@ -1,6 +1,6 @@
 <?php
 
-namespace fashop;
+namespace ezswoole;
 
 class Session
 {
@@ -95,7 +95,7 @@ class Session
 			if( empty( $sessid ) ){
 				$sessid = Cookie::get( self::$cookie_key );
 				if( empty( $sessid ) ){
-					$sessid = \fashop\utils\RandomKey::randmd5( 40 );
+					$sessid = \ezswoole\utils\RandomKey::randmd5( 40 );
 					Response::getInstance()->getResponse()->getSwooleResponse()->cookie( self::$cookie_key, $sessid, time() + $this->cookie_lifetime, $this->cookie_path, $this->cookie_domain );
 				}
 			}

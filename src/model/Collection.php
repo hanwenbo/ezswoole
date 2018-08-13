@@ -1,9 +1,9 @@
 <?php
 
-namespace fashop\model;
+namespace ezswoole\model;
 
-use fashop\Collection as BaseCollection;
-use fashop\Model;
+use ezswoole\Collection as BaseCollection;
+use ezswoole\Model;
 
 class Collection extends BaseCollection {
 	/**

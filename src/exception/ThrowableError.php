@@ -1,6 +1,6 @@
 <?php
 
-namespace fashop\exception;
+namespace ezswoole\exception;
 
 class ThrowableError extends \ErrorException {
 	public function __construct(\Throwable $e) {

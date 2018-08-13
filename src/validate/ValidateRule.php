@@ -11,7 +11,7 @@
  *
  */
 
-namespace fashop\validate;
+namespace ezswoole\validate;
 /**
  * Class ValidateRule
  * @package think\validate
