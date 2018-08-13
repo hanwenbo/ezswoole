@@ -69,8 +69,8 @@ abstract class Controller extends AbstractController
 	protected function onRequest( $actionName ) : ?bool
 	{
 		$this->request = Request::getInstance();
-		$this->get     = new SplArray( $this->request->get() );
-		$this->post    = new SplArray( $this->request->post() );
+		$this->get     = $this->request->get() ? new SplArray( $this->request->get() ) : null;
+		$this->post    = $this->request->post() ? new SplArray( $this->request->post() ) : null;
 		return null;
 	}
 
@@ -94,7 +94,7 @@ abstract class Controller extends AbstractController
 			"msg"    => $message,
 		];
 		$this->response()->write( json_encode( $content, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) );
-		trace( $content, 'debug' );
+		wsdebug()->send( $content, 'debug' );
 	}
 
 	protected function getPageLimit()

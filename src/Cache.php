@@ -70,7 +70,6 @@ class Cache {
 	public function delete($key) {
 		return $this->adapter->delete($key);
 	}
-	// todo 增加tag Query里有牵连
 
 	/**
 	 * @method GET

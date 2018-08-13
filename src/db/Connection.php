@@ -9,7 +9,6 @@ use fashop\Exception;
 use fashop\exception\PDOException;
 use fashop\Log;
 use PDO;
-use EasySwoole\Core\Component\Di;
 use EasySwoole\Core\Component\Logger;
 
 /**
@@ -258,7 +257,10 @@ abstract class Connection
 	 */
 	public function connect( array $config = [], $linkNum = 0, $autoConnection = false )
 	{
-		if( !isset( $this->links[$linkNum] ) || !$this->ping($this->links[$linkNum])){
+		if( !isset( $this->links[$linkNum] ) || !$this->ping( $this->links[$linkNum] ) ){
+			wsdebug()->send( [
+				'mysql connect' => $linkNum,
+			] );
 			if( !$config ){
 				$config = $this->config;
 			} else{
@@ -293,33 +295,41 @@ abstract class Connection
 			} catch( \PDOException $e ){
 				if( $autoConnection ){
 					Log::record( $e->getMessage(), 'error' );
-					return $this->connect( $config,  $linkNum , $autoConnection );
+					return $this->connect( $config, $linkNum, $autoConnection );
 				} else{
 					throw $e;
 				}
 			}
+		} else{
+			wsdebug()->send( [
+				'mysql connect' => $linkNum,
+				'用的老的'          => 1,
+			] );
 		}
 		return $this->links[$linkNum];
 	}
+
 	/**
 	 * 检查连接是否可用
 	 * @param Link $connect 数据库连接
 	 * @return Boolean
 	 */
-	public function ping( $connect){
-		if(!$connect instanceof PDO || empty($connect) ){
+	public function ping( $connect )
+	{
+		if( !$connect instanceof PDO || empty( $connect ) ){
 			return false;
 		}
 		try{
-			$connect->getAttribute(PDO::ATTR_SERVER_INFO);
-		} catch (\PDOException $e) {
-			if(strpos($e->getMessage(), 'MySQL server has gone away')!==false){
+			$connect->getAttribute( PDO::ATTR_SERVER_INFO );
+		} catch( \PDOException $e ){
+			if( strpos( $e->getMessage(), 'MySQL server has gone away' ) !== false ){
 				$this->close();
 				return false;
 			}
 		}
 		return true;
 	}
+
 	/**
 	 * 释放查询结果
 	 * @access public
@@ -721,8 +731,10 @@ abstract class Connection
 	 * 批处理的指令都认为是execute操作
 	 * @access public
 	 * @param array $sqlArray SQL批处理指令
+	 * @throws \PDOException | \Exception
 	 * @return boolean
 	 */
+
 	public function batchQuery( $sqlArray = [] )
 	{
 		if( !is_array( $sqlArray ) ){
@@ -964,7 +976,7 @@ abstract class Connection
 				$this->linkID = $this->linkRead;
 			}
 			// 是否存在  是否被清理  是否断开
-		} elseif( !$this->linkID || empty($this->linkID) || !$this->ping($this->linkID)){
+		} elseif( !$this->linkID || empty( $this->linkID ) || !$this->ping( $this->linkID ) ){
 			// 默认单数据库
 			$this->linkID = $this->connect();
 		}

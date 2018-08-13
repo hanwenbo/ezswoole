@@ -70,6 +70,5 @@ class FaShop
 		// 执行应用
 		$app = new App();
 		$app->run();
-
 	}
 }

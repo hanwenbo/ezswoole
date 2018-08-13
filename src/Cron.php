@@ -2,7 +2,6 @@
 
 namespace fashop;
 
-use EasySwoole\Core\Component\Logger;
 use EasySwoole\Core\Swoole\ServerManager;
 use EasySwoole\Core\Utility\Random;
 
@@ -55,11 +54,13 @@ class Cron
 	 * 运行定时任务
 	 * @author 韩文博
 	 */
-	public function run( )
+	public function run()
 	{
-		if( isset($this->config['task_list']) && !empty( $this->config['task_list'] ) ){
+		if( isset( $this->config['task_list'] ) && !empty( $this->config['task_list'] ) ){
 			$task_list = $this->config['task_list'];
-			Logger::getInstance()->console( "定时任务：加载开始" );
+
+			var_dump( "定时任务：加载开始" );
+			// todo 这有bug  是阻塞的  kankan easyswoole 的最新定时任务
 			// 每次创建都会重新生成，以免和其他缓存命名冲突
 			$this->taskCachePrefix = "cron_".Random::randStr( 10 )."_";
 			// 定时执行
@@ -67,28 +68,36 @@ class Cron
 				$cache = Cache::getInstance();
 				// 分别执行
 				foreach( $task_list as $name => $option ){
-					// 判断是否存在
-					$cache_name = $this->taskCachePrefix.$name;
-					// 是到期需执行 当前时间 > 最后一次时间 + 间隔时间
-					$last_time     = $cache->has( $cache_name ) ? $cache->get( $cache_name ) : 0;
-					$current_time  = time();
-					$interval_time = ceil( $option['interval_time'] );
-					if( $current_time > ($last_time + $interval_time) ){
-						// 检测是否可执行
-						if( $this->checkTask( $name, $option ) === true ){
-							// 执行任务
-							$this->exec( $name, $option );
-							// 设置最后一次执行时间
-							$cache->set( $cache_name, $current_time, $interval_time );
-						} else{
-							// 删除该任务
-							unset( $task_list[$name] );
-						}
+					try{
+						// 判断是否存在
+						$cache_name = $this->taskCachePrefix.$name;
+						// 是到期需执行 当前时间 > 最后一次时间 + 间隔时间
+						$last_time     = $cache->has( $cache_name ) ? $cache->get( $cache_name ) : 0;
+						$current_time  = time();
+						$interval_time = ceil( $option['interval_time'] );
 
+						if( $current_time > ($last_time + $interval_time) ){
+							// 检测是否可执行
+							if( \fashop\Cron::checkTask( $name, $option ) === true ){
+								\EasySwoole\Core\Swoole\Task\TaskManager::async( function() use (  $name, $option ){
+									\fashop\Cron::exec( $name, $option );
+									return true;
+								});
+								// 设置最后一次执行时间
+								$cache->set( $cache_name, $current_time, $interval_time );
+							} else{
+								// 删除该任务
+								unset( $task_list[$name] );
+							}
+						}
+					}catch(\Exception $e){
+						wsdebug()->send([
+							'cron-message'=>$e->getMessage()
+						]);
 					}
 				}
 			} );
-			Logger::getInstance()->console( "定时任务：加载完毕" );
+			var_dump( "定时任务：加载完毕" );
 
 		}
 		return true;
@@ -99,12 +108,12 @@ class Cron
 	 * @datetime 2017-11-02T17:10:25+0800
 	 * @author   韩文博
 	 */
-	private function exec( string $name, array $option )
+	static function exec( string $name, array $option )
 	{
 		list( $class, $function ) = explode( "::", $option['script'] );
-		$result = $class::$function();
-		Logger::getInstance()->console( "定时任务：".$name." 返回".var_export( $result ) );
-		return;
+		$class::$function();
+		//		Logger::getInstance()->console( "定时任务：".$name." 返回".var_export( $result ) );
+		return true;
 	}
 
 	/**
@@ -114,12 +123,12 @@ class Cron
 	 * @param string $option 任务配置[ interval_time 扫描间隔 , script 类方法 ]
 	 * @author   韩文博
 	 */
-	private function checkTask( string $name, array $option )
+	static function checkTask( string $name, array $option )
 	{
 		if( is_callable( explode( "::", $option['script'] ) ) !== true ){
-			Logger::getInstance()->console( "定时任务：".$name." 不存在的script：".$option['script'] );
+			var_dump( "定时任务：".$name." 不存在的script：".$option['script'] );
 			return false;
-		}else{
+		} else{
 			return true;
 		}
 	}

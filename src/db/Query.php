@@ -7,7 +7,6 @@ use fashop\Cache;
 use fashop\Collection;
 use fashop\Config;
 use fashop\Db;
-use fashop\db\exception\BindParamException;
 use fashop\db\exception\DataNotFoundException;
 use fashop\db\exception\ModelNotFoundException;
 use fashop\Exception;

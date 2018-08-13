@@ -63,7 +63,6 @@ class Curl
 				$string   = "{$key}:$value";
 				$header[] = $string;
 			}
-
 			$request->setUserOpt( [CURLOPT_HTTPHEADER => $header] );
 		}
 

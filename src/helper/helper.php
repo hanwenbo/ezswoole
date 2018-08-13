@@ -2,20 +2,20 @@
 
 use fashop\Cache;
 use fashop\Config;
-use fashop\Cookie;
 use fashop\Db;
 use fashop\Debug;
 use fashop\exception\HttpException;
 use fashop\exception\HttpResponseException;
-use fashop\Lang;
 use fashop\Loader;
 use fashop\Log;
 use fashop\Model;
 use fashop\Request;
+use fashop\Cookie;
 use fashop\Session;
-use fashop\Url;
 use Jenssegers\Blade\Blade;
 use EasySwoole\Core\Component\Di;
+use fashop\Response;
+use fashop\WsDebug;
 
 if( !function_exists( 'load_trait' ) ){
 	/**
@@ -47,6 +47,24 @@ if( !function_exists( 'exception' ) ){
 	}
 }
 
+if( !function_exists( 'wsdebug' ) ){
+	/**
+	 * @return WsDebug
+	 */
+	function wsdebug() : WsDebug
+	{
+		$di      = Di::getInstance();
+		$wsdebug = $di->get( 'wsdebug' );
+		if( $wsdebug instanceof WsDebug ){
+			return $wsdebug;
+		} else{
+			$wsdebug = new WsDebug();
+			$di->set( 'wsdebug', $wsdebug );
+			return $wsdebug;
+		}
+	}
+}
+
 if( !function_exists( 'debug' ) ){
 	/**
 	 * 记录时间（微秒）和内存使用情况
@@ -64,7 +82,7 @@ if( !function_exists( 'debug' ) ){
 		}
 	}
 }
-if (!function_exists('lang')){
+if( !function_exists( 'lang' ) ){
 	/**
 	 * 获取语言变量值
 	 * @param string $name 语言变量名
@@ -166,8 +184,8 @@ if( !function_exists( 'validate' ) ){
 	/**
 	 * 实例化验证器
 	 * @method GET
-	 * @param string $name 验证器名称
-	 * @param string $layer 业务层名称
+	 * @param string $name         验证器名称
+	 * @param string $layer        业务层名称
 	 * @param bool   $appendSuffix 是否添加类名后缀
 	 * @return false|object
 	 * @author 韩文博
@@ -184,42 +202,16 @@ if( !function_exists( 'db' ) ){
 	 * @param string       $name   操作的数据表名称（不含前缀）
 	 * @param array|string $config 数据库配置参数
 	 * @param bool         $force  是否强制重新连接
+	 * @throws \fashop\Exception
 	 * @return \fashop\db\Query
 	 */
+
 	function db( $name = '', $config = [], $force = false )
 	{
 		return Db::connect( $config, $force )->name( $name );
 	}
 }
 
-if( !function_exists( 'controller' ) ){
-	/**
-	 * 实例化控制器 格式：[模块/]控制器
-	 * @param string $name         资源地址
-	 * @param string $layer        控制层名称
-	 * @param bool   $appendSuffix 是否添加类名后缀
-	 * @return \fashop\Controller
-	 */
-	function controller( $name, $layer = 'Controller', $appendSuffix = false )
-	{
-		return Loader::controller( $name, $layer, $appendSuffix );
-	}
-}
-
-if( !function_exists( 'action' ) ){
-	/**
-	 * 调用模块的操作方法 参数格式 [模块/控制器/]操作
-	 * @param string       $url          调用地址
-	 * @param string|array $vars         调用参数 支持字符串和数组
-	 * @param string       $layer        要调用的控制层名称
-	 * @param bool         $appendSuffix 是否添加类名后缀
-	 * @return mixed
-	 */
-	function action( $url, $vars = [], $layer = 'Controller', $appendSuffix = false )
-	{
-		return Loader::action( $url, $vars, $layer, $appendSuffix );
-	}
-}
 
 if( !function_exists( 'import' ) ){
 	/**
@@ -254,14 +246,13 @@ if( !function_exists( 'dump' ) ){
 	 * @param mixed   $var   变量
 	 * @param boolean $echo  是否输出 默认为true 如果为false 则返回输出字符串
 	 * @param string  $label 标签 默认为空
-	 * @return void|string
+	 * @return string|null
 	 */
-	function dump( $var, $echo = true, $label = null )
+	function dump( $var, $echo = true, $label = null ) : ?string
 	{
 		return Debug::dump( $var, $echo, $label );
 	}
 }
-
 
 
 if( !function_exists( 'session' ) ){
@@ -272,23 +263,16 @@ if( !function_exists( 'session' ) ){
 	 * @param string       $prefix 前缀
 	 * @return mixed
 	 */
-	function session( $name, $value = '', $prefix = null )
+	function session( $name = null, $value = '', $prefix = null )
 	{
-		if( is_array( $name ) ){
-			// 初始化
-			Session::init( $name );
-		} elseif( is_null( $name ) ){
-			// 清除
-			Session::clear( '' === $value ? null : $value );
-		} elseif( '' === $value ){
-			// 判断或获取
-			return 0 === strpos( $name, '?' ) ? Session::has( substr( $name, 1 ), $prefix ) : Session::get( $name, $prefix );
+		if( is_null( $name ) ){
+			return Session::get();
+		} else if( '' === $value ){
+			return Session::get( $name );
 		} elseif( is_null( $value ) ){
-			// 删除
-			return Session::delete( $name, $prefix );
+			Session::delete( $name );
 		} else{
-			// 设置
-			return Session::set( $name, $value, $prefix );
+			Session::set( $name, $value );
 		}
 	}
 }
@@ -303,21 +287,14 @@ if( !function_exists( 'cookie' ) ){
 	 */
 	function cookie( $name, $value = '', $option = null )
 	{
-		if( is_array( $name ) ){
-			// 初始化
-			Cookie::init( $name );
-		} elseif( is_null( $name ) ){
-			// 清除
-			Cookie::clear( $value );
-		} elseif( '' === $value ){
-			// 获取
-			return 0 === strpos( $name, '?' ) ? Cookie::has( substr( $name, 1 ), $option ) : Cookie::get( $name, $option );
+		if( is_null( $name ) ){
+			return Cookie::get();
+		} else if( '' === $value ){
+			return Cookie::get( $name, $option );
 		} elseif( is_null( $value ) ){
-			// 删除
-			return Cookie::delete( $name );
+			Cookie::delete( $name );
 		} else{
-			// 设置
-			return Cookie::set( $name, $value, $option );
+			Cookie::set( $name, $value, $option );
 		}
 	}
 }
@@ -332,9 +309,7 @@ if( !function_exists( 'cache' ) ){
 	 */
 	function cache( $name, $value = '', $expire = null )
 	{
-
 		$cache = Cache::getInstance();
-
 		if( is_null( $name ) ){
 			return $cache->clear( $value );
 		} elseif( '' === $value ){
@@ -355,14 +330,15 @@ if( !function_exists( 'trace' ) ){
 	 * 记录日志信息
 	 * @param mixed  $log   log信息 支持字符串和数组
 	 * @param string $level 日志级别
-	 * @return void|array
+	 * @return null|array
 	 */
-	function trace( $log = '[fashop]', $level = 'trace' )
+	function trace( $log = '[fashop]', $level = 'trace' ) : ?array
 	{
 		if( '[fashop]' === $log ){
 			return Log::getLog();
 		} else{
 			Log::write( $log, $level );
+			return null;
 		}
 	}
 }
@@ -385,7 +361,7 @@ if( !function_exists( 'response' ) ){
 	 */
 	function response( \swoole_http_response $response = null )
 	{
-		return \Core\Http\Response::getInstance( $response );
+		return Response::getInstance( $response );
 	}
 }
 
@@ -448,32 +424,6 @@ if( !function_exists( 'abort' ) ){
 		} else{
 			throw new HttpException( $code, $message, null, $header );
 		}
-	}
-}
-
-if( !function_exists( 'halt' ) ){
-	/**
-	 * 调试变量并且中断输出
-	 * @param mixed $var 调试变量或者信息
-	 */
-	function halt( $var )
-	{
-		dump( $var );
-		throw new HttpResponseException( new Response );
-	}
-}
-
-if( !function_exists( 'token' ) ){
-	/**
-	 * 生成表单令牌
-	 * @param string $name 令牌名称
-	 * @param mixed  $type 令牌生成方法
-	 * @return string
-	 */
-	function token( $name = '__token__', $type = 'md5' )
-	{
-		$token = Request::getInstance()->token( $name, $type );
-		return '<input type="hidden" name="'.$name.'" value="'.$token.'" />';
 	}
 }
 

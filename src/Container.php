@@ -185,12 +185,12 @@ class Container
 		return $reflect->invokeArgs( $args );
 	}
 
-	/**
-	 * 调用反射执行类的方法 支持参数绑定
-	 * @access public
-	 * @param  string|array $method 方法
-	 * @param  array        $vars   变量
+	/**调用反射执行类的方法 支持参数绑定
+	 * @param       $method
+	 * @param array $vars
 	 * @return mixed
+	 * @throws \ReflectionException
+	 * @author 韩文博
 	 */
 	public function invokeMethod( $method, $vars = [] )
 	{

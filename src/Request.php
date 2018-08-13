@@ -594,7 +594,7 @@ class Request
 	public function put( $name = '', $default = null, $filter = '' )
 	{
 		if( is_null( $this->put ) ){
-			$content = $this->raw();
+			$content = $this->getEsRequest()->getSwooleRequest()->rawContent();
 			if( false !== strpos( $this->contentType(), 'application/json' ) ){
 				$this->put = (array)json_decode( $content, true );
 			} else{
@@ -636,24 +636,7 @@ class Request
 	}
 
 	/**
-	 * 获取request变量
-	 * @param string       $name    数据名称
-	 * @param string       $default 默认值
-	 * @param string|array $filter  过滤方法
-	 * @return mixed
-	 */
-	//	public function request( $name = '', $default = null, $filter = '' )
-	//	{
-	//		if( is_array( $name ) ){
-	//			$this->param = [];
-	//			return $this->esRequest = array_merge( $this->esRequest, $name );
-	//		}
-	//		return $this->input( $this->esRequest, $name, $default, $filter );
-	//	}
-
-	/**
 	 * 获取session数据
-	 * todo
 	 * @access public
 	 * @param string|array $name    数据名称
 	 * @param string       $default 默认值
@@ -673,7 +656,6 @@ class Request
 
 	/**
 	 * 获取cookie参数
-	 * todo
 	 * @access public
 	 * @param string|array $name    数据名称
 	 * @param string       $default 默认值
@@ -905,7 +887,7 @@ class Request
 				}
 			}
 		}
-		 $this->filterExp( $value );
+		$this->filterExp( $value );
 	}
 
 	/**
@@ -1299,7 +1281,7 @@ class Request
 		}
 	}
 
-	public function getContent() : ? string
+	public function getContent() : ?string
 	{
 		$content = $this->esRequest->getSwooleRequest()->rawContent();
 		if( is_null( $content ) ){
@@ -1314,10 +1296,11 @@ class Request
 	 * @access public
 	 * @return string
 	 */
-	public function getInput() : ? string
+	public function getInput() : ?string
 	{
 		return $this->getEsRequest()->getSwooleRequest()->rawContent();
 	}
+
 	/**
 	 * 生成请求令牌
 	 * @access public
@@ -1428,7 +1411,8 @@ class Request
 	{
 		return $this->cache;
 	}
-	static function clearGlobalVariables(  )
+
+	static function clearGlobalVariables()
 	{
 		$_GET    = null;
 		$_POST   = null;
@@ -1436,6 +1420,7 @@ class Request
 		$_FILES  = null;
 		$_SERVER = null;
 	}
+
 	static function setGlobalVariables( EasySwooleRequest $request )
 	{
 		$_GET    = isset( $request->getSwooleRequest()->get ) ? $request->getSwooleRequest()->get : [];
@@ -1513,5 +1498,4 @@ class Request
 			self::$hook[$method] = $callback;
 		}
 	}
-
 }

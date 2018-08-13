@@ -12,60 +12,71 @@ use fashop\Response;
 use EasySwoole\Core\Http\Request as EasySwooleRequest;
 use EasySwoole\Core\Http\Response as EasySwooleResponse;
 
-class Handle {
-	protected $request ;
+class Handle
+{
+	protected $request;
 	/**
 	 * @var \EasySwoole\Core\Http\Response
 	 */
 	protected $response;
 	protected $render;
-	protected $ignoreReport = [
-		'\\fashop\\exception\\HttpException',
-	];
-	public function setRender($render) {
+	protected $ignoreReport
+		= [
+			'\\fashop\\exception\\HttpException',
+		];
+
+	public function setRender( $render )
+	{
 		$this->render = $render;
 	}
-	public function setResponse( EasySwooleResponse $response ){
+
+	public function setResponse( EasySwooleResponse $response )
+	{
 		$this->response = $response;
 	}
-	public function setRequest(EasySwooleRequest $request){
+
+	public function setRequest( EasySwooleRequest $request )
+	{
 		$this->request = $request;
 	}
+
 	/**
 	 * Report or log an exception.
 	 *
 	 * @param  \Exception $exception
 	 * @return void
 	 */
-	public function report(Exception $exception) {
-		if (!$this->isIgnoreReport($exception)) {
+	public function report( Exception $exception )
+	{
+		if( !$this->isIgnoreReport( $exception ) ){
 			// 收集异常数据
-			if (App::$debug) {
+			if( App::$debug ){
 				$data = [
 					'file'    => $exception->getFile(),
 					'line'    => $exception->getLine(),
-					'message' => $this->getMessage($exception),
-					'code'    => $this->getCode($exception),
+					'message' => $this->getMessage( $exception ),
+					'code'    => $this->getCode( $exception ),
 				];
-				$log = "[{$data['code']}]{$data['message']}[{$data['file']}:{$data['line']}]";
-			} else {
+				$log  = "[{$data['code']}]{$data['message']}[{$data['file']}:{$data['line']}]";
+			} else{
 				$data = [
-					'code'    => $this->getCode($exception),
-					'message' => $this->getMessage($exception),
+					'code'    => $this->getCode( $exception ),
+					'message' => $this->getMessage( $exception ),
 				];
-				$log = "[{$data['code']}]{$data['message']}";
+				$log  = "[{$data['code']}]{$data['message']}";
 			}
 
-			if (Config::get('record_trace')) {
-				$log .= "\r\n" . $exception->getTraceAsString();
+			if( Config::get( 'record_trace' ) ){
+				$log .= "\r\n".$exception->getTraceAsString();
 			}
-			Log::record($log, 'error');
+			Log::record( $log, 'error' );
 		}
 	}
 
-	protected function isIgnoreReport(Exception $exception) {
-		foreach ($this->ignoreReport as $class) {
-			if ($exception instanceof $class) {
+	protected function isIgnoreReport( Exception $exception )
+	{
+		foreach( $this->ignoreReport as $class ){
+			if( $exception instanceof $class ){
 				return true;
 			}
 		}
@@ -74,21 +85,22 @@ class Handle {
 
 	/**
 	 * Render an exception into an HTTP response.
-	 *
-	 * @param  \Exception $e
-	 * @return Response
+	 * @param Exception $e
+	 * @return Response|mixed
+	 * @throws Exception
 	 */
-	public function render(Exception $e) {
-		if ($this->render && $this->render instanceof \Closure) {
-			$result = call_user_func_array($this->render, [$e]);
-			if ($result) {
+	public function render( Exception $e )
+	{
+		if( $this->render && $this->render instanceof \Closure ){
+			$result = call_user_func_array( $this->render, [$e] );
+			if( $result ){
 				return $result;
 			}
 		}
-		if ($e instanceof HttpException) {
-			return $this->renderHttpException($e);
-		} else {
-			return $this->convertExceptionToResponse($e);
+		if( $e instanceof HttpException ){
+			return $this->renderHttpException( $e );
+		} else{
+			return $this->convertExceptionToResponse( $e );
 		}
 	}
 
@@ -96,73 +108,88 @@ class Handle {
 	 * @param Output    $output
 	 * @param Exception $e
 	 */
-	public function renderForConsole(Output $output, Exception $e) {
-		if (App::$debug) {
-			$output->setVerbosity(Output::VERBOSITY_DEBUG);
+	public function renderForConsole( Output $output, Exception $e )
+	{
+		if( App::$debug ){
+			$output->setVerbosity( Output::VERBOSITY_DEBUG );
 		}
-		$output->renderException($e);
+		$output->renderException( $e );
 	}
 
 	/**
 	 * @param HttpException $e
 	 * @return Response
+	 * @throws Exception
+	 * @author 韩文博
 	 */
-	protected function renderHttpException(HttpException $e) {
+	protected function renderHttpException( HttpException $e )
+	{
 		$status   = $e->getStatusCode();
-		$template = Config::get('http_exception_template');
-		if (!App::$debug && !empty($template[$status])) {
-			return Response::create($template[$status], 'view', $status)->assign(['e' => $e]);
-		} else {
-			return $this->convertExceptionToResponse($e);
+		$template = Config::get( 'http_exception_template' );
+		if( !App::$debug && !empty( $template[$status] ) ){
+			//			return Response::create($template[$status], 'view', $status)->assign(['e' => $e]);
+		} else{
+			return $this->convertExceptionToResponse( $e );
 		}
 	}
 
 	/**
 	 * @param Exception $exception
-	 * @return Response
+	 * @throws Exception
 	 */
-	protected function convertExceptionToResponse(Exception $exception) {
+	protected function convertExceptionToResponse( Exception $exception )
+	{
 		// 收集异常数据
-		if (App::$debug) {
+		if( App::$debug ){
 			// 调试模式，获取详细的错误信息
 			$data = [
-				'name'    => get_class($exception),
+				'name'    => get_class( $exception ),
 				'file'    => $exception->getFile(),
 				'line'    => $exception->getLine(),
-				'message' => $this->getMessage($exception),
+				'message' => $this->getMessage( $exception ),
 				'trace'   => $exception->getTrace(),
-				'code'    => $this->getCode($exception),
-				'source'  => $this->getSourceCode($exception),
-				'datas'   => $this->getExtendData($exception),
+				'code'    => $this->getCode( $exception ),
+				'source'  => $this->getSourceCode( $exception ),
+				'datas'   => $this->getExtendData( $exception ),
 				'tables'  => [
 
 				],
 			];
-		} else {
+		} else{
 			// 部署模式仅显示 Code 和 Message
 			$data = [
-				'code'    => $this->getCode($exception),
-				'message' => $this->getMessage($exception),
+				'code'    => $this->getCode( $exception ),
+				'message' => $this->getMessage( $exception ),
 			];
 
-			if (!Config::get('show_error_msg')) {
+			if( !Config::get( 'show_error_msg' ) ){
 				// 不显示详细错误信息
-				$data['message'] = Config::get('error_message');
+				$data['message'] = Config::get( 'error_message' );
 			}
 		}
 		ob_start();
-		extract($data);
-		include Config::get('exception_tmpl');
+		extract( $data );
+		include Config::get( 'exception_tmpl' );
 		$content = ob_get_clean();
-		if (!isset($statusCode)) {
+		if( !isset( $statusCode ) ){
 			$statusCode = 500;
 		}
-		$this->response->withStatus($statusCode);
-		$this->response->withAddedHeader('Content-Type','text/html;charset=utf-8');
-		if(ob_get_length()){
+		$this->response->withStatus( $statusCode );
+		$this->response->withAddedHeader( 'Content-Type', 'text/html;charset=utf-8' );
+		if( ob_get_length() ){
 			ob_end_clean();
 		}
-		$this->response->getSwooleResponse()->end($content);
+		$this->response->getSwooleResponse()->end( $content );
+		if( config( 'wsdebug.open' ) === true ){
+			wsdebug()->send( [
+				'code'     => $exception->getCode(),
+				'line'     => $exception->getLine(),
+				'file'     => $exception->getFile(),
+				'message'  => $exception->getMessage(),
+				'previous' => $exception->getPrevious(),
+				'trace'    => $exception->getTraceAsString(),
+			], 'error' );
+		}
 		// 抛出错误为了中断
 		throw $exception;
 
@@ -174,9 +201,10 @@ class Handle {
 	 * @param  \Exception $exception
 	 * @return integer                错误编码
 	 */
-	protected function getCode(Exception $exception) {
+	protected function getCode( Exception $exception )
+	{
 		$code = $exception->getCode();
-		if (!$code && $exception instanceof ErrorException) {
+		if( !$code && $exception instanceof ErrorException ){
 			$code = $exception->getSeverity();
 		}
 		return $code;
@@ -188,20 +216,21 @@ class Handle {
 	 * @param  \Exception $exception
 	 * @return string                错误信息
 	 */
-	protected function getMessage(Exception $exception) {
+	protected function getMessage( Exception $exception )
+	{
 		$message = $exception->getMessage();
-		if (IS_CLI) {
+		if( IS_CLI ){
 			return $message;
 		}
 
-		if (strpos($message, ':')) {
-			$name    = strstr($message, ':', true);
-			$message = Lang::has($name) ? Lang::get($name) . strstr($message, ':') : $message;
-		} elseif (strpos($message, ',')) {
-			$name    = strstr($message, ',', true);
-			$message = Lang::has($name) ? Lang::get($name) . ':' . substr(strstr($message, ','), 1) : $message;
-		} elseif (Lang::has($message)) {
-			$message = Lang::get($message);
+		if( strpos( $message, ':' ) ){
+			$name    = strstr( $message, ':', true );
+			$message = Lang::has( $name ) ? Lang::get( $name ).strstr( $message, ':' ) : $message;
+		} elseif( strpos( $message, ',' ) ){
+			$name    = strstr( $message, ',', true );
+			$message = Lang::has( $name ) ? Lang::get( $name ).':'.substr( strstr( $message, ',' ), 1 ) : $message;
+		} elseif( Lang::has( $message ) ){
+			$message = Lang::get( $message );
 		}
 		return $message;
 	}
@@ -212,18 +241,19 @@ class Handle {
 	 * @param  \Exception $exception
 	 * @return array                 错误文件内容
 	 */
-	protected function getSourceCode(Exception $exception) {
+	protected function getSourceCode( Exception $exception )
+	{
 		// 读取前9行和后9行
 		$line  = $exception->getLine();
 		$first = ($line - 9 > 0) ? $line - 9 : 1;
 
-		try {
-			$contents = file($exception->getFile());
+		try{
+			$contents = file( $exception->getFile() );
 			$source   = [
 				'first'  => $first,
-				'source' => array_slice($contents, $first - 1, 19),
+				'source' => array_slice( $contents, $first - 1, 19 ),
 			];
-		} catch (Exception $e) {
+		} catch( Exception $e ){
 			$source = [];
 		}
 		return $source;
@@ -235,9 +265,10 @@ class Handle {
 	 * @param  \Exception $exception
 	 * @return array                 异常类定义的扩展数据
 	 */
-	protected function getExtendData(Exception $exception) {
+	protected function getExtendData( Exception $exception )
+	{
 		$data = [];
-		if ($exception instanceof \fashop\Exception) {
+		if( $exception instanceof \fashop\Exception ){
 			$data = $exception->getData();
 		}
 		return $data;
