@@ -12,12 +12,11 @@ namespace ezswoole;
  * Time: 下午4:21
  *
  */
-
 class Init
 {
 	public static function register()
 	{
-		defined( 'FASHOP_VERSION' ) or define( 'FASHOP_VERSION','1.0' );
+		defined( 'FASHOP_VERSION' ) or define( 'FASHOP_VERSION', '1.0' );
 		define( 'FASHOP_START_TIME', microtime( true ) );
 		define( 'FASHOP_START_MEM', memory_get_usage() );
 		define( 'EXT', '.php' );
