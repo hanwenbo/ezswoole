@@ -6,7 +6,8 @@
   "require": {
     "php": ">=7.2",
     "easyswoole/easyswoole": "v2.1.1",
-    "phpFastCache/phpFastCache": "^6.0"
+    "phpFastCache/phpFastCache": "^6.0",
+    "easyswoole/wsdebug": "^1"
   },
   "license" : "Apache-2.0",
   "authors": [

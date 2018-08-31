@@ -1,0 +1,39 @@
+{
+    "name": "ezswoole",
+    "description": "ezswoole",
+    "type": "project",
+    "keywords": [
+        "ezswoole",
+        "fashop",
+        "shop",
+        "mojikeji"
+    ],
+    "homepage": "http://www.fashop.cn/",
+    "authors": [{
+        "name": "hanwenbo",
+        "email": "9476400@qq.com"
+    }],
+    "require": {
+        "php": "^7.2",
+        "easyswoole/easyswoole": "v2.1.1",
+        "phpFastCache/phpFastCache": "^6.0",
+        "easyswoole/wsdebug": "^1"
+    },
+    "autoload": {
+        "psr-4": {
+            "EasySwoole\\" : "Conf/",
+            "App\\": "App/",
+            "ezswoole\\": "../src/"
+        },
+        "files": ["../src/helper/helper.php"]
+    },
+    "require-dev": {
+        "easyswoole/swoole-ide-helper": "dev-master"
+    },
+    "repositories": {
+        "packagist": {
+            "type": "composer",
+            "url": "https://packagist.laravel-china.org"
+        }
+    }
+}

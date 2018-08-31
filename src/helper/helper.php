@@ -12,10 +12,10 @@ use ezswoole\Model;
 use ezswoole\Request;
 use ezswoole\Cookie;
 use ezswoole\Session;
-use Jenssegers\Blade\Blade;
 use EasySwoole\Core\Component\Di;
 use ezswoole\Response;
-use ezswoole\WsDebug;
+use wsdebug\WsDebug;
+use EasySwoole\Core\Swoole\ServerManager;
 
 if( !function_exists( 'load_trait' ) ){
 	/**
@@ -59,6 +59,7 @@ if( !function_exists( 'wsdebug' ) ){
 			return $wsdebug;
 		} else{
 			$wsdebug = new WsDebug();
+			$wsdebug->setServer( ServerManager::getInstance()->getServer() );
 			$di->set( 'wsdebug', $wsdebug );
 			return $wsdebug;
 		}
@@ -472,11 +473,11 @@ if( !function_exists( 'view' ) ){
 	 */
 	function view( $view = null, $data = [], $mergeData = [] )
 	{
-		$blade = Di::getInstance()->get( 'BladeView' );
-		if( !$blade ){
-			Di::getInstance()->set( 'BladeView', Blade::class, APP_PATH.'View', CACHE_PATH.'html' );
-			$blade = Di::getInstance()->get( 'BladeView' );
-		}
-		return $blade->make( $view, $data, $mergeData );
+		//		$blade = Di::getInstance()->get( 'BladeView' );
+		//		if( !$blade ){
+		//			Di::getInstance()->set( 'BladeView', Blade::class, APP_PATH.'View', CACHE_PATH.'html' );
+		//			$blade = Di::getInstance()->get( 'BladeView' );
+		//		}
+		//		return $blade->make( $view, $data, $mergeData );
 	}
 }
