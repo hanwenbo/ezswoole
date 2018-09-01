@@ -4,6 +4,7 @@ namespace ezswoole;
 
 use EasySwoole\Core\Http\Request;
 use EasySwoole\Core\Http\Response;
+use EasySwoole\Core\Utility\File;
 
 /**
  * App 应用管理
@@ -61,6 +62,7 @@ class App
 
 	public function run()
 	{
+		$this->initDir();
 		$this->initBase();
 		$this->initConfig();
 		$this->initApp();
@@ -152,6 +154,29 @@ class App
 			Config::load( CONF_PATH.Config::get( 'app_status' ).CONF_EXT );
 		}
 		$this->config = Config::get();
+	}
+
+	private function initDir() : void
+	{
+		if( !is_dir( RUNTIME_PATH ) ){
+			File::createDir( RUNTIME_PATH );
+		}
+		if( !is_dir( LOG_PATH ) ){
+			File::createDir( LOG_PATH );
+		}
+		if( !is_dir( CACHE_PATH ) ){
+			File::createDir( CACHE_PATH );
+		}
+		if( !is_dir( TEMP_PATH ) ){
+			File::createDir( TEMP_PATH );
+		}
+		if( !is_dir( CONF_PATH ) ){
+			File::createDir( CONF_PATH );
+		}
+		// 存放子配置项 如微信 定时任务等
+		if( !is_dir( CONF_PATH.'config/' ) ){
+			File::createDir( CONF_PATH.'config/' );
+		}
 	}
 
 	static function addHook( $type, $func )
