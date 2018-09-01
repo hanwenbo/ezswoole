@@ -8,5 +8,6 @@ composer require hanwenbo/ezswoole
 
 # TODO
 - 文档
-- 测试脚本
+- 测试脚本完善
 - Demo演示
+- V3版本开发：增加携程开发、原生mysqli或pdo的链接
