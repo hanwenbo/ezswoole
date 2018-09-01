@@ -23,9 +23,9 @@
         "psr-4": {
             "EasySwoole\\" : "Conf/",
             "App\\": "App/",
-            "ezswoole\\": "../src/"
+            "ezswoole\\": "../../src/"
         },
-        "files": ["../src/helper/helper.php"]
+        "files": ["../../src/helper/helper.php"]
     },
     "require-dev": {
         "easyswoole/swoole-ide-helper": "dev-master"

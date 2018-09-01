@@ -14,7 +14,7 @@ use ezswoole\Cookie;
 use ezswoole\Session;
 use EasySwoole\Core\Component\Di;
 use ezswoole\Response;
-use wsdebug\WsDebug;
+use ezswoole\WsDebug;
 use EasySwoole\Core\Swoole\ServerManager;
 
 if( !function_exists( 'load_trait' ) ){
