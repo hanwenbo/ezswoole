@@ -28,7 +28,7 @@ class WsDebug extends \wsdebug\WsDebug
 	public function getHtml() : string
 	{
 		if( config( 'app_debug' ) === true ){
-			parent::getHtml();
+			return parent::getHtml();
 		} else{
 			return 'closed';
 		}
