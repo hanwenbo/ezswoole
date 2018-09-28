@@ -58,11 +58,8 @@ class Cron
 	{
 		if( isset( $this->config['task_list'] ) && !empty( $this->config['task_list'] ) ){
 			$task_list = $this->config['task_list'];
-
-			var_dump( "定时任务：加载开始" );
-			// todo 这有bug  是阻塞的  kankan easyswoole 的最新定时任务
 			// 每次创建都会重新生成，以免和其他缓存命名冲突
-			$this->taskCachePrefix = "cron_".Random::randStr( 10 )."_";
+			$this->taskCachePrefix = "cron_ezswoole_";
 			// 定时执行
 			ServerManager::getInstance()->getServer()->tick( $this->config['loop_time'] * 1000, function() use ( &$task_list ){
 				$cache = Cache::getInstance();
@@ -97,8 +94,6 @@ class Cron
 					}
 				}
 			} );
-			var_dump( "定时任务：加载完毕" );
-
 		}
 		return true;
 	}
