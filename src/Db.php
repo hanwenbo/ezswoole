@@ -68,10 +68,7 @@ class Db {
 				throw new \InvalidArgumentException('Undefined db type');
 			}
 			$class = false !== strpos($options['type'], '\\') ? $options['type'] : '\\ezswoole\\db\\connector\\' . ucwords($options['type']);
-			// 记录初始化信息
-			if (App::$debug) {
-				Log::record('[ DB ] INIT ' . $options['type'], 'info');
-			}
+
 			if (true === $name) {
 				$name = md5(serialize($config));
 			}
