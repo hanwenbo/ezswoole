@@ -76,12 +76,13 @@ class Cron
 						if( $current_time > ($last_time + $interval_time) ){
 							// 检测是否可执行
 							if( \ezswoole\Cron::checkTask( $name, $option ) === true ){
+								// 设置最后一次执行时间 不可等任务执行完毕后再设置时间，因为会阻塞导致每秒进行一次
+								$cache->set( $cache_name, $current_time, $interval_time );
+
 								\EasySwoole\Core\Swoole\Task\TaskManager::async( function() use (  $name, $option ){
 									\ezswoole\Cron::exec( $name, $option );
 									return true;
 								});
-								// 设置最后一次执行时间
-								$cache->set( $cache_name, $current_time, $interval_time );
 							} else{
 								// 删除该任务
 								unset( $task_list[$name] );
@@ -107,7 +108,6 @@ class Cron
 	{
 		list( $class, $function ) = explode( "::", $option['script'] );
 		$class::$function();
-		//		Logger::getInstance()->console( "定时任务：".$name." 返回".var_export( $result ) );
 		return true;
 	}
 

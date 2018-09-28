@@ -30,6 +30,7 @@ class EasySwooleEvent implements EventInterface
 				swoole_set_process_name( 'ezswoole' );
 			}
 			if( $worker_id === 0 ){
+				var_dump($worker_id);
 				\ezswoole\Cron::getInstance()->run();
 			}
 		} );
