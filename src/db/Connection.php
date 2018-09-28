@@ -258,9 +258,6 @@ abstract class Connection
 	public function connect( array $config = [], $linkNum = 0, $autoConnection = false )
 	{
 		if( !isset( $this->links[$linkNum] ) || !$this->ping( $this->links[$linkNum] ) ){
-			wsdebug()->send( [
-				'mysql connect' => $linkNum,
-			] );
 			if( !$config ){
 				$config = $this->config;
 			} else{
@@ -300,11 +297,6 @@ abstract class Connection
 					throw $e;
 				}
 			}
-		} else{
-			wsdebug()->send( [
-				'mysql connect' => $linkNum,
-				'用的老的'          => 1,
-			] );
 		}
 		return $this->links[$linkNum];
 	}

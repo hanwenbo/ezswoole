@@ -1,0 +1,1 @@
+\ezswoole\Log::write($e->getFile()."：".$e->getMessage(),'error');
