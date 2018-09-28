@@ -94,7 +94,6 @@ abstract class Controller extends AbstractController
 			"msg"    => $message,
 		];
 		$this->response()->write( json_encode( $content, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) );
-		wsdebug()->send( $content, 'debug' );
 	}
 
 	protected function getPageLimit()

@@ -41,10 +41,10 @@ class Config
 				'SOCK_TYPE'   => SWOOLE_TCP,//该配置项当为SERVER_TYPE值为TYPE_SERVER时有效
 				'RUN_MODEL'   => SWOOLE_PROCESS,
 				"SETTING"     => [
-					'task_worker_num'  => 8, //异步任务进程
+					'task_worker_num'  => 9, //异步任务进程
 					"task_max_request" => 10,
 					'max_request'      => 5000,//强烈建议设置此配置项
-					'worker_num'       => 8,
+					'worker_num'       => 10,
 					'log_file'         => EASYSWOOLE_ROOT."/Runtime/swoole.log",
 					'pid_file'         => EASYSWOOLE_ROOT."/pid.pid",
 					'package_max_length'=>1024 * 1024 * 80
@@ -61,7 +61,7 @@ class Config
 		$config = [
 			'app_host'            => '',
 			// 应用调试模式
-			'app_debug'           => false,
+			'app_debug'           => true,
 			// 入口自动绑定模块
 			'auto_bind_module'    => false,
 			// 默认时区
