@@ -53,8 +53,47 @@ class Curl
 				$request->setUserOpt( [CURLOPT_POSTFIELDS => $params['body']] );
 			}
 		break;
+		case 'PUT' :
+			if( $params && isset( $params['form_params'] ) ){
+				foreach( $params['form_params'] as $key => $value ){
+					$request->addPost( new Field( $key, $value ) );
+				}
+			} elseif( $params && isset( $params['body'] ) ){
+				if( !isset( $params['header']['Content-Type'] ) ){
+					$params['header']['Content-Type'] = 'application/json; charset=utf-8';
+				}
+				$request->setUserOpt( [CURLOPT_CUSTOMREQUEST => "PUT"] );
+				$request->setUserOpt( [CURLOPT_POSTFIELDS => $params['body']] );
+			}
+		break;
+		case 'DELETE' :
+			if( $params && isset( $params['form_params'] ) ){
+				foreach( $params['form_params'] as $key => $value ){
+					$request->addPost( new Field( $key, $value ) );
+				}
+			} elseif( $params && isset( $params['body'] ) ){
+				if( !isset( $params['header']['Content-Type'] ) ){
+					$params['header']['Content-Type'] = 'application/json; charset=utf-8';
+				}
+				$request->setUserOpt( [CURLOPT_CUSTOMREQUEST => "DELETE"] );
+				$request->setUserOpt( [CURLOPT_POSTFIELDS => $params['body']] );
+			}
+		break;
+		case 'PATCH' :
+			if( $params && isset( $params['form_params'] ) ){
+				foreach( $params['form_params'] as $key => $value ){
+					$request->addPost( new Field( $key, $value ) );
+				}
+			} elseif( $params && isset( $params['body'] ) ){
+				if( !isset( $params['header']['Content-Type'] ) ){
+					$params['header']['Content-Type'] = 'application/json; charset=utf-8';
+				}
+				$request->setUserOpt( [CURLOPT_CUSTOMREQUEST => "PATCH"] );
+				$request->setUserOpt( [CURLOPT_POSTFIELDS => $params['body']] );
+			}
+		break;
 		default:
-			throw new \InvalidArgumentException( "method eroor" );
+			throw new \InvalidArgumentException( "method error" );
 		break;
 		}
 
