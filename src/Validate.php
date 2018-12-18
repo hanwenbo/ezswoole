@@ -739,7 +739,6 @@ class Validate
 			$result = $this->json( $value );
 		break;
         case 'phone':
-            // 是否为json
             $result = $this->phone( $value );
             break;
         //TODO email
