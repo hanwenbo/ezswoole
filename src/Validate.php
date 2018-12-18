@@ -738,6 +738,11 @@ class Validate
 			// 是否为json
 			$result = $this->json( $value );
 		break;
+        case 'phone':
+            // 是否为json
+            $result = $this->phone( $value );
+            break;
+        //TODO email
 		default:
 			if( isset( self::$type[$rule] ) ){
 				// 注册的验证规则
