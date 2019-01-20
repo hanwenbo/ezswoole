@@ -1466,11 +1466,12 @@ class Validate
 	 */
 	protected function json( $value )
 	{
-		if( !is_string( $value ) || '' === $value ){
+		$data = json_decode($value,false);
+		if ($data && (is_object($data)) || (is_array($data) && !empty(current($data)))) {
+			return true;
+		}else{
 			return false;
 		}
-		json_decode( $value );
-		return (json_last_error() === JSON_ERROR_NONE);
 	}
 
 	public function getRule()

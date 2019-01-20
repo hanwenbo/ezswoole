@@ -173,6 +173,9 @@ class App
 		if( !is_dir( CONF_PATH ) ){
 			File::createDir( CONF_PATH );
 		}
+		if( !is_dir( UPLOAD_PATH ) ){
+			File::createDir( UPLOAD_PATH );
+		}
 		// 存放子配置项 如微信 定时任务等
 		if( !is_dir( CONF_PATH.'config/' ) ){
 			File::createDir( CONF_PATH.'config/' );

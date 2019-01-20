@@ -1048,21 +1048,6 @@ class Request
 		}
 	}
 
-	/**
-	 * 当前是否Pjax请求
-	 * @access public
-	 * @param bool $pjax true 获取原始pjax请求
-	 * @return bool
-	 */
-	public function isPjax( $pjax = false )
-	{
-		$result = !is_null( $this->server( 'http_x_pjax' ) ) ? true : false;
-		if( true === $pjax ){
-			return $result;
-		} else{
-			return $this->param( Config::get( 'var_pjax' ) ) ? true : $result;
-		}
-	}
 
 	/**
 	 * 获取客户端IP地址

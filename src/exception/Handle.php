@@ -151,9 +151,7 @@ class Handle
 				'code'    => $this->getCode( $exception ),
 				'source'  => $this->getSourceCode( $exception ),
 				'datas'   => $this->getExtendData( $exception ),
-				'tables'  => [
-
-				],
+				'tables'  => [],
 			];
 		} else{
 			// 部署模式仅显示 Code 和 Message
