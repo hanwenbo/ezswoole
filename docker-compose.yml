@@ -1,0 +1,26 @@
+version: '3'
+services:
+  swoole:
+    image: ezkuangren/swoole4
+    ports:
+      - 9510:9510
+    volumes:
+      - ./:/var/www/project
+    stdin_open: true
+    tty: true
+    privileged: true
+#    entrypoint: ["php", "/var/www/fashop/fashop", "start"]
+
+  mysql:
+    image: mysql:${MYSQL_VERSION}
+    ports:
+      - "${MYSQL_HOST_PORT}:3306"
+    volumes:
+      - ${MYSQL_CONF_FILE}:/etc/mysql/conf.d/mysql.cnf:ro
+      - ${MYSQL_DATA_DIR}:/var/lib/mysql/:rw
+    restart: always
+    networks:
+      - default
+    environment:
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"

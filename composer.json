@@ -2,20 +2,27 @@
   "name": "hanwenbo/ezswoole",
   "description": "ezswoole",
   "type": "library",
-  "keywords" : ["swoole", "framework", "async","easyswoole","ezswoole"],
-  "require": {
-    "php": ">=7.2",
-    "easyswoole/easyswoole": "v2.1.1",
-    "phpFastCache/phpFastCache": "^6.0",
-    "easyswoole/wsdebug": "^1"
-  },
-  "license" : "Apache-2.0",
+  "license": "Apache-2.0",
   "authors": [
     {
       "name": "韩文博",
       "email": "9476400@qq.com"
     }
   ],
+  "keywords": [
+    "easyswoole",
+    "swoole",
+    "php"
+  ],
+  "require": {
+    "php": ">=7.2",
+    "easyswoole/easyswoole": "^3.0",
+    "phpFastCache/phpFastCache": "^6.0",
+    "easyswoole/wsdebug": "^1"
+  },
+  "require-dev": {
+    "easyswoole/swoole-ide-helper": "^1.2"
+  },
   "autoload": {
     "psr-4": {
       "ezswoole\\": "src/"

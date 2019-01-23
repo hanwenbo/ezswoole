@@ -1,3 +1,12 @@
+# ide
+/.idea/
+/.DS_Store
+/.svn/
+
+# docker volumes
+/volumes/mysql
+/volumes/log
+
 vendor/
 .env
 .idea/*
