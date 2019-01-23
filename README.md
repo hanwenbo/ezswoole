@@ -11,3 +11,6 @@ composer require hanwenbo/ezswoole
 - 测试脚本完善
 - Demo演示
 - V3版本开发：增加携程开发、原生mysqli或pdo的链接
+
+## 我的本地环境
+docker run -it -p 9527:9501 -v /Volumes/dev/www/ezswoole-v3:/var/www/project --privileged=true ezkuangren/swoole4 /bin/bash

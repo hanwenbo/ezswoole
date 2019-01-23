@@ -11,7 +11,6 @@ class Cache {
 	// 调度器
 	protected $adapter;
 	/**
-	 * @method GET
 	 * @param array $options
 	 * @return Cache
 	 * @throws \phpFastCache\Exceptions\phpFastCacheDriverCheckException
@@ -37,7 +36,6 @@ class Cache {
 	}
 
 	/**
-	 * @method GET
 	 * @param $key
 	 * @return mixed|null
 	 * @throws \phpFastCache\Exceptions\phpFastCacheSimpleCacheException
@@ -48,7 +46,6 @@ class Cache {
 	}
 
 	/**
-	 * @method GET
 	 * @param      $key
 	 * @param      $value
 	 * @param null $ttl
@@ -61,7 +58,6 @@ class Cache {
 	}
 
 	/**
-	 * @method GET
 	 * @param $key
 	 * @return bool
 	 * @throws \phpFastCache\Exceptions\phpFastCacheSimpleCacheException
@@ -72,7 +68,6 @@ class Cache {
 	}
 
 	/**
-	 * @method GET
 	 * @param null $tag
 	 * @return bool
 	 * @throws \phpFastCache\Exceptions\phpFastCacheSimpleCacheException
@@ -83,7 +78,6 @@ class Cache {
 	}
 
 	/**
-	 * @method GET
 	 * @param      $keys
 	 * @param null $default
 	 * @return iterable
@@ -95,7 +89,6 @@ class Cache {
 	}
 
 	/**
-	 * @method GET
 	 * @param      $values
 	 * @param null $ttl
 	 * @return bool
@@ -107,7 +100,6 @@ class Cache {
 	}
 
 	/**
-	 * @method GET
 	 * @param $keys
 	 * @return bool
 	 * @throws \phpFastCache\Exceptions\phpFastCacheSimpleCacheException
@@ -118,7 +110,6 @@ class Cache {
 	}
 
 	/**
-	 * @method GET
 	 * @param $key
 	 * @return bool
 	 * @throws \phpFastCache\Exceptions\phpFastCacheSimpleCacheException

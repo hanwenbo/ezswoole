@@ -20,5 +20,11 @@
     "psr-4": {
       "ezswoole\\": "src/"
     }
+  },
+  "repositories": {
+    "packagist": {
+      "type": "composer",
+      "url": "https://packagist.laravel-china.org"
+    }
   }
 }
