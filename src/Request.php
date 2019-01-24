@@ -275,25 +275,12 @@ class Request
 	{
 		if( is_null( $this->pathinfo ) ){
 			$_server = $this->esRequest->getServerParams();
-			$_get    = $this->esRequest->getQueryParams();
-			if( isset( $_get[Config::get( 'var_pathinfo' )] ) ){
-				// 判断url里面是否有兼容模式参数
-				$_server['path_info'] = $_get[Config::get( 'var_pathinfo' )];
-				unset( $_get[Config::get( 'var_pathinfo' )] );
-			} elseif( IS_CLI ){
+			if( IS_CLI ){
 				// cli模式下 index.php module/controller/action/params/...
 				$_server['path_info'] = isset( $_server['argv'][1] ) ? $_server['argv'][1] : '';
 			}
 
-			// 分析pathinfo信息
-			if( !isset( $_server['path_info'] ) ){
-				foreach( Config::get( 'pathinfo_fetch' ) as $type ){
-					if( !empty( $_server[$type] ) ){
-						$_server['path_info'] = (0 === strpos( $_server[$type], $_server['script_name'] )) ? substr( $_server[$type], strlen( $_server['script_name'] ) ) : $_server[$type];
-						break;
-					}
-				}
-			}
+
 			$this->pathinfo = empty( $_server['path_info'] ) ? '/' : ltrim( $_server['path_info'], '/' );
 		}
 		return $this->pathinfo;
@@ -1024,8 +1011,6 @@ class Request
 		} elseif( isset( $server['server_port'] ) && ('443' == $server['server_port']) ){
 			return true;
 		} elseif( isset( $server['http_x_forwarded_proto'] ) && 'https' == $server['http_x_forwarded_proto'] ){
-			return true;
-		} elseif( Config::get( 'https_agent_name' ) && isset( $server[Config::get( 'https_agent_name' )] ) ){
 			return true;
 		}
 		return false;

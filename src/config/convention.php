@@ -4,77 +4,13 @@ return [
 	// +----------------------------------------------------------------------
 	// | 应用设置
 	// +----------------------------------------------------------------------
-	// 默认Host地址
-	'app_host'             => '',
 	// 应用调试模式
 	'app_debug'            => true,
-	// 应用Trace
-	'app_trace'            => false,
 	// 默认时区
 	'default_timezone'     => 'PRC',
-	// 是否开启多语言
-	'lang_switch_on'       => false,
-	// 默认全局过滤方法 用逗号分隔多个
-	'default_filter'       => '',
-	// 默认语言
-	'default_lang'         => 'zh-cn',
-
-
-	// +----------------------------------------------------------------------
-	// | URL设置
-	// +----------------------------------------------------------------------
-
-	// PATHINFO变量名 用于兼容模式
-	'var_pathinfo'         => 's',
-	// 兼容PATH_INFO获取
-	'pathinfo_fetch'       => ['ORIG_PATH_INFO', 'REDIRECT_PATH_INFO', 'REDIRECT_URL'],
-	// pathinfo分隔符
-	'pathinfo_depr'        => '/',
-	// HTTPS代理标识
-	'https_agent_name'     => '',
-	// URL伪静态后缀
-	'url_html_suffix'      => 'html',
-	// URL普通方式参数 用于自动生成
-	'url_common_param'     => false,
-	// URL参数方式 0 按名称成对解析 1 按顺序解析
-	'url_param_type'       => 0,
-	// 是否开启路由
-	'url_route_on'         => true,
-	// 路由配置文件（支持配置多个）
-	'route_config_file'    => ['route'],
-	// 路由使用完整匹配
-	'route_complete_match' => false,
-	// 是否强制使用路由
-	'url_route_must'       => false,
-	// 域名部署
-	'url_domain_deploy'    => false,
-	// 域名根，如ezswoolephp.cn
-	'url_domain_root'      => '',
-	// 是否自动转换URL中的控制器和操作名
-	'url_convert'          => true,
-	// 默认的访问控制器层
-	'url_controller_layer' => 'controller',
-	// 表单请求类型伪装变量
-	'var_method'           => '_method',
-	// 表单ajax伪装变量
-	'var_ajax'             => '_ajax',
-	// 表单pjax伪装变量
-	'var_pjax'             => '_pjax',
-	// 是否开启请求缓存 true自动缓存 支持设置请求缓存规则
-	'request_cache'        => false,
-	// 请求缓存有效期
-	'request_cache_expire' => null,
-	// 全局请求缓存排除规则
-	'request_cache_except' => [],
-
-	// +----------------------------------------------------------------------
-	// | 异常及错误设置
-	// +----------------------------------------------------------------------
-	// 异常页面的模板文件
-	'exception_tmpl'       => FASHOP_PATH.'tpl'.DS.'exception.tpl',
 
 	// 错误显示信息,非调试模式有效
-	'error_message'        => '页面错误！请稍后再试～',
+	'error_message'        => '接口错误！请稍后再试～',
 	// 显示错误信息
 	'show_error_msg'       => false,
 	// 异常处理handle类 留空使用 \ezswoole\exception\Handle
@@ -82,9 +18,6 @@ return [
 	// 是否记录trace信息到日志
 	'record_trace'         => false,
 
-	// +----------------------------------------------------------------------
-	// | 日志设置
-	// +----------------------------------------------------------------------
 
 	'log' => [
 		// 日志记录方式，内置 file socket 支持扩展
@@ -99,9 +32,6 @@ return [
 		'show_included_files' => false,
 	],
 
-	// +----------------------------------------------------------------------
-	// | 缓存设置
-	// +----------------------------------------------------------------------
 
 	'cache' => [
 		// 驱动方式
