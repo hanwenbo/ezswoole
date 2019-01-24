@@ -64,7 +64,7 @@ class Init
 		Loader::register();
 
 		// 加载惯例配置文件
-		\ezswoole\Config::set( include LIB_PATH.'config/convention'.EXT );
+		\ezswoole\Config::set( include LIB_PATH.'config/detault'.EXT );
 
 		// 执行应用
 		$app = new App();
