@@ -108,7 +108,7 @@ class Image
 
 	private function createTargetFloder() : void
 	{
-		File::createDir( $this->targetFolder );
+		File::createDirectory( $this->targetFolder );
 	}
 
 	/**

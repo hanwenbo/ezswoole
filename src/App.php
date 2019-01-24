@@ -34,7 +34,7 @@ class App
 
 	private function initConfig()
 	{
-		$server_config = \EasySwoole\Config::getInstance()->getConf( "." );
+		$server_config = \EasySwoole\EasySwoole\Config::getInstance()->getConf( "." );
 		foreach( $server_config as $key => $_config ){
 			if( isset( $_config[$key] ) && is_array( $_config[$key] ) ){
 				foreach( $_config[$key] as $k => $v ){
@@ -53,23 +53,23 @@ class App
 	private function initDir() : void
 	{
 		if( !is_dir( RUNTIME_PATH ) ){
-			File::createDir( RUNTIME_PATH );
+			File::createDirectory( RUNTIME_PATH );
 		}
 		if( !is_dir( LOG_PATH ) ){
-			File::createDir( LOG_PATH );
+			File::createDirectory( LOG_PATH );
 		}
 		if( !is_dir( CACHE_PATH ) ){
-			File::createDir( CACHE_PATH );
+			File::createDirectory( CACHE_PATH );
 		}
 		if( !is_dir( TEMP_PATH ) ){
-			File::createDir( TEMP_PATH );
+			File::createDirectory( TEMP_PATH );
 		}
 		if( !is_dir( CONF_PATH ) ){
-			File::createDir( CONF_PATH );
+			File::createDirectory( CONF_PATH );
 		}
 		// 存放子配置项 如微信 定时任务等
 		if( !is_dir( CONF_PATH.'config/' ) ){
-			File::createDir( CONF_PATH.'config/' );
+			File::createDirectory( CONF_PATH.'config/' );
 		}
 	}
 }

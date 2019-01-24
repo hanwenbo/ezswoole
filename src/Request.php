@@ -47,15 +47,6 @@ class Request
 	 */
 	protected $path;
 
-	/**
-	 * @var array 当前路由信息
-	 */
-	protected $routeInfo = [];
-
-	/**
-	 * @var array 环境变量
-	 */
-	protected $env;
 
 	/**
 	 * @var array 当前调度信息
@@ -67,16 +58,12 @@ class Request
 	// 当前语言集
 	protected $langset;
 
-
-	protected $esRequest;
-
 	/**
 	 * @var array 请求参数
 	 */
 	protected $param = [];
 	protected $get = [];
 	protected $post = [];
-	protected $route = [];
 	protected $put;
 	protected $session = [];
 	protected $file = [];
@@ -108,26 +95,18 @@ class Request
 
 	// 全局过滤规则
 	protected $filter;
-	// Hook扩展方法
-	protected static $hook = [];
-	// 绑定的属性
-	protected $bind = [];
-	// php://input
-	protected $input;
-	// 请求缓存
-	protected $cache;
-	// 缓存是否检查
-	protected $isCheckCache;
+
+	private $EasySwooleRequest;
 
 	final protected function __construct( EasySwooleRequest $request )
 	{
-		$this->esRequest = $request;
-		$this->get       = $request->getSwooleRequest()->get ? $request->getSwooleRequest()->get : [];
-		$this->post      = $request->getSwooleRequest()->post ? $request->getSwooleRequest()->post : [];
-		$this->file      = $request->getSwooleRequest()->files ? $request->getSwooleRequest()->files : [];
-		$this->header    = $request->getSwooleRequest()->header;
-		$this->cookie    = $request->getSwooleRequest()->cookie ? $request->getSwooleRequest()->cookie : [];
-		$this->server    = $request->getSwooleRequest()->server;
+		$this->EasySwooleRequest = $request;
+		$this->get               = $request->getSwooleRequest()->get ? $request->getSwooleRequest()->get : [];
+		$this->post              = $request->getSwooleRequest()->post ? $request->getSwooleRequest()->post : [];
+		$this->file              = $request->getSwooleRequest()->files ? $request->getSwooleRequest()->files : [];
+		$this->header            = $request->getSwooleRequest()->header;
+		$this->cookie            = $request->getSwooleRequest()->cookie ? $request->getSwooleRequest()->cookie : [];
+		$this->server            = $request->getSwooleRequest()->server;
 	}
 
 	final public static function getInstance( EasySwooleRequest $request = null )
@@ -143,9 +122,9 @@ class Request
 		self::$instance = null;
 	}
 
-	final public function getEsRequest()
+	final public function getEasySwooleRequest()
 	{
-		return $this->esRequest;
+		return $this->EasySwooleRequest;
 	}
 
 	/**
@@ -166,7 +145,6 @@ class Request
 	}
 
 	/**
-	 * todo
 	 * 设置或获取当前完整URL 包括QUERY_STRING
 	 * @access public
 	 * @param string|true $url URL地址 true 带域名获取
@@ -174,14 +152,12 @@ class Request
 	 */
 	public function url( $url = null )
 	{
-		$server = $this->esRequest->getServerParams();
+		$server = $this->getEasySwooleRequest()->getServerParams();
 		if( !is_null( $url ) && true !== $url ){
 			$this->url = $url;
 			return $this;
 		} elseif( !$this->url ){
-			if( IS_CLI ){
-				$this->url = isset( $server['argv'][1] ) ? $server['argv'][1] : '';
-			} elseif( isset( $server['http_x_rewrite_url'] ) ){
+			if( isset( $server['http_x_rewrite_url'] ) ){
 				$this->url = $server['http_x_rewrite_url'];
 			} elseif( isset( $server['request_uri'] ) ){
 				$this->url = $server['request_uri'];
@@ -195,7 +171,6 @@ class Request
 	}
 
 	/**
-	 * todo
 	 * 设置或获取当前URL 不含QUERY_STRING
 	 * @access public
 	 * @param string $url URL地址
@@ -213,48 +188,8 @@ class Request
 		return true === $url ? $this->domain().$this->baseUrl : $this->baseUrl;
 	}
 
-	/**
-	 * todo
-	 * 设置或获取当前执行的文件 SCRIPT_NAME
-	 * @access public
-	 * @param string $file 当前执行的文件
-	 * @return string
-	 */
-	public function baseFile( $file = null )
-	{
-		if( !is_null( $file ) && true !== $file ){
-			$this->baseFile = $file;
-			return $this;
-		} elseif( !$this->baseFile ){
-			$this->baseFile = '';
-		}
-		return true === $file ? $this->domain().$this->baseFile : $this->baseFile;
-	}
 
 	/**
-	 * todo
-	 * 设置或获取URL访问根地址
-	 * @access public
-	 * @param string $url URL地址
-	 * @return string
-	 */
-	public function root( $url = null )
-	{
-		if( !is_null( $url ) && true !== $url ){
-			$this->root = $url;
-			return $this;
-		} elseif( !$this->root ){
-			$file = $this->baseFile();
-			if( $file && 0 !== strpos( $this->url(), $file ) ){
-				$file = str_replace( '\\', '/', dirname( $file ) );
-			}
-			$this->root = rtrim( $file, '/' );
-		}
-		return true === $url ? $this->domain().$this->root : $this->root;
-	}
-
-	/**
-	 * todo 未测试
 	 * 获取当前请求URL的pathinfo信息（含URL后缀）
 	 * @access public
 	 * @return string
@@ -262,10 +197,7 @@ class Request
 	public function pathinfo()
 	{
 		if( is_null( $this->pathinfo ) ){
-			$_server = $this->esRequest->getServerParams();
-			if( IS_CLI ){
-				$_server['path_info'] = isset( $_server['argv'][1] ) ? $_server['argv'][1] : '';
-			}
+			$_server        = $this->getEasySwooleRequest()->getSwooleRequest()->server;
 			$this->pathinfo = empty( $_server['path_info'] ) ? '/' : ltrim( $_server['path_info'], '/' );
 		}
 		return $this->pathinfo;
@@ -278,7 +210,7 @@ class Request
 	 */
 	public function path()
 	{
-		return $this->esRequest->getUri()->getPath();
+		return $this->getEasySwooleRequest()->getUri()->getPath();
 	}
 
 	/**
@@ -299,7 +231,7 @@ class Request
 	 */
 	public function time( $float = false )
 	{
-		$_server = $this->esRequest->getServerParams();
+		$_server = $this->getEasySwooleRequest()->getServerParams();
 		return $float ? $_server['request_time_float'] : $_server['request_time'];
 	}
 
@@ -310,12 +242,10 @@ class Request
 	 */
 	public function type()
 	{
-
 		$accept = $this->server( 'http_accept' );
 		if( empty( $accept ) ){
 			return false;
 		}
-
 		foreach( $this->mimeType as $key => $val ){
 			$array = explode( ',', $val );
 			foreach( $array as $k => $v ){
@@ -344,22 +274,18 @@ class Request
 	}
 
 	/**
+	 * TODO 测试
 	 * 当前的请求类型
 	 * @access public
 	 * @param bool $method true 获取原始请求类型
 	 * @return string
 	 */
-	public function method( $method = false )
+	public function method( $method = false ) : string
 	{
-
 		if( true === $method ){
-			// 获取原始请求类型
-			return IS_CLI ? 'GET' : (isset( $this->server['request_method'] ) ?? $this->server['request_method']);
+			return (isset( $this->server['request_method'] ) ?? $this->server['request_method']);
 		} elseif( !$this->method ){
-			if( isset( $this->post[Config::get( 'var_method' )] ) ){
-				$this->method = strtoupper( $this->post[Config::get( 'var_method' )] );
-				$this->{$this->method}( $this->post );
-			} elseif( isset( $_server['http_x_method_override'] ) ){
+			if( isset( $_server['http_x_method_override'] ) ){
 				$this->method = strtoupper( $this->server['http_x_method_override'] );
 			} else{
 				$this->method = strtoupper( isset( $this->server['request_method'] ) ? $this->server['request_method'] : null );
@@ -368,95 +294,41 @@ class Request
 		return $this->method;
 	}
 
-	/**
-	 * 是否为GET请求
-	 * @access public
-	 * @return bool
-	 */
-	public function isGet()
+	public function isGet() : bool
 	{
 		return $this->method() == 'GET';
 	}
 
-	/**
-	 * 是否为POST请求
-	 * @access public
-	 * @return bool
-	 */
-	public function isPost()
+	public function isPost() : bool
 	{
 		return $this->method() == 'POST';
 	}
 
-	/**
-	 * 是否为PUT请求
-	 * @access public
-	 * @return bool
-	 */
-	public function isPut()
+	public function isPut() : bool
 	{
 		return $this->method() == 'PUT';
 	}
 
-	/**
-	 * 是否为DELTE请求
-	 * @access public
-	 * @return bool
-	 */
-	public function isDelete()
+	public function isDelete() : bool
 	{
 		return $this->method() == 'DELETE';
 	}
 
-	/**
-	 * 是否为HEAD请求
-	 * @access public
-	 * @return bool
-	 */
-	public function isHead()
+	public function isHead() : bool
 	{
 		return $this->method() == 'HEAD';
 	}
 
-	/**
-	 * 是否为PATCH请求
-	 * @access public
-	 * @return bool
-	 */
-	public function isPatch()
+	public function isPatch() : bool
 	{
 		return $this->method() == 'PATCH';
 	}
 
-	/**
-	 * 是否为OPTIONS请求
-	 * @access public
-	 * @return bool
-	 */
-	public function isOptions()
+	public function isOptions() : bool
 	{
 		return $this->method() == 'OPTIONS';
 	}
 
-	/**
-	 * 是否为cli
-	 * @access public
-	 * @return bool
-	 */
-	public function isCli()
-	{
-		return PHP_SAPI == 'cli';
-	}
-
-	/**
-	 * 是否为cgi
-	 * @access public
-	 * @return bool
-	 */
-	public function isCgi()
-	{
-		return strpos( PHP_SAPI, 'cgi' ) === 0;
-	}
 
 	/**
 	 * 获取当前请求的参数
@@ -484,7 +356,7 @@ class Request
 				$vars = [];
 			}
 			// 当前请求参数和URL地址中的参数合并
-			$this->param = array_merge( $this->get( false ), $vars, $this->route( false ) );
+			$this->param = array_merge( $this->get( false ), $vars );
 		}
 		if( true === $name ){
 			// 获取包含文件上传信息的数组
@@ -495,22 +367,6 @@ class Request
 		return $this->input( $this->param, $name, $default, $filter );
 	}
 
-	/**
-	 * 设置获取路由参数
-	 * @access public
-	 * @param string|array $name    变量名
-	 * @param mixed        $default 默认值
-	 * @param string|array $filter  过滤方法
-	 * @return mixed
-	 */
-	public function route( $name = '', $default = null, $filter = '' )
-	{
-		if( is_array( $name ) ){
-			$this->param = [];
-			return $this->route = array_merge( $this->route, $name );
-		}
-		return $this->input( $this->route, $name, $default, $filter );
-	}
 
 	/**
 	 * 设置获取GET参数
@@ -541,7 +397,7 @@ class Request
 	{
 
 		if( empty( $this->post ) ){
-			$_post = $this->esRequest->getParsedBody();
+			$_post = $this->getEasySwooleRequest()->getParsedBody();
 			if( empty( $_post ) && false !== strpos( $this->contentType(), 'application/json' ) ){
 				$this->post = $this->raw();
 			} else{
@@ -566,7 +422,7 @@ class Request
 	public function put( $name = '', $default = null, $filter = '' )
 	{
 		if( is_null( $this->put ) ){
-			$content = $this->getEsRequest()->getSwooleRequest()->rawContent();
+			$content = $this->getEasySwooleRequest()->getSwooleRequest()->rawContent();
 			if( false !== strpos( $this->contentType(), 'application/json' ) ){
 				$this->put = (array)json_decode( $content, true );
 			} else{
@@ -697,29 +553,7 @@ class Request
 		return null;
 	}
 
-	/**
-	 * 获取环境变量
-	 * @param string|array $name    数据名称
-	 * @param string       $default 默认值
-	 * @param string|array $filter  过滤方法
-	 * @return mixed
-	 */
-	public function env( $name = '', $default = null, $filter = '' )
-	{
-		if( is_array( $name ) ){
-			return $this->env = array_merge( $this->env, $name );
-		}
-		return $this->input( $this->env, false === $name ? false : strtoupper( $name ), $default, $filter );
-	}
-
-	/**
-	 * 设置或者获取当前的Header
-	 * @access public
-	 * @param string|array $name    header名称
-	 * @param string       $default 默认值
-	 * @return mixed
-	 */
-	public function header( $name = '', $default = null )
+	public function header( string $name = '', $default = null )
 	{
 		if( is_array( $name ) ){
 			return $this->header = array_merge( $this->header, $name );
@@ -731,18 +565,13 @@ class Request
 		return isset( $this->header[$name] ) ? $this->header[$name] : $default;
 	}
 
-	public function raw( $raw = null )
+	public function raw() : ?string
 	{
-		if( is_null( $raw ) ){
-			$content = $this->esRequest->getBody()->__toString();
-			$raw     = (array)json_decode( $content, true );
-			return (array)$raw;
-		} else{
-			return (array)$this->raw = $raw;
-		}
+		return $this->getEasySwooleRequest()->getSwooleRequest()->rawcontent();
 	}
 
 	/**
+	 * todo
 	 * 获取变量 支持过滤和默认值
 	 * @param array        $data    数据源
 	 * @param string|false $name    字段名
@@ -921,10 +750,10 @@ class Request
 	 */
 	public function has( $name, $type = 'param', $checkEmpty = false )
 	{
-		if( empty( $this->$type ) ){
+		if( empty( $this->type ) ){
 			$param = $this->$type();
 		} else{
-			$param = $this->$type;
+			$param = $this->type;
 		}
 		// 按.拆分成多维数组进行判断
 		foreach( explode( '.', $name ) as $val ){
@@ -1002,39 +831,6 @@ class Request
 	}
 
 	/**
-	 * 当前是否Ajax请求
-	 * @access public
-	 * @param bool $ajax true 获取原始ajax请求
-	 * @return bool
-	 */
-	public function isAjax( $ajax = false )
-	{
-		$value  = $this->server( 'http_x_requested_with', '', 'strtolower' );
-		$result = ('xmlhttprequest' == $value) ? true : false;
-		if( true === $ajax ){
-			return $result;
-		} else{
-			return $this->param( Config::get( 'var_ajax' ) ) ? true : $result;
-		}
-	}
-
-	/**
-	 * 当前是否Pjax请求
-	 * @access public
-	 * @param bool $pjax true 获取原始pjax请求
-	 * @return bool
-	 */
-	public function isPjax( $pjax = false )
-	{
-		$result = !is_null( $this->server( 'http_x_pjax' ) ) ? true : false;
-		if( true === $pjax ){
-			return $result;
-		} else{
-			return $this->param( Config::get( 'var_pjax' ) ) ? true : $result;
-		}
-	}
-
-	/**
 	 * 获取客户端IP地址
 	 * @param integer $type 返回类型 0 返回IP地址 1 返回IPV4地址数字
 	 * @param boolean $adv  是否进行高级模式获取（有可能被伪装）
@@ -1100,17 +896,17 @@ class Request
 
 	public function query() : string
 	{
-		return $this->esRequest->getUri()->getQuery();
+		return $this->getEasySwooleRequest()->getUri()->getQuery();
 	}
 
 	public function host() : string
 	{
-		return $this->esRequest->getUri()->getHost();
+		return $this->getEasySwooleRequest()->getUri()->getHost();
 	}
 
 	public function port() : int
 	{
-		return $this->esRequest->getUri()->getPort();
+		return $this->getEasySwooleRequest()->getUri()->getPort();
 	}
 
 	public function protocol() : int
@@ -1149,35 +945,6 @@ class Request
 			return '';
 		}
 
-	}
-
-	/**
-	 * 获取当前请求的路由信息
-	 * @access public
-	 * @param array $route 路由名称
-	 * @return array
-	 */
-	public function routeInfo( $route = [] )
-	{
-		if( !empty( $route ) ){
-			$this->routeInfo = $route;
-		} else{
-			return $this->routeInfo;
-		}
-	}
-
-	/**
-	 * 设置或者获取当前请求的调度信息
-	 * @access public
-	 * @param array $dispatch 调度信息
-	 * @return array
-	 */
-	public function dispatch( $dispatch = null )
-	{
-		if( !is_null( $dispatch ) ){
-			$this->dispatch = $dispatch;
-		}
-		return $this->dispatch;
 	}
 
 	/**
@@ -1253,7 +1020,7 @@ class Request
 
 	public function getContent() : ?string
 	{
-		$content = $this->esRequest->getSwooleRequest()->rawContent();
+		$content = $this->getEasySwooleRequest()->getSwooleRequest()->rawContent();
 		if( is_null( $content ) ){
 			return $content;
 		} else{
@@ -1261,126 +1028,6 @@ class Request
 		}
 	}
 
-	/**
-	 * 获取当前请求的php://input
-	 * @access public
-	 * @return string
-	 */
-	public function getInput() : ?string
-	{
-		return $this->getEsRequest()->getSwooleRequest()->rawContent();
-	}
-
-	/**
-	 * 生成请求令牌
-	 * @access public
-	 * @param string $name 令牌名称
-	 * @param mixed  $type 令牌生成方法
-	 * @return string
-	 */
-	public function token( $name = '__token__', $type = 'md5' )
-	{
-		$_server = $this->server;
-
-		$type  = is_callable( $type ) ? $type : 'md5';
-		$token = call_user_func( $type, $_server['request_time_float'] );
-		if( $this->isAjax() ){
-			header( $name.': '.$token );
-		}
-		Session::set( $name, $token );
-		return $token;
-	}
-
-	/**
-	 * 设置当前地址的请求缓存
-	 * @access public
-	 * @param string $key    缓存标识，支持变量规则 ，例如 item/:name/:id
-	 * @param mixed  $expire 缓存有效期
-	 * @param array  $except 缓存排除
-	 * @param string $tag    缓存标签
-	 * @return void
-	 */
-	public function cache( $key, $expire = null, $except = [], $tag = null )
-	{
-		$_server = $this->server;
-
-		if( !is_array( $except ) ){
-			$tag    = $except;
-			$except = [];
-		}
-
-		if( false !== $key && $this->isGet() && !$this->isCheckCache ){
-			// 标记请求缓存检查
-			$this->isCheckCache = true;
-			if( false === $expire ){
-				// 关闭当前缓存
-				return;
-			}
-			if( $key instanceof \Closure ){
-				$key = call_user_func_array( $key, [$this] );
-			} elseif( true === $key ){
-				foreach( $except as $rule ){
-					if( 0 === stripos( $this->url(), $rule ) ){
-						return;
-					}
-				}
-				// 自动缓存功能
-				$key = '__URL__';
-			} elseif( strpos( $key, '|' ) ){
-				list( $key, $fun ) = explode( '|', $key );
-			}
-			// 特殊规则替换
-			if( false !== strpos( $key, '__' ) ){
-				$key = str_replace( ['__MODULE__', '__CONTROLLER__', '__ACTION__', '__URL__', ''], [
-					$this->module,
-					$this->controller,
-					$this->action,
-					md5( $this->url( true ) ),
-				], $key );
-			}
-
-			if( false !== strpos( $key, ':' ) ){
-				$param = $this->param();
-				foreach( $param as $item => $val ){
-					if( is_string( $val ) && false !== strpos( $key, ':'.$item ) ){
-						$key = str_replace( ':'.$item, $val, $key );
-					}
-				}
-			} elseif( strpos( $key, ']' ) ){
-				if( '['.$this->ext().']' == $key ){
-					// 缓存某个后缀的请求
-					$key = md5( $this->url() );
-				} else{
-					return;
-				}
-			}
-			if( isset( $fun ) ){
-				$key = $fun( $key );
-			}
-
-			if( strtotime( $this->server( 'http_if_modified_since' ) ) + $expire > $_server['request_time'] ){
-				// 读取缓存
-				$response = Response::create()->code( 304 );
-				throw new \ezswoole\exception\HttpResponseException( $response );
-			} elseif( Cache::getInstance()->has( $key ) ){
-				list( $content, $header ) = Cache::getInstance()->get( $key );
-				$response = Response::create( $content )->header( $header );
-				throw new \ezswoole\exception\HttpResponseException( $response );
-			} else{
-				$this->cache = [$key, $expire, $tag];
-			}
-		}
-	}
-
-	/**
-	 * 读取请求缓存设置
-	 * @access public
-	 * @return array
-	 */
-	public function getCache()
-	{
-		return $this->cache;
-	}
 
 	static function clearGlobalVariables()
 	{
@@ -1403,69 +1050,6 @@ class Request
 			foreach( $server as $key => $value ){
 				$_SERVER[strtoupper( $key )] = $value;
 			}
-		}
-	}
-
-	/**
-	 * 设置当前请求绑定的对象实例
-	 * @access public
-	 * @param string|array $name 绑定的对象标识
-	 * @param mixed        $obj  绑定的对象实例
-	 * @return mixed
-	 */
-	public function bind( $name, $obj = null )
-	{
-		if( is_array( $name ) ){
-			$this->bind = array_merge( $this->bind, $name );
-		} else{
-			$this->bind[$name] = $obj;
-		}
-	}
-
-	public function __set( $name, $value )
-	{
-		$this->bind[$name] = $value;
-	}
-
-	public function __get( $name )
-	{
-		return isset( $this->bind[$name] ) ? $this->bind[$name] : null;
-	}
-
-	public function __isset( $name )
-	{
-		return isset( $this->bind[$name] );
-	}
-
-	/**
-	 * @param $method
-	 * @param $args
-	 * @return mixed
-	 * @throws Exception
-	 */
-	public function __call( $method, $args )
-	{
-		if( array_key_exists( $method, self::$hook ) ){
-			array_unshift( $args, $this );
-			return call_user_func_array( self::$hook[$method], $args );
-		} else{
-			throw new Exception( 'method not exists:'.__CLASS__.'->'.$method );
-		}
-	}
-
-	/**
-	 * Hook 方法注入
-	 * @access public
-	 * @param string|array $method   方法名
-	 * @param mixed        $callback callable
-	 * @return void
-	 */
-	public static function hook( $method, $callback = null )
-	{
-		if( is_array( $method ) ){
-			self::$hook = array_merge( self::$hook, $method );
-		} else{
-			self::$hook[$method] = $callback;
 		}
 	}
 }

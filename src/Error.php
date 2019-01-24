@@ -10,6 +10,6 @@ class Error
 	public static function exception( \Exception $exception )
 	{
 		$handle = new ExceptionHandler();
-		$handle->handle( $exception, Request::getInstance()->getEsRequest(), Response::getInstance()->getResponse() );
+		$handle->handle( $exception, Request::getInstance()->getEasySwooleRequest(), Response::getInstance()->getResponse() );
 	}
 }
