@@ -6,15 +6,6 @@ use BadMethodCallException;
 use ezswoole\db\Query;
 use ezswoole\exception\ValidateException;
 use ezswoole\model\Collection as ModelCollection;
-use ezswoole\model\Relation;
-use ezswoole\model\relation\BelongsTo;
-use ezswoole\model\relation\BelongsToMany;
-use ezswoole\model\relation\HasMany;
-use ezswoole\model\relation\HasManyThrough;
-use ezswoole\model\relation\HasOne;
-use ezswoole\model\relation\MorphMany;
-use ezswoole\model\relation\MorphOne;
-use ezswoole\model\relation\MorphTo;
 use InvalidArgumentException;
 
 /**
@@ -364,36 +355,6 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 
 		// 设置数据对象属性
 		$this->data[$name] = $value;
-		return $this;
-	}
-
-	/**
-	 * 获取当前模型的关联模型数据
-	 * @access public
-	 * @param string $name 关联方法名
-	 * @return mixed
-	 */
-	public function getRelation( $name = null )
-	{
-		if( is_null( $name ) ){
-			return $this->relation;
-		} elseif( array_key_exists( $name, $this->relation ) ){
-			return $this->relation[$name];
-		} else{
-			return;
-		}
-	}
-
-	/**
-	 * 设置关联数据对象值
-	 * @access public
-	 * @param string $name  属性名
-	 * @param mixed  $value 属性值
-	 * @return $this
-	 */
-	public function setRelation( $name, $value )
-	{
-		$this->relation[$name] = $value;
 		return $this;
 	}
 
@@ -1546,44 +1507,6 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 		return $this->error;
 	}
 
-	/**
-	 * 注册回调方法
-	 * @access public
-	 * @param string   $event    事件名
-	 * @param callable $callback 回调方法
-	 * @param bool     $override 是否覆盖
-	 * @return void
-	 */
-	public static function event( $event, $callback, $override = false )
-	{
-		$class = get_called_class();
-		if( $override ){
-			self::$event[$class][$event] = [];
-		}
-		self::$event[$class][$event][] = $callback;
-	}
-
-	/**
-	 * 触发事件
-	 * @access protected
-	 * @param string $event  事件名
-	 * @param mixed  $params 传入参数（引用）
-	 * @return bool
-	 */
-	protected function trigger( $event, &$params )
-	{
-		if( isset( self::$event[$this->class][$event] ) ){
-			foreach( self::$event[$this->class][$event] as $callback ){
-				if( is_callable( $callback ) ){
-					$result = call_user_func_array( $callback, [& $params] );
-					if( false === $result ){
-						return false;
-					}
-				}
-			}
-		}
-		return true;
-	}
 
 	/**
 	 * 写入数据
@@ -1805,37 +1728,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 		return $model;
 	}
 
-	/**
-	 * 查询当前模型的关联数据
-	 * @access public
-	 * @param string|array $relations 关联名
-	 * @return $this
-	 */
-	public function relationQuery( $relations )
-	{
-		if( is_string( $relations ) ){
-			$relations = explode( ',', $relations );
-		}
 
-		foreach( $relations as $key => $relation ){
-			$subRelation = '';
-			$closure     = null;
-			if( $relation instanceof \Closure ){
-				// 支持闭包查询过滤关联条件
-				$closure  = $relation;
-				$relation = $key;
-			}
-			if( is_array( $relation ) ){
-				$subRelation = $relation;
-				$relation    = $key;
-			} elseif( strpos( $relation, '.' ) ){
-				list( $relation, $subRelation ) = explode( '.', $relation, 2 );
-			}
-			$method                = Loader::parseName( $relation, 1, false );
-			$this->data[$relation] = $this->$method()->getRelation( $subRelation, $closure );
-		}
-		return $this;
-	}
 
 	/**
 	 * 预载入关联查询 返回数据集
@@ -1894,34 +1787,6 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 		}
 	}
 
-	/**
-	 * 关联统计
-	 * @access public
-	 * @param Model        $result   数据对象
-	 * @param string|array $relation 关联名
-	 * @return void
-	 */
-	public function relationCount( &$result, $relation )
-	{
-		$relations = is_string( $relation ) ? explode( ',', $relation ) : $relation;
-
-		foreach( $relations as $key => $relation ){
-			$closure = false;
-			if( $relation instanceof \Closure ){
-				$closure  = $relation;
-				$relation = $key;
-			} elseif( is_string( $key ) ){
-				$name     = $relation;
-				$relation = $key;
-			}
-			$relation = Loader::parseName( $relation, 1, false );
-			$count    = $this->$relation()->relationCount( $result, $closure );
-			if( !isset( $name ) ){
-				$name = Loader::parseName( $relation ).'_count';
-			}
-			$result->setAttr( $name, $count );
-		}
-	}
 
 	/**
 	 * 获取模型的默认外键名
@@ -1935,181 +1800,6 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 			$name = basename( str_replace( '\\', '/', $name ) );
 		}
 		return Loader::parseName( $name ).'_id';
-	}
-
-	/**
-	 * HAS ONE 关联定义
-	 * @access public
-	 * @param string $model      模型名
-	 * @param string $foreignKey 关联外键
-	 * @param string $localKey   当前模型主键
-	 * @param array  $alias      别名定义（已经废弃）
-	 * @param string $joinType   JOIN类型
-	 * @return HasOne
-	 */
-	public function hasOne( $model, $foreignKey = '', $localKey = '', $alias = [], $joinType = 'INNER' )
-	{
-		// 记录当前关联信息
-		$model      = $this->parseModel( $model );
-		$localKey   = $localKey ?: $this->getPk();
-		$foreignKey = $foreignKey ?: $this->getForeignKey( $this->name );
-		return new HasOne( $this, $model, $foreignKey, $localKey, $joinType );
-	}
-
-	/**
-	 * BELONGS TO 关联定义
-	 * @access public
-	 * @param string $model      模型名
-	 * @param string $foreignKey 关联外键
-	 * @param string $localKey   关联主键
-	 * @param array  $alias      别名定义（已经废弃）
-	 * @param string $joinType   JOIN类型
-	 * @return BelongsTo
-	 */
-	public function belongsTo( $model, $foreignKey = '', $localKey = '', $alias = [], $joinType = 'INNER' )
-	{
-		// 记录当前关联信息
-		$model      = $this->parseModel( $model );
-		$foreignKey = $foreignKey ?: $this->getForeignKey( $model );
-		$localKey   = $localKey ?: (new $model)->getPk();
-		$trace      = debug_backtrace( false, 2 );
-		$relation   = Loader::parseName( $trace[1]['function'] );
-		return new BelongsTo( $this, $model, $foreignKey, $localKey, $joinType, $relation );
-	}
-
-	/**
-	 * HAS MANY 关联定义
-	 * @access public
-	 * @param string $model      模型名
-	 * @param string $foreignKey 关联外键
-	 * @param string $localKey   当前模型主键
-	 * @return HasMany
-	 */
-	public function hasMany( $model, $foreignKey = '', $localKey = '' )
-	{
-		// 记录当前关联信息
-		$model      = $this->parseModel( $model );
-		$localKey   = $localKey ?: $this->getPk();
-		$foreignKey = $foreignKey ?: $this->getForeignKey( $this->name );
-		return new HasMany( $this, $model, $foreignKey, $localKey );
-	}
-
-	/**
-	 * HAS MANY 远程关联定义
-	 * @access public
-	 * @param string $model      模型名
-	 * @param string $through    中间模型名
-	 * @param string $foreignKey 关联外键
-	 * @param string $throughKey 关联外键
-	 * @param string $localKey   当前模型主键
-	 * @return HasManyThrough
-	 */
-	public function hasManyThrough( $model, $through, $foreignKey = '', $throughKey = '', $localKey = '' )
-	{
-		// 记录当前关联信息
-		$model      = $this->parseModel( $model );
-		$through    = $this->parseModel( $through );
-		$localKey   = $localKey ?: $this->getPk();
-		$foreignKey = $foreignKey ?: $this->getForeignKey( $this->name );
-		$throughKey = $throughKey ?: $this->getForeignKey( $through );
-		return new HasManyThrough( $this, $model, $through, $foreignKey, $throughKey, $localKey );
-	}
-
-	/**
-	 * BELONGS TO MANY 关联定义
-	 * @access public
-	 * @param string $model      模型名
-	 * @param string $table      中间表名
-	 * @param string $foreignKey 关联外键
-	 * @param string $localKey   当前模型关联键
-	 * @return BelongsToMany
-	 */
-	public function belongsToMany( $model, $table = '', $foreignKey = '', $localKey = '' )
-	{
-		// 记录当前关联信息
-		$model      = $this->parseModel( $model );
-		$name       = Loader::parseName( basename( str_replace( '\\', '/', $model ) ) );
-		$table      = $table ?: Loader::parseName( $this->name ).'_'.$name;
-		$foreignKey = $foreignKey ?: $name.'_id';
-		$localKey   = $localKey ?: $this->getForeignKey( $this->name );
-		return new BelongsToMany( $this, $model, $table, $foreignKey, $localKey );
-	}
-
-	/**
-	 * MORPH  MANY 关联定义
-	 * @access public
-	 * @param string       $model 模型名
-	 * @param string|array $morph 多态字段信息
-	 * @param string       $type  多态类型
-	 * @return MorphMany
-	 */
-	public function morphMany( $model, $morph = null, $type = '' )
-	{
-		// 记录当前关联信息
-		$model = $this->parseModel( $model );
-		if( is_null( $morph ) ){
-			$trace = debug_backtrace( false, 2 );
-			$morph = Loader::parseName( $trace[1]['function'] );
-		}
-		$type = $type ?: Loader::parseName( $this->name );
-		if( is_array( $morph ) ){
-			list( $morphType, $foreignKey ) = $morph;
-		} else{
-			$morphType  = $morph.'_type';
-			$foreignKey = $morph.'_id';
-		}
-		return new MorphMany( $this, $model, $foreignKey, $morphType, $type );
-	}
-
-	/**
-	 * MORPH  One 关联定义
-	 * @access public
-	 * @param string       $model 模型名
-	 * @param string|array $morph 多态字段信息
-	 * @param string       $type  多态类型
-	 * @return MorphOne
-	 */
-	public function morphOne( $model, $morph = null, $type = '' )
-	{
-		// 记录当前关联信息
-		$model = $this->parseModel( $model );
-		if( is_null( $morph ) ){
-			$trace = debug_backtrace( false, 2 );
-			$morph = Loader::parseName( $trace[1]['function'] );
-		}
-		$type = $type ?: Loader::parseName( $this->name );
-		if( is_array( $morph ) ){
-			list( $morphType, $foreignKey ) = $morph;
-		} else{
-			$morphType  = $morph.'_type';
-			$foreignKey = $morph.'_id';
-		}
-		return new MorphOne( $this, $model, $foreignKey, $morphType, $type );
-	}
-
-	/**
-	 * MORPH TO 关联定义
-	 * @access public
-	 * @param string|array $morph 多态字段信息
-	 * @param array        $alias 多态别名定义
-	 * @return MorphTo
-	 */
-	public function morphTo( $morph = null, $alias = [] )
-	{
-		$trace    = debug_backtrace( false, 2 );
-		$relation = Loader::parseName( $trace[1]['function'] );
-
-		if( is_null( $morph ) ){
-			$morph = $relation;
-		}
-		// 记录当前关联信息
-		if( is_array( $morph ) ){
-			list( $morphType, $foreignKey ) = $morph;
-		} else{
-			$morphType  = $morph.'_type';
-			$foreignKey = $morph.'_id';
-		}
-		return new MorphTo( $this, $morphType, $foreignKey, $alias, $relation );
 	}
 
 	public function __call( $method, $args )
@@ -2230,59 +1920,6 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	public function offsetGet( $name )
 	{
 		return $this->getAttr( $name );
-	}
-
-	/**
-	 * 解序列化后处理
-	 */
-	public function __wakeup()
-	{
-		$this->initialize();
-	}
-
-	/**
-	 * 模型事件快捷方法
-	 * @param      $callback
-	 * @param bool $override
-	 */
-	protected static function beforeInsert( $callback, $override = false )
-	{
-		self::event( 'before_insert', $callback, $override );
-	}
-
-	protected static function afterInsert( $callback, $override = false )
-	{
-		self::event( 'after_insert', $callback, $override );
-	}
-
-	protected static function beforeUpdate( $callback, $override = false )
-	{
-		self::event( 'before_update', $callback, $override );
-	}
-
-	protected static function afterUpdate( $callback, $override = false )
-	{
-		self::event( 'after_update', $callback, $override );
-	}
-
-	protected static function beforeWrite( $callback, $override = false )
-	{
-		self::event( 'before_write', $callback, $override );
-	}
-
-	protected static function afterWrite( $callback, $override = false )
-	{
-		self::event( 'after_write', $callback, $override );
-	}
-
-	protected static function beforeDelete( $callback, $override = false )
-	{
-		self::event( 'before_delete', $callback, $override );
-	}
-
-	protected static function afterDelete( $callback, $override = false )
-	{
-		self::event( 'after_delete', $callback, $override );
 	}
 
 }

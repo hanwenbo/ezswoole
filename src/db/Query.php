@@ -5,7 +5,6 @@ namespace ezswoole\db;
 use ezswoole\App;
 use ezswoole\Cache;
 use ezswoole\Collection;
-use ezswoole\Config;
 use ezswoole\Db;
 use ezswoole\db\exception\DataNotFoundException;
 use ezswoole\db\exception\ModelNotFoundException;
@@ -14,9 +13,6 @@ use ezswoole\exception\DbException;
 use ezswoole\exception\PDOException;
 use ezswoole\Loader;
 use ezswoole\Model;
-use ezswoole\model\Relation;
-use ezswoole\model\relation\OneToOne;
-use ezswoole\Paginator;
 use PDO;
 use ezswoole\Error;
 
@@ -509,10 +505,10 @@ class Query
 			// 支持GROUP
 			$options = $this->getOptions();
 			$subSql  = $this->options( $options )->field( 'count('.$field.')' )->bind( $this->bind )->buildSql();
-			return $this->table( [$subSql => '_group_count_'] )->value( 'COUNT(*) AS tp_count', 0, true );
+			return $this->table( [$subSql => '_group_count_'] )->value( 'COUNT(*) AS ez_count', 0, true );
 		}
 
-		return $this->value( 'COUNT('.$field.') AS tp_count', 0, true );
+		return $this->value( 'COUNT('.$field.') AS ez_count', 0, true );
 	}
 
 	/**
@@ -523,7 +519,7 @@ class Query
 	 */
 	public function sum( $field )
 	{
-		return $this->value( 'SUM('.$field.') AS tp_sum', 0, true );
+		return $this->value( 'SUM('.$field.') AS ez_sum', 0, true );
 	}
 
 	/**
@@ -534,7 +530,7 @@ class Query
 	 */
 	public function min( $field )
 	{
-		return $this->value( 'MIN('.$field.') AS tp_min', 0, true );
+		return $this->value( 'MIN('.$field.') AS ez_min', 0, true );
 	}
 
 	/**
@@ -545,7 +541,7 @@ class Query
 	 */
 	public function max( $field )
 	{
-		return $this->value( 'MAX('.$field.') AS tp_max', 0, true );
+		return $this->value( 'MAX('.$field.') AS ez_max', 0, true );
 	}
 
 	/**
@@ -556,7 +552,7 @@ class Query
 	 */
 	public function avg( $field )
 	{
-		return $this->value( 'AVG('.$field.') AS tp_avg', 0, true );
+		return $this->value( 'AVG('.$field.') AS ez_avg', 0, true );
 	}
 
 	/**

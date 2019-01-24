@@ -793,8 +793,6 @@ abstract class Connection
 		if( !$this->config['break_reconnect'] ){
 			return false;
 		}
-		Logger::getInstance()->log( "已经设置了重连" );
-
 		$info = [
 			'server has gone away',
 			'no connection to the server',
