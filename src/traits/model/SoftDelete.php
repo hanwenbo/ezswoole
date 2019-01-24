@@ -29,7 +29,6 @@ trait SoftDelete
 	public static function withTrashed()
 	{
 		$model = new static();
-		$field = $model->getDeleteTimeField( true );
 		return $model->getQuery();
 	}
 
