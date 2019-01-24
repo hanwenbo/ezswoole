@@ -9,14 +9,14 @@ use ezswoole\console\Output;
 use ezswoole\Lang;
 use ezswoole\Log;
 use ezswoole\Response;
-use EasySwoole\Core\Http\Request as EasySwooleRequest;
-use EasySwoole\Core\Http\Response as EasySwooleResponse;
+use EasySwoole\Http\Request as EasySwooleRequest;
+use EasySwoole\Http\Response as EasySwooleResponse;
 
 class Handle
 {
 	protected $request;
 	/**
-	 * @var \EasySwoole\Core\Http\Response
+	 * @var \EasySwoole\Http\Response
 	 */
 	protected $response;
 	protected $render;

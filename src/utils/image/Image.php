@@ -137,7 +137,7 @@ class Image
 		}
 		// 文件上传
 		if( isset( $file['tmp_name'] ) ){
-			$this->fileUpload( new \EasySwoole\Core\Http\Message\UploadFile( $file['tmp_name'], $file['size'], $file['error'], $file['name'], $file['type'] ) );
+			$this->fileUpload( new \EasySwoole\Http\Message\UploadFile( $file['tmp_name'], $file['size'], $file['error'], $file['name'], $file['type'] ) );
 		} elseif( is_string( $file ) && strstr( $file, "data:image" ) && strstr( $file, ";base64" ) ){
 			// base64上传
 			$this->base64Upload( $file );
@@ -162,10 +162,10 @@ class Image
 	 * Stream上传
 	 * @datetime 2017-11-01T18:19:06+0800
 	 * @author   韩文博
-	 * @param    \EasySwoole\Core\Http\Message\UploadFile $file
+	 * @param    \EasySwoole\Http\Message\UploadFile $file
 	 * @throws \Exception
 	 */
-	private function fileUpload( \EasySwoole\Core\Http\Message\UploadFile $file ) : void
+	private function fileUpload( \EasySwoole\Http\Message\UploadFile $file ) : void
 	{
 		$this->file = $file;
 

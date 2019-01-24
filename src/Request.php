@@ -2,7 +2,7 @@
 
 namespace ezswoole;
 
-use EasySwoole\Core\Http\Request as EasySwooleRequest;
+use EasySwoole\Http\Request as EasySwooleRequest;
 
 class Request
 {

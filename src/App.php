@@ -2,8 +2,8 @@
 
 namespace ezswoole;
 
-use EasySwoole\Core\Http\Request;
-use EasySwoole\Core\Http\Response;
+use EasySwoole\Http\Request;
+use EasySwoole\Http\Response;
 use EasySwoole\Core\Utility\File;
 
 /**

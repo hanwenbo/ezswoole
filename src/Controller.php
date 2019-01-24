@@ -14,9 +14,9 @@
 namespace ezswoole;
 
 use EasySwoole\Config as AppConfig;
-use EasySwoole\Core\Http\AbstractInterface\Controller as AbstractController;
-use EasySwoole\Core\Http\Request as EasySwooleRequest;
-use EasySwoole\Core\Http\Response as EasySwooleResponse;
+use EasySwoole\Http\AbstractInterface\Controller as AbstractController;
+use EasySwoole\Http\Request as EasySwooleRequest;
+use EasySwoole\Http\Response as EasySwooleResponse;
 use ezswoole\exception\ValidateException;
 use EasySwoole\Core\Component\Spl\SplArray;
 

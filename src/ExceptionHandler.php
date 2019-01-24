@@ -13,9 +13,9 @@
 
 namespace ezswoole;
 
-use EasySwoole\Core\Http\AbstractInterface\ExceptionHandlerInterface;
-use EasySwoole\Core\Http\Request;
-use EasySwoole\Core\Http\Response;
+use EasySwoole\Http\AbstractInterface\ExceptionHandlerInterface;
+use EasySwoole\Http\Request;
+use EasySwoole\Http\Response;
 
 class ExceptionHandler implements ExceptionHandlerInterface
 {

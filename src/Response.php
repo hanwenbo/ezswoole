@@ -13,7 +13,7 @@
 
 namespace ezswoole;
 
-use EasySwoole\Core\Http\Response as EasySwooleResponse;
+use EasySwoole\Http\Response as EasySwooleResponse;
 
 class Response
 {

@@ -13,9 +13,9 @@
 
 namespace ezswoole;
 
-use EasySwoole\Core\Utility\Curl\Response;
-use EasySwoole\Core\Utility\Curl\Request;
-use EasySwoole\Core\Utility\Curl\Field;
+use EasySwoole\Curl\Response;
+use EasySwoole\Curl\Request;
+use EasySwoole\Curl\Field;
 
 class Curl
 {

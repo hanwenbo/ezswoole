@@ -13,8 +13,6 @@ class Cache {
 	/**
 	 * @param array $options
 	 * @return Cache
-	 * @throws \phpFastCache\Exceptions\phpFastCacheDriverCheckException
-	 * @author 韩文博
 	 */
 	public static function getInstance($options = []) {
 		if (is_null(self::$instance)) {
@@ -26,7 +24,6 @@ class Cache {
 	/**
 	 * Cache constructor.
 	 * @param array $options
-	 * @throws \phpFastCache\Exceptions\phpFastCacheDriverCheckException
 	 */
 	public function __construct($options = []) {
 		$this->adapter = new Psr16Adapter(Config::get('cache.type'), [
@@ -38,8 +35,6 @@ class Cache {
 	/**
 	 * @param $key
 	 * @return mixed|null
-	 * @throws \phpFastCache\Exceptions\phpFastCacheSimpleCacheException
-	 * @author 韩文博
 	 */
 	public function get($key) {
 		return $this->adapter->get($key);
@@ -50,8 +45,6 @@ class Cache {
 	 * @param      $value
 	 * @param null $ttl
 	 * @return bool
-	 * @throws \phpFastCache\Exceptions\phpFastCacheSimpleCacheException
-	 * @author 韩文博
 	 */
 	public function set($key, $value, $ttl = null) {
 		return $this->adapter->set($key, $value, $ttl);
@@ -60,8 +53,6 @@ class Cache {
 	/**
 	 * @param $key
 	 * @return bool
-	 * @throws \phpFastCache\Exceptions\phpFastCacheSimpleCacheException
-	 * @author 韩文博
 	 */
 	public function delete($key) {
 		return $this->adapter->delete($key);
@@ -70,8 +61,6 @@ class Cache {
 	/**
 	 * @param null $tag
 	 * @return bool
-	 * @throws \phpFastCache\Exceptions\phpFastCacheSimpleCacheException
-	 * @author 韩文博
 	 */
 	public function clear() {
 		return $this->adapter->clear();
@@ -80,8 +69,6 @@ class Cache {
 	/**
 	 * @param      $keys
 	 * @param null $default
-	 * @return iterable
-	 * @throws \phpFastCache\Exceptions\phpFastCacheSimpleCacheException
 	 * @author 韩文博
 	 */
 	public function getMultiple($keys, $default = null) {
@@ -92,8 +79,6 @@ class Cache {
 	 * @param      $values
 	 * @param null $ttl
 	 * @return bool
-	 * @throws \phpFastCache\Exceptions\phpFastCacheSimpleCacheException
-	 * @author 韩文博
 	 */
 	public function setMultiple($values, $ttl = null) {
 		return $this->adapter->setMultiple($values, $ttl);
@@ -102,8 +87,6 @@ class Cache {
 	/**
 	 * @param $keys
 	 * @return bool
-	 * @throws \phpFastCache\Exceptions\phpFastCacheSimpleCacheException
-	 * @author 韩文博
 	 */
 	public function deleteMultiple($keys) {
 		return $this->adapter->deleteMultiple($keys);
@@ -112,8 +95,6 @@ class Cache {
 	/**
 	 * @param $key
 	 * @return bool
-	 * @throws \phpFastCache\Exceptions\phpFastCacheSimpleCacheException
-	 * @author 韩文博
 	 */
 	public function has($key) {
 		return $this->adapter->has($key);

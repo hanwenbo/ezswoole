@@ -122,18 +122,6 @@ class BelongsToMany extends Relation {
 		return $result;
 	}
 
-	/**
-	 * 重载paginate方法
-	 * @param null  $listRows
-	 * @param bool  $simple
-	 * @param array $config
-	 * @return Paginator
-	 */
-	public function paginate($listRows = null, $simple = false, $config = []) {
-		$result = $this->buildQuery()->paginate($listRows, $simple, $config);
-		$this->hydratePivot($result);
-		return $result;
-	}
 
 	/**
 	 * 重载find方法

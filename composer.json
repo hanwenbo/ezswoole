@@ -18,7 +18,8 @@
     "php": ">=7.2",
     "easyswoole/easyswoole": "^3.0",
     "phpFastCache/phpFastCache": "^6.0",
-    "easyswoole/wsdebug": "^1"
+    "easyswoole/wsdebug": "^1",
+    "easyswoole/curl": "^1.0"
   },
   "require-dev": {
     "easyswoole/swoole-ide-helper": "^1.2"

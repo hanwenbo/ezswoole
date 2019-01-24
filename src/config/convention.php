@@ -281,12 +281,6 @@ return [
 		'sql_explain'     => false,
 	],
 
-	//分页配置
-	'paginate' => [
-		'type'      => 'bootstrap',
-		'var_page'  => 'page',
-		'list_rows' => 15,
-	],
 
 	// 定时任务
 	'corn'     => [
