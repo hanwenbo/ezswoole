@@ -10,9 +10,6 @@ class Validate
 	// 实例
 	protected static $instance;
 
-	// 自定义的验证类型
-//	protected static $type = ['phone'=>'phone'];
-
 	// 验证类型别名
 	protected $alias
 		= [

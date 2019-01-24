@@ -2,8 +2,8 @@
 
 namespace ezswoole\utils\image;
 
-use EasySwoole\Core\Utility\File;
-use EasySwoole\Core\Utility\Random;
+use EasySwoole\Utility\File;
+use EasySwoole\Utility\Random;
 use Intervention\Image\ImageManagerStatic as ImageManage;
 
 /**
@@ -278,8 +278,6 @@ class Image
 
 	/**
 	 * 图片信息格式
-	 * @datetime 2017-11-01T20:45:54+0800
-	 * @author   韩文博
 	 * @param    string $path
 	 * @param    int    $size
 	 * @throws \Exception

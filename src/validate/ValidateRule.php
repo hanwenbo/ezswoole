@@ -14,7 +14,7 @@
 namespace ezswoole\validate;
 /**
  * Class ValidateRule
- * @package think\validate
+ * @package ezswoole\validate
  * @method ValidateRule confirm(mixed $rule, string $msg = '') static 验证是否和某个字段的值一致
  * @method ValidateRule different(mixed $rule, string $msg = '') static 验证是否和某个字段的值是否不同
  * @method ValidateRule egt(mixed $rule, string $msg = '') static 验证是否大于等于某个值

@@ -61,8 +61,6 @@ abstract class Controller extends AbstractController
 		// 初始化，目的清理上一次请求的static记录
 		Request::getInstance()->clearInstance();
 		Response::getInstance()->clearInstance();
-		// 清理上一次请求的model关联static记录
-		Loader::clearInstance();
 		Log::clear();
 	}
 

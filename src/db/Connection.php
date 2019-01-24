@@ -76,8 +76,6 @@ abstract class Connection
 			'debug'           => false,
 			// 数据库部署方式:0 集中式(单一服务器),1 分布式(主从服务器)
 			'deploy'          => 0,
-			// 数据库读写是否分离 主从式有效
-			'rw_separate'     => false,
 			// 读写分离后 主服务器数量
 			'master_num'      => 1,
 			// 指定从服务器序号
@@ -989,22 +987,9 @@ abstract class Connection
 		// 主服务器序号
 		$m = floor( mt_rand( 0, $this->config['master_num'] - 1 ) );
 
-		if( $this->config['rw_separate'] ){
-			// 主从式采用读写分离
-			if( $master ) // 主服务器写入
-			{
-				$r = $m;
-			} elseif( is_numeric( $this->config['slave_no'] ) ){
-				// 指定服务器读
-				$r = $this->config['slave_no'];
-			} else{
-				// 读操作连接从服务器 每次随机连接的数据库
-				$r = floor( mt_rand( $this->config['master_num'], count( $_config['hostname'] ) - 1 ) );
-			}
-		} else{
+
 			// 读写操作不区分服务器 每次随机连接的数据库
 			$r = floor( mt_rand( 0, count( $_config['hostname'] ) - 1 ) );
-		}
 		$dbMaster = false;
 		if( $m != $r ){
 			$dbMaster = [];
