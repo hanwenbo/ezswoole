@@ -17,35 +17,6 @@ use ezswoole\Response;
 use ezswoole\WsDebug;
 use EasySwoole\Core\Swoole\ServerManager;
 
-if( !function_exists( 'load_trait' ) ){
-	/**
-	 * 快速导入Traits PHP5.5以上无需调用
-	 * @param string $class trait库
-	 * @param string $ext   类库后缀
-	 * @return boolean
-	 */
-	function load_trait( $class, $ext = EXT )
-	{
-		return Loader::import( $class, TRAIT_PATH, $ext );
-	}
-}
-
-if( !function_exists( 'exception' ) ){
-	/**
-	 * 抛出异常处理
-	 *
-	 * @param string  $msg       异常消息
-	 * @param integer $code      异常代码 默认为0
-	 * @param string  $exception 异常类
-	 *
-	 * @throws Exception
-	 */
-	function exception( $msg, $code = 0, $exception = '' )
-	{
-		$e = $exception ?: '\ezswoole\Exception';
-		throw new $e( $msg, $code );
-	}
-}
 
 if( !function_exists( 'wsdebug' ) ){
 	/**
@@ -114,56 +85,6 @@ if( !function_exists( 'config' ) ){
 	}
 }
 
-if( !function_exists( 'input' ) ){
-	/**
-	 * 获取输入数据 支持默认值和过滤
-	 * @param string $key     获取的变量名
-	 * @param mixed  $default 默认值
-	 * @param string $filter  过滤方法
-	 * @return mixed
-	 */
-	function input( $key = '', $default = null, $filter = '' )
-	{
-		if( 0 === strpos( $key, '?' ) ){
-			$key = substr( $key, 1 );
-			$has = true;
-		}
-		if( $pos = strpos( $key, '.' ) ){
-			// 指定参数来源
-			list( $method, $key ) = explode( '.', $key, 2 );
-			if(
-			!in_array( $method, [
-				'get',
-				'post',
-				'put',
-				'patch',
-				'delete',
-				'route',
-				'param',
-				'request',
-				'session',
-				'cookie',
-				'server',
-				'env',
-				'path',
-				'file',
-			] )
-			){
-				$key    = $method.'.'.$key;
-				$method = 'param';
-			}
-		} else{
-			// 默认为自动判断
-			$method = 'param';
-		}
-		if( isset( $has ) ){
-			return request()->has( $key, $method, $default );
-		} else{
-			return request()->$method( $key, $default, $filter );
-		}
-	}
-}
-
 
 if( !function_exists( 'model' ) ){
 
@@ -213,33 +134,6 @@ if( !function_exists( 'db' ) ){
 	}
 }
 
-
-if( !function_exists( 'import' ) ){
-	/**
-	 * 导入所需的类库 同java的Import 本函数有缓存功能
-	 * @param string $class   类库命名空间字符串
-	 * @param string $baseUrl 起始路径
-	 * @param string $ext     导入的文件扩展名
-	 * @return boolean
-	 */
-	function import( $class, $baseUrl = '', $ext = EXT )
-	{
-		return Loader::import( $class, $baseUrl, $ext );
-	}
-}
-
-if( !function_exists( 'vendor' ) ){
-	/**
-	 * 快速导入第三方框架类库 所有第三方框架的类库文件统一放到 系统的Vendor目录下面
-	 * @param string $class 类库
-	 * @param string $ext   类库后缀
-	 * @return boolean
-	 */
-	function vendor( $class, $ext = EXT )
-	{
-		return Loader::import( $class, VENDOR_PATH, $ext );
-	}
-}
 
 if( !function_exists( 'dump' ) ){
 	/**
@@ -366,85 +260,6 @@ if( !function_exists( 'response' ) ){
 	}
 }
 
-if( !function_exists( 'json' ) ){
-	/**
-	 * 获取\ezswoole\response\Json对象实例
-	 * @param mixed   $data    返回的数据
-	 * @param integer $code    状态码
-	 * @param array   $header  头部
-	 * @param array   $options 参数
-	 * @return \ezswoole\response\Json
-	 */
-	function json( $data = [], $code = 200, $header = [], $options = [] )
-	{
-		return Response::create( $data, 'json', $code, $header, $options );
-	}
-}
-
-if( !function_exists( 'jsonp' ) ){
-	/**
-	 * 获取\ezswoole\response\Jsonp对象实例
-	 * @param mixed   $data    返回的数据
-	 * @param integer $code    状态码
-	 * @param array   $header  头部
-	 * @param array   $options 参数
-	 * @return \ezswoole\response\Jsonp
-	 */
-	function jsonp( $data = [], $code = 200, $header = [], $options = [] )
-	{
-		return Response::create( $data, 'jsonp', $code, $header, $options );
-	}
-}
-
-if( !function_exists( 'xml' ) ){
-	/**
-	 * 获取\ezswoole\response\Xml对象实例
-	 * @param mixed   $data    返回的数据
-	 * @param integer $code    状态码
-	 * @param array   $header  头部
-	 * @param array   $options 参数
-	 * @return \ezswoole\response\Xml
-	 */
-	function xml( $data = [], $code = 200, $header = [], $options = [] )
-	{
-		return Response::create( $data, 'xml', $code, $header, $options );
-	}
-}
-
-if( !function_exists( 'abort' ) ){
-	/**
-	 * 抛出HTTP异常
-	 * @param integer|Response $code    状态码 或者 Response对象实例
-	 * @param string           $message 错误信息
-	 * @param array            $header  参数
-	 */
-	function abort( $code, $message = null, $header = [] )
-	{
-		if( $code instanceof Response ){
-			throw new HttpResponseException( $code );
-		} else{
-			throw new HttpException( $code, $message, null, $header );
-		}
-	}
-}
-
-if( !function_exists( 'load_relation' ) ){
-	/**
-	 * 延迟预载入关联查询
-	 * @param mixed $resultSet 数据集
-	 * @param mixed $relation  关联
-	 * @return array
-	 */
-	function load_relation( $resultSet, $relation )
-	{
-		$item = current( $resultSet );
-		if( $item instanceof Model ){
-			$item->eagerlyResultSet( $resultSet, $relation );
-		}
-		return $resultSet;
-	}
-}
-
 if( !function_exists( 'collection' ) ){
 	/**
 	 * 数组转换为数据集对象
@@ -462,22 +277,3 @@ if( !function_exists( 'collection' ) ){
 	}
 }
 
-
-if( !function_exists( 'view' ) ){
-	/**
-	 * @param null  $view
-	 * @param array $data
-	 * @param array $mergeData
-	 * @return mixed
-	 * @author 韩文博
-	 */
-	function view( $view = null, $data = [], $mergeData = [] )
-	{
-		//		$blade = Di::getInstance()->get( 'BladeView' );
-		//		if( !$blade ){
-		//			Di::getInstance()->set( 'BladeView', Blade::class, APP_PATH.'View', CACHE_PATH.'html' );
-		//			$blade = Di::getInstance()->get( 'BladeView' );
-		//		}
-		//		return $blade->make( $view, $data, $mergeData );
-	}
-}
