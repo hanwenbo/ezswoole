@@ -47,7 +47,7 @@ class Debug
 	 */
 	public static function getUseTime( $dec = 6 )
 	{
-		return number_format( (microtime( true ) - FASHOP_START_TIME), $dec );
+		return number_format( (microtime( true ) - EZSWOOLE_START_TIME), $dec );
 	}
 
 	/**
@@ -88,7 +88,7 @@ class Debug
 	 */
 	public static function getUseMem( $dec = 2 )
 	{
-		$size = memory_get_usage() - FASHOP_START_MEM;
+		$size = memory_get_usage() - EZSWOOLE_START_MEM;
 		$a    = ['B', 'KB', 'MB', 'GB', 'TB'];
 		$pos  = 0;
 		while( $size >= 1024 ){

@@ -5,16 +5,6 @@ namespace ezswoole;
 class Config {
 	// 配置参数
 	private static $config = [];
-	// 参数作用域
-	private static $range = '_sys_';
-
-	// 设定配置参数的作用域
-	public static function range($range) {
-		self::$range = $range;
-		if (!isset(self::$config[$range])) {
-			self::$config[$range] = [];
-		}
-	}
 
 	/**
 	 * 解析配置文件或内容
@@ -104,7 +94,7 @@ class Config {
 			if (!isset(self::$config[$range][$name[0]])) {
 				// 动态载入额外配置
 				$module = Request::getInstance()->module();
-				$file   = CONF_PATH . ($module ? $module . DS : '') . 'extra' . DS . $name[0] . CONF_EXT;
+				$file   = ($module ? $module . DS : '') . 'extra' . DS . $name[0] ;
 
 				is_file($file) && self::load($file, $name[0]);
 			}

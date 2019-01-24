@@ -45,7 +45,7 @@ class App
 			}
 		}
 		if( Config::get( 'app_status' ) ){
-			Config::load( CONF_PATH.Config::get( 'app_status' ).CONF_EXT );
+			Config::load( CONF_PATH.Config::get( 'app_status' ) );
 		}
 		$this->config = Config::get();
 	}
