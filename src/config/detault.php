@@ -5,7 +5,6 @@ return [
 	'app_debug'        => true,
 	// 默认时区
 	'default_timezone' => 'PRC',
-
 	// 错误显示信息,非调试模式有效
 	'error_message'    => '接口错误！请稍后再试～',
 	// 显示错误信息
@@ -17,15 +16,13 @@ return [
 
 	'log' => [
 		// 日志记录方式，内置 file socket 支持扩展
-		'type'                => 'File',
+		'type'      => 'File',
 		// 日志保存目录
-		'path'                => LOG_PATH,
+		'path'      => LOG_PATH,
 		// 日志记录级别
-		'level'               => [],
+		'level'     => [],
 		//单个日志文件的大小限制，超过后会自动记录到第二个文件
-		'file_size'           => 2097152,
-		// 显示加载文件
-		'show_included_files' => false,
+		'file_size' => 2097152,
 	],
 
 	'cache' => [

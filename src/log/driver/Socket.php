@@ -27,7 +27,6 @@ class Socket
 			'file_size'           => 2097152,
 			'path'                => LOG_PATH,
 			'apart_level'         => [],
-			'show_included_files' => false,
 			'show_http_message'   => false,
 			'send_type'           => ['log', 'error', 'info', 'sql', 'notice', 'alert', 'debug'],
 			// 限制允许读取日志的client_id
