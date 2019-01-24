@@ -73,7 +73,6 @@ class Validate
 			'min'         => ':attribute长度不能小于 :rule',
 			'after'       => ':attribute日期不能小于 :rule',
 			'before'      => ':attribute日期不能超过 :rule',
-			'expire'      => '不在有效期内 :rule',
 			'allowIp'     => '不允许的IP访问',
 			'denyIp'      => '禁止的IP访问',
 			'confirm'     => ':attribute和确认字段:2不一致',
@@ -185,18 +184,6 @@ class Validate
 		}
 		return self::$instance;
 	}
-
-	//	/**
-	//	 * 创建一个验证器类
-	//	 * @access public
-	//	 * @param  array $rules   验证规则
-	//	 * @param  array $message 验证提示信息
-	//	 * @param  array $field   验证字段描述信息
-	//	 */
-	//	public static function make( array $rules = [], array $message = [], array $field = [] )
-	//	{
-	//		return new self( $rules, $message, $field );
-	//	}
 
 	/**
 	 * 添加字段验证规则
@@ -1205,28 +1192,6 @@ class Validate
 	}
 
 	/**
-	 * 验证有效期
-	 * @access public
-	 * @param  mixed $value 字段值
-	 * @param  mixed $rule  验证规则
-	 * @return bool
-	 */
-	public function expire( $value, $rule )
-	{
-		if( is_string( $rule ) ){
-			$rule = explode( ',', $rule );
-		}
-		list( $start, $end ) = $rule;
-		if( !is_numeric( $start ) ){
-			$start = strtotime( $start );
-		}
-		if( !is_numeric( $end ) ){
-			$end = strtotime( $end );
-		}
-		return $_SERVER['REQUEST_TIME'] >= $start && $_SERVER['REQUEST_TIME'] <= $end;
-	}
-
-	/**
 	 * 验证IP许可
 	 * @access public
 	 * @param  string $value 字段值
@@ -1460,6 +1425,7 @@ class Validate
 
 
 	/**
+	 * todo 老了
 	 * 验证json
 	 * @access protected
 	 * @param mixed $value 字段值

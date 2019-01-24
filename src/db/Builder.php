@@ -4,8 +4,6 @@ namespace ezswoole\db;
 
 use BadMethodCallException;
 use ezswoole\Exception;
-use PDO;
-use EasySwoole\Mysqli\Mysqli;
 
 abstract class Builder {
 	// connection对象实例

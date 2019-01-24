@@ -13,20 +13,18 @@
 
 namespace ezswoole;
 
-use EasySwoole\Config as AppConfig;
+use EasySwoole\EasySwoole\Config as AppConfig;
 use EasySwoole\Http\AbstractInterface\Controller as AbstractController;
 use EasySwoole\Http\Request as EasySwooleRequest;
 use EasySwoole\Http\Response as EasySwooleResponse;
 use ezswoole\exception\ValidateException;
-use EasySwoole\Core\Component\Spl\SplArray;
+use EasySwoole\Spl\SplArray;
 
 abstract class Controller extends AbstractController
 {
-
 	protected $app;
 	protected $post;
 	protected $get;
-
 	/**
 	 * @var Request
 	 */
@@ -42,7 +40,6 @@ abstract class Controller extends AbstractController
 	public function __construct( string $actionName, EasySwooleRequest $request, EasySwooleResponse $response )
 	{
 		parent::__construct( $actionName, $request, $response );
-
 	}
 
 
@@ -94,10 +91,9 @@ abstract class Controller extends AbstractController
 		$this->response()->write( json_encode( $content, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) );
 	}
 
-	protected function getPageLimit()
+	protected function getPageLimit() : string
 	{
-		$param = input( 'post.' );
-		$param = $param ? $param : input( 'get.' );
+		$param = Request::getInstance()->param();
 		$page  = isset( $param['page'] ) ? $param['page'] : 1;
 		$rows  = isset( $param['rows'] ) ? $param['rows'] : 10;
 		return $page.','.$rows;
@@ -105,11 +101,10 @@ abstract class Controller extends AbstractController
 
 	/**
 	 * 设置验证失败后是否抛出异常
-	 * @access protected
-	 * @param bool $fail 是否抛出异常
-	 * @return $this
+	 * @param bool $fail
+	 * @return Controller
 	 */
-	protected function validateFailException( $fail = true )
+	protected function validateFailException( $fail = true ) : Controller
 	{
 		$this->failException = $fail;
 		return $this;
@@ -118,25 +113,24 @@ abstract class Controller extends AbstractController
 	/**
 	 * 验证数据
 	 * @access protected
-	 * @param array        $data     数据
-	 * @param string|array $validate 验证器名或者验证规则数组
-	 * @param array        $message  提示信息
-	 * @param bool         $batch    是否批量验证
-	 * @param mixed        $callback 回调方法（闭包）
+	 * @param mixed $data     数据
+	 * @param mixed $validate 验证器名或者验证规则数组
+	 * @param array $message  提示信息
+	 * @param bool  $batch    是否批量验证
+	 * @param mixed $callback 回调方法（闭包）
 	 * @return array|string|true
 	 * @throws ValidateException
 	 */
-	protected function validate( $data, $validate, $message = [], $batch = false, $callback = null )
+	protected function validate( $data, $validate, array $message = [], bool $batch = false, $callback = null )
 	{
 		if( is_array( $validate ) ){
-			$v = Loader::validate();
+			$v = new Validate();
 			$v->rule( $validate );
 		} else{
 			if( strpos( $validate, '.' ) ){
-				// 支持场景
 				list( $validate, $scene ) = explode( '.', $validate );
 			}
-			$v = Loader::validate( $validate );
+			$v = new Validate( $validate );
 			if( !empty( $scene ) ){
 				$v->scene( $scene );
 			}

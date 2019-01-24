@@ -166,6 +166,7 @@ class Request
 	}
 
 	/**
+	 * todo
 	 * 设置或获取当前完整URL 包括QUERY_STRING
 	 * @access public
 	 * @param string|true $url URL地址 true 带域名获取
@@ -194,6 +195,7 @@ class Request
 	}
 
 	/**
+	 * todo
 	 * 设置或获取当前URL 不含QUERY_STRING
 	 * @access public
 	 * @param string $url URL地址
@@ -212,6 +214,7 @@ class Request
 	}
 
 	/**
+	 * todo
 	 * 设置或获取当前执行的文件 SCRIPT_NAME
 	 * @access public
 	 * @param string $file 当前执行的文件
@@ -223,28 +226,13 @@ class Request
 			$this->baseFile = $file;
 			return $this;
 		} elseif( !$this->baseFile ){
-			$url = '';
-			if( !IS_CLI ){
-				$_server     = $this->esRequest->getServerParams();
-				$script_name = basename( $_server['script_filename'] );
-				if( basename( $_server['script_name'] ) === $script_name ){
-					$url = $_server['script_name'];
-				} elseif( basename( $_server['php_self'] ) === $script_name ){
-					$url = $_server['php_self'];
-				} elseif( isset( $_server['orig_script_name'] ) && basename( $_server['orig_script_name'] ) === $script_name ){
-					$url = $_server['orig_script_name'];
-				} elseif( ($pos = strpos( $_server['php_self'], '/'.$script_name )) !== false ){
-					$url = substr( $_server['script_name'], 0, $pos ).'/'.$script_name;
-				} elseif( isset( $_server['document_root'] ) && strpos( $_server['script_filename'], $_server['document_root'] ) === 0 ){
-					$url = str_replace( '\\', '/', str_replace( $_server['document_root'], '', $_server['script_filename'] ) );
-				}
-			}
-			$this->baseFile = $url;
+			$this->baseFile = '';
 		}
 		return true === $file ? $this->domain().$this->baseFile : $this->baseFile;
 	}
 
 	/**
+	 * todo
 	 * 设置或获取URL访问根地址
 	 * @access public
 	 * @param string $url URL地址
@@ -276,11 +264,8 @@ class Request
 		if( is_null( $this->pathinfo ) ){
 			$_server = $this->esRequest->getServerParams();
 			if( IS_CLI ){
-				// cli模式下 index.php module/controller/action/params/...
 				$_server['path_info'] = isset( $_server['argv'][1] ) ? $_server['argv'][1] : '';
 			}
-
-
 			$this->pathinfo = empty( $_server['path_info'] ) ? '/' : ltrim( $_server['path_info'], '/' );
 		}
 		return $this->pathinfo;
