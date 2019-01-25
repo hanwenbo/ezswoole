@@ -2,11 +2,12 @@
 
 namespace ezswoole;
 
-use BadMethodCallException;
 use ezswoole\db\Query;
 use ezswoole\exception\ValidateException;
 use ezswoole\model\Collection as ModelCollection;
 use InvalidArgumentException;
+use ezswoole\Pool\MysqlObject;
+use ezswoole\Pool\MysqlPool;
 
 /**
  * Class Model
@@ -15,10 +16,7 @@ use InvalidArgumentException;
  */
 abstract class Model implements \JsonSerializable, \ArrayAccess
 {
-	// 数据库查询对象池
-	protected static $links = [];
-	// 数据库配置
-	protected $connection = [];
+	protected $connection;
 	// 父关联模型对象
 	protected $parent;
 	// 数据库查询对象
@@ -29,8 +27,6 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	protected $table;
 	// 当前类名称
 	protected $class;
-	// 回调事件
-	private static $event = [];
 	// 错误信息
 	protected $error;
 	// 字段验证规则
@@ -51,8 +47,6 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	protected $data = [];
 	// 原始数据
 	protected $origin = [];
-	// 关联模型
-	protected $relation = [];
 	// 保存自动完成列表
 	protected $auto = [];
 	// 新增自动完成列表
@@ -79,10 +73,6 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	protected $useGlobalScope = true;
 	// 是否采用批量验证
 	protected $batchValidate = false;
-	// 查询数据集对象
-	protected $resultSetType;
-	// 关联自动写入
-	protected $relationWrite;
 	/**
 	 * 保存的状态
 	 * @var bool
@@ -103,6 +93,15 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	 */
 	public function __construct( $data = [] )
 	{
+		try{
+			$connection       = MysqlPool::invoke( function( MysqlObject $connection ){
+				return $connection;
+			} );
+			$this->connection = $connection;
+		} catch( \Throwable $throwable ){
+			throw new $throwable;
+		}
+
 		if( is_object( $data ) ){
 			$this->data = get_object_vars( $data );
 		} else{
@@ -118,10 +117,6 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 			// 当前模型名
 			$name       = str_replace( '\\', '/', $this->class );
 			$this->name = basename( $name );
-			if( Config::get( 'class_suffix' ) ){
-				$suffix     = basename( dirname( $name ) );
-				$this->name = substr( $this->name, 0, - strlen( $suffix ) );
-			}
 		}
 
 		if( is_null( $this->autoWriteTimestamp ) ){
@@ -133,7 +128,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 			// 设置时间戳格式
 			$this->dateFormat = $this->getQuery()->getConfig( 'datetime_format' );
 		}
-
+		// todo
 		if( is_null( $this->resultSetType ) ){
 			$this->resultSetType = $this->getQuery()->getConfig( 'resultset_type' );
 		}
@@ -150,21 +145,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	 */
 	protected function buildQuery()
 	{
-		// 合并数据库配置
-		if( !empty( $this->connection ) ){
-			if( is_array( $this->connection ) ){
-				$connection = array_merge( Config::get( 'database' ), $this->connection );
-			} else{
-				$connection = $this->connection;
-			}
-		} else{
-			$connection = [];
-		}
-		$con = Db::connect( $connection );
-		// 设置当前模型 确保查询返回模型对象
-		$queryClass = $this->query ?: $con->getConfig( 'query' );
-		$query      = new $queryClass( $con, $this->class );
-
+		$query = new Query( $this->connection, $this->class );
 		// 设置当前数据表和模型名
 		if( !empty( $this->table ) ){
 			$query->setTable( $this->table );
@@ -181,25 +162,16 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 
 	/**
 	 * 获取当前模型的查询对象
-	 * @access public
-	 * @param bool $buildNewQuery 创建新的查询对象
+	 * @throws Exception
 	 * @return Query
 	 */
-	public function getQuery( $buildNewQuery = false )
+	public function getQuery()
 	{
-		if( $buildNewQuery ){
-			return $this->buildQuery();
-		} elseif( !isset( self::$links[$this->class] ) ){
-			// 创建模型查询对象
-			self::$links[$this->class] = $this->buildQuery();
-		}
-
-		return self::$links[$this->class];
+		return $this->buildQuery();
 	}
 
 	/**
 	 * 获取当前模型的数据库查询对象
-	 * @access public
 	 * @param bool $useBaseQuery  是否调用全局查询范围
 	 * @param bool $buildNewQuery 创建新的查询对象
 	 * @return Query
@@ -215,52 +187,6 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 
 		// 返回当前模型的数据库查询对象
 		return $query;
-	}
-
-	/**
-	 *  初始化模型
-	 * @access protected
-	 * @return void
-	 */
-	protected function initialize()
-	{
-		$class = get_class( $this );
-		if( !isset( static::$initialized[$class] ) ){
-			static::$initialized[$class] = true;
-			static::init();
-		}
-	}
-
-	/**
-	 * 初始化处理
-	 * @access protected
-	 * @return void
-	 */
-	protected static function init()
-	{
-	}
-
-	/**
-	 * 设置父关联对象
-	 * @access public
-	 * @param Model $model 模型对象
-	 * @return $this
-	 */
-	public function setParent( $model )
-	{
-		$this->parent = $model;
-
-		return $this;
-	}
-
-	/**
-	 * 获取父关联对象
-	 * @access public
-	 * @return Model
-	 */
-	public function getParent()
-	{
-		return $this->parent;
 	}
 
 	/**
@@ -425,7 +351,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	protected function writeTransform( $value, $type )
 	{
 		if( is_null( $value ) ){
-			return;
+			return null;
 		}
 
 		if( is_array( $type ) ){
@@ -528,28 +454,6 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	}
 
 	/**
-	 * 获取关联模型数据
-	 * @access public
-	 * @param Relation $modelRelation 模型关联对象
-	 * @return mixed
-	 * @throws BadMethodCallException
-	 */
-	protected function getRelationData( Relation $modelRelation )
-	{
-		if( $this->parent && get_class( $this->parent ) == $modelRelation->getModel() ){
-			$value = $this->parent;
-		} else{
-			// 首先获取关联数据
-			if( method_exists( $modelRelation, 'getRelation' ) ){
-				$value = $modelRelation->getRelation();
-			} else{
-				throw new BadMethodCallException( 'method not exists:'.get_class( $modelRelation ).'-> getRelation' );
-			}
-		}
-		return $value;
-	}
-
-	/**
 	 * 数据读取 类型转换
 	 * @access public
 	 * @param mixed        $value 值
@@ -559,7 +463,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	protected function readTransform( $value, $type )
 	{
 		if( is_null( $value ) ){
-			return;
+			return null;
 		}
 
 		if( is_array( $type ) ){
@@ -615,6 +519,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	}
 
 	/**
+	 * todo
 	 * 设置需要追加的输出属性
 	 * @access public
 	 * @param array $append   属性列表
@@ -628,6 +533,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	}
 
 	/**
+	 * todo
 	 * 设置附加关联对象的属性
 	 * @access public
 	 * @param string       $relation 关联方法
@@ -664,6 +570,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	}
 
 	/**
+	 * todo
 	 * 设置需要隐藏的输出属性
 	 * @access public
 	 * @param array $hidden   属性列表
@@ -677,6 +584,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	}
 
 	/**
+	 * todo
 	 * 设置需要输出的属性
 	 * @access public
 	 * @param array $visible
@@ -690,8 +598,8 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	}
 
 	/**
+	 * todo
 	 * 解析隐藏及显示属性
-	 * @access protected
 	 * @param array $attrs  属性
 	 * @param array $result 结果集
 	 * @param bool  $visible
@@ -720,8 +628,8 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	}
 
 	/**
+	 * todo
 	 * 转换子模型对象
-	 * @access protected
 	 * @param Model|ModelCollection $model
 	 * @param                       $visible
 	 * @param                       $hidden
@@ -740,6 +648,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	}
 
 	/**
+	 * todo
 	 * 转换当前模型对象为数组
 	 * @access public
 	 * @return array
@@ -797,6 +706,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	}
 
 	/**
+	 * todo
 	 * 转换当前模型对象为JSON字符串
 	 * @access public
 	 * @param integer $options json参数
@@ -808,17 +718,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	}
 
 	/**
-	 * 移除当前模型的关联属性
-	 * @access public
-	 * @return $this
-	 */
-	public function removeRelation()
-	{
-		$this->relation = [];
-		return $this;
-	}
-
-	/**
+	 * todo
 	 * 转换当前模型数据集为数据集对象
 	 * @access public
 	 * @param array|\ezswoole\Collection $collection 数据集
@@ -837,26 +737,12 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 		return $collection;
 	}
 
-	/**
-	 * 关联数据一起更新
-	 * @access public
-	 * @param mixed $relation 关联
-	 * @return $this
-	 */
-	public function together( $relation )
-	{
-		if( is_string( $relation ) ){
-			$relation = explode( ',', $relation );
-		}
-		$this->relationWrite = $relation;
-		return $this;
-	}
 
 	/**
 	 * 获取模型对象的主键
-	 * @access public
 	 * @param string $name 模型名
-	 * @return mixed
+	 * @return array|string
+	 * @throws Exception
 	 */
 	public function getPk( $name = '' )
 	{
@@ -871,8 +757,8 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 
 	/**
 	 * 判断一个字段名是否为主键字段
-	 * @access public
 	 * @param string $key 名称
+	 * @throws Exception
 	 * @return bool
 	 */
 	protected function isPk( $key )
@@ -944,10 +830,6 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 		// 数据自动完成
 		$this->autoCompleteData( $this->auto );
 
-		// 事件回调
-		if( false === $this->trigger( 'before_write', $this ) ){
-			return false;
-		}
 		$pk = $this->getPk();
 		if( $this->isUpdate ){
 			// 自动更新
@@ -962,10 +844,6 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 			$data = $this->getChangedData();
 
 			if( empty( $data ) || (count( $data ) == 1 && is_string( $pk ) && isset( $data[$pk] )) ){
-				// 关联更新
-				if( isset( $relation ) ){
-					$this->autoRelationUpdate( $relation );
-				}
 				return 0;
 			} elseif( $this->autoWriteTimestamp && $this->updateTime && !isset( $data[$this->updateTime] ) ){
 				// 自动写入更新时间
@@ -1044,23 +922,10 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 				}
 			}
 
-			// 关联写入
-			if( isset( $relation ) ){
-				foreach( $relation as $name => $val ){
-					$method = Loader::parseName( $name, 1, false );
-					$this->$method()->save( $val );
-				}
-			}
-
 			// 标记为更新
 			$this->isUpdate = true;
 
-			// 新增回调
-			$this->trigger( 'after_insert', $this );
 		}
-		// 写入回调
-		$this->trigger( 'after_write', $this );
-
 		// 重新记录原始数据
 		$this->origin = $this->data;
 
@@ -1082,21 +947,6 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 		}
 
 		return $field;
-	}
-
-	protected function autoRelationUpdate( $relation )
-	{
-		foreach( $relation as $name => $val ){
-			if( $val instanceof Model ){
-				$val->save();
-			} else{
-				unset( $this->data[$name] );
-				$model = $this->getAttr( $name );
-				if( $model instanceof Model ){
-					$model->save( $val );
-				}
-			}
-		}
 	}
 
 	/**
@@ -1130,16 +980,15 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	 * @access public
 	 * @param string  $field    字段名
 	 * @param integer $step     增长值
-	 * @param integer $lazyTime 延时时间(s)
 	 * @return integer|true
 	 * @throws Exception
 	 */
-	public function setInc( $field, $step = 1, $lazyTime = 0 )
+	public function setInc( $field, $step = 1)
 	{
 		// 更新条件
 		$where = $this->getWhere();
 
-		$result = $this->getQuery()->where( $where )->setInc( $field, $step, $lazyTime );
+		$result = $this->getQuery()->where( $where )->setInc( $field, $step );
 		if( true !== $result ){
 			$this->data[$field] += $step;
 		}
@@ -1152,15 +1001,14 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	 * @access public
 	 * @param string  $field    字段名
 	 * @param integer $step     增长值
-	 * @param integer $lazyTime 延时时间(s)
 	 * @return integer|true
 	 * @throws Exception
 	 */
-	public function setDec( $field, $step = 1, $lazyTime = 0 )
+	public function setDec( $field, $step = 1)
 	{
 		// 更新条件
 		$where  = $this->getWhere();
-		$result = $this->getQuery()->where( $where )->setDec( $field, $step, $lazyTime );
+		$result = $this->getQuery()->where( $where )->setDec( $field, $step );
 		if( true !== $result ){
 			$this->data[$field] -= $step;
 		}
@@ -1170,7 +1018,6 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 
 	/**
 	 * 获取更新条件
-	 * @access protected
 	 * @return mixed
 	 */
 	protected function getWhere()
@@ -1381,9 +1228,6 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	 */
 	public function delete()
 	{
-		if( false === $this->trigger( 'before_delete', $this ) ){
-			return false;
-		}
 
 		// 删除条件
 		$where = $this->getWhere();
@@ -1402,7 +1246,6 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 			}
 		}
 
-		$this->trigger( 'after_delete', $this );
 		// 清空原始数据
 		$this->origin = [];
 
@@ -1457,7 +1300,6 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 
 	/**
 	 * 自动验证数据
-	 * @access protected
 	 * @param array $data  验证数据
 	 * @param mixed $rule  验证规则
 	 * @param bool  $batch 批量验证
@@ -1469,7 +1311,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 
 		if( !empty( $info ) ){
 			if( is_array( $info ) ){
-				$validate = Loader::validate();
+				$validate = new Validate();
 				$validate->rule( $info['rule'] );
 				$validate->message( $info['msg'] );
 			} else{
@@ -1477,7 +1319,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 				if( strpos( $name, '.' ) ){
 					list( $name, $scene ) = explode( '.', $name );
 				}
-				$validate = Loader::validate( $name );
+				$validate = new Validate();
 				if( !empty( $scene ) ){
 					$validate->scene( $scene );
 				}
@@ -1555,7 +1397,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	public static function get( $data, $with = [], $cache = false )
 	{
 		if( is_null( $data ) ){
-			return;
+			return null;
 		}
 
 		if( true === $with || is_int( $with ) ){
@@ -1640,6 +1482,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	}
 
 	/**
+	 * todo
 	 * 命名范围
 	 * @access    public
 	 * @param string|array|\Closure $name 命名范围名称 逗号分隔
@@ -1670,6 +1513,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	}
 
 	/**
+	 * todo
 	 * 设置是否使用全局查询范围
 	 * @param bool $use 是否启用全局查询范围
 	 * @access public
@@ -1681,37 +1525,9 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 		return $model->db( $use );
 	}
 
-	/**
-	 * 根据关联条件查询当前模型
-	 * @param        $relation -关联方法名
-	 * @param string $operator 比较操作符
-	 * @param int    $count 个数
-	 * @param string $id 关联表的统计字段
-	 * @return mixed
-	 * @author 韩文博
-	 */
-	public static function has( $relation, $operator = '>=', $count = 1, $id = '*' )
-	{
-		$relation = (new static())->$relation();
-		if( is_array( $operator ) || $operator instanceof \Closure ){
-			return $relation->hasWhere( $operator );
-		}
-		return $relation->has( $operator, $count, $id );
-	}
 
 	/**
-	 * 根据关联条件查询当前模型
-	 * @access public
-	 * @param string $relation 关联方法名
-	 * @param mixed  $where    查询条件（数组或者闭包）
-	 * @return Relation|Query
-	 */
-	public static function hasWhere( $relation, $where = [] )
-	{
-		return (new static())->$relation()->hasWhere( $where );
-	}
-
-	/**
+	 * todo
 	 * 解析模型的完整命名空间
 	 * @access public
 	 * @param string $model 模型名（或者完整类名）
@@ -1726,65 +1542,6 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 			$model = implode( '\\', $path );
 		}
 		return $model;
-	}
-
-
-
-	/**
-	 * 预载入关联查询 返回数据集
-	 * @access public
-	 * @param array  $resultSet 数据集
-	 * @param string $relation  关联名
-	 * @return array
-	 */
-	public function eagerlyResultSet( &$resultSet, $relation )
-	{
-		$relations = is_string( $relation ) ? explode( ',', $relation ) : $relation;
-		foreach( $relations as $key => $relation ){
-			$subRelation = '';
-			$closure     = false;
-			if( $relation instanceof \Closure ){
-				$closure  = $relation;
-				$relation = $key;
-			}
-			if( is_array( $relation ) ){
-				$subRelation = $relation;
-				$relation    = $key;
-			} elseif( strpos( $relation, '.' ) ){
-				list( $relation, $subRelation ) = explode( '.', $relation, 2 );
-			}
-			$relation = Loader::parseName( $relation, 1, false );
-			$this->$relation()->eagerlyResultSet( $resultSet, $relation, $subRelation, $closure );
-		}
-	}
-
-	/**
-	 * 预载入关联查询 返回模型对象
-	 * @access public
-	 * @param Model  $result   数据对象
-	 * @param string $relation 关联名
-	 * @return Model
-	 */
-	public function eagerlyResult( &$result, $relation )
-	{
-		$relations = is_string( $relation ) ? explode( ',', $relation ) : $relation;
-
-		foreach( $relations as $key => $relation ){
-			$subRelation = '';
-			$closure     = false;
-			if( $relation instanceof \Closure ){
-				$closure  = $relation;
-				$relation = $key;
-			}
-			if( is_array( $relation ) ){
-				$subRelation = $relation;
-				$relation    = $key;
-			} elseif( strpos( $relation, '.' ) ){
-				list( $relation, $subRelation ) = explode( '.', $relation, 2 );
-			}
-			$relation = Loader::parseName( $relation, 1, false );
-			$this->$relation()->eagerlyResult( $result, $relation, $subRelation, $closure );
-		}
 	}
 
 

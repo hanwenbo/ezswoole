@@ -12,7 +12,7 @@ class Mysql extends Builder {
 
 	/**
 	 * 字段和表名处理
-	 * @access protected
+
 	 * @param string $key
 	 * @param array  $options
 	 * @return string
@@ -46,7 +46,7 @@ class Mysql extends Builder {
 
 	/**
 	 * 随机排序
-	 * @access protected
+
 	 * @return string
 	 */
 	protected function parseRand() {

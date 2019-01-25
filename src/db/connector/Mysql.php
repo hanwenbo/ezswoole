@@ -15,7 +15,7 @@ class Mysql extends Connection {
 
 	/**
 	 * 解析pdo连接的dsn信息
-	 * @access protected
+
 	 * @param array $config 连接信息
 	 * @return string
 	 */
@@ -85,7 +85,7 @@ class Mysql extends Connection {
 
 	/**
 	 * SQL性能分析
-	 * @access protected
+
 	 * @param string $sql
 	 * @return array
 	 */

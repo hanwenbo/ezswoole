@@ -127,7 +127,7 @@ abstract class Connection
 
 	/**
 	 * 获取新的查询对象
-	 * @access protected
+
 	 * @return Query
 	 */
 	protected function getQuery()
@@ -164,7 +164,7 @@ abstract class Connection
 
 	/**
 	 * 解析pdo连接的dsn信息
-	 * @access protected
+
 	 * @param array $config 连接信息
 	 * @return string
 	 */
@@ -188,7 +188,7 @@ abstract class Connection
 
 	/**
 	 * SQL性能分析
-	 * @access protected
+
 	 * @param string $sql
 	 * @return array
 	 */
@@ -551,7 +551,7 @@ abstract class Connection
 
 	/**
 	 * 获得数据集数组
-	 * @access protected
+
 	 * @param bool $pdo       是否返回PDOStatement
 	 * @param bool $procedure 是否存储过程
 	 * @return PDOStatement|array
@@ -573,7 +573,7 @@ abstract class Connection
 
 	/**
 	 * 获得存储过程数据集
-	 * @access protected
+
 	 * @return array
 	 */
 	protected function procedure()
@@ -782,7 +782,7 @@ abstract class Connection
 
 	/**
 	 * 是否断线
-	 * @access protected
+
 	 * @param \PDOException|\Exception $e 异常对象
 	 * @return bool
 	 */
@@ -879,7 +879,7 @@ abstract class Connection
 
 	/**
 	 * 数据库调试 记录当前SQL及分析性能
-	 * @access protected
+
 	 * @param boolean $start 调试开始标记 true 开始 false 结束
 	 * @param string  $sql   执行的SQL语句 留空自动获取
 	 * @return void
@@ -919,7 +919,7 @@ abstract class Connection
 
 	/**
 	 * 触发SQL事件
-	 * @access protected
+
 	 * @param string $sql     SQL语句
 	 * @param float  $runtime SQL运行时间
 	 * @param mixed  $explain SQL分析
@@ -944,7 +944,7 @@ abstract class Connection
 
 	/**
 	 * 初始化数据库连接
-	 * @access protected
+
 	 * @param boolean $master 是否主服务器
 	 * @return void
 	 */
@@ -972,7 +972,7 @@ abstract class Connection
 
 	/**
 	 * 连接分布式服务器
-	 * @access protected
+
 	 * @param boolean $master 主服务器
 	 * @return PDO
 	 */

@@ -75,6 +75,7 @@ class Session
 		$this->use_php_session = false;
 		/**
 		 * 注册钩子，请求结束后保存Session
+		 * TODO
 		 */
 		App::addHook( App::HOOK_AFTER_ACTION, [$this, 'save'] );
 	}

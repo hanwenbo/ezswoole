@@ -112,7 +112,7 @@ abstract class Controller extends AbstractController
 
 	/**
 	 * 验证数据
-	 * @access protected
+
 	 * @param mixed $data     数据
 	 * @param mixed $validate 验证器名或者验证规则数组
 	 * @param array $message  提示信息

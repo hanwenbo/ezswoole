@@ -14,21 +14,13 @@
 namespace ezswoole;
 
 use EasySwoole\Http\Response as EasySwooleResponse;
+use EasySwoole\Component\Singleton;
 
 class Response
 {
-
-	private static $instance;
+	use Singleton;
 
 	private $response;
-
-	final public static function getInstance( EasySwooleResponse $EasySwooleResponse = null )
-	{
-		if($EasySwooleResponse){
-			self::$instance = new static( $EasySwooleResponse );
-		}
-		return self::$instance;
-	}
 
 	final public function __construct( EasySwooleResponse $response )
 	{

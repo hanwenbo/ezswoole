@@ -135,7 +135,7 @@ trait SoftDelete
 
 	/**
 	 * 查询默认不包含软删除数据
-	 * @access protected
+
 	 * @param Query $query 查询对象
 	 * @return void
 	 */

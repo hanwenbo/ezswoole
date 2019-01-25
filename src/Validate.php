@@ -1,15 +1,12 @@
 <?php
 
 namespace ezswoole;
-
 use ezswoole\exception\ClassNotFoundException;
 use ezswoole\validate\ValidateRule;
-
 class Validate
 {
 	// 实例
 	protected static $instance;
-
 	// 验证类型别名
 	protected $alias
 		= [
@@ -187,7 +184,7 @@ class Validate
 
 	/**
 	 * 添加字段验证规则
-	 * @access protected
+
 	 * @param string|array $name 字段名称或者规则数组
 	 * @param mixed        $rule 验证规则
 	 * @return Validate
@@ -456,7 +453,7 @@ class Validate
 
 	/**
 	 * 验证单个字段规则
-	 * @access protected
+
 	 * @param  string $field 字段名
 	 * @param  mixed  $value 字段值
 	 * @param  mixed  $rules 验证规则
@@ -1269,7 +1266,7 @@ class Validate
 
 	/**
 	 * 获取数据值
-	 * @access protected
+
 	 * @param  array  $data 数据
 	 * @param  string $key  数据标识 支持二维
 	 * @return mixed
@@ -1290,7 +1287,7 @@ class Validate
 
 	/**
 	 * 获取验证规则的错误提示信息
-	 * @access protected
+
 	 * @param  string $attribute 字段英文名
 	 * @param  string $title     字段描述名
 	 * @param  string $type      验证规则名称
@@ -1338,7 +1335,7 @@ class Validate
 
 	/**
 	 * 获取数据验证的场景
-	 * @access protected
+
 	 * @param  string $scene 验证场景
 	 * @return array
 	 */
@@ -1382,7 +1379,7 @@ class Validate
 
 	 /**
 	  * 手机格式
-	  * @access protected
+
 	  * @param mixed $value 字段值
 	  * @param mixed $rule  验证规则
 	  * @return bool
@@ -1398,7 +1395,7 @@ class Validate
 
 	/**
 	 * 数组是否有重复值
-	 * @access protected
+
 	 * @param mixed $value 字段值
 	 * @param mixed $rule  验证规则
 	 * @return bool
@@ -1427,7 +1424,7 @@ class Validate
 	/**
 	 * todo 老了
 	 * 验证json
-	 * @access protected
+
 	 * @param mixed $value 字段值
 	 * @return bool
 	 */

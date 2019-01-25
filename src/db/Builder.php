@@ -52,7 +52,7 @@ abstract class Builder {
 
 	/**
 	 * 将SQL语句中的__TABLE_NAME__字符串替换成带前缀的表名（小写）
-	 * @access protected
+
 	 * @param string $sql sql语句
 	 * @return string
 	 */
@@ -62,7 +62,7 @@ abstract class Builder {
 
 	/**
 	 * 数据分析
-	 * @access protected
+
 	 * @param array     $data 数据
 	 * @param array     $options 查询参数
 	 * @return array
@@ -112,7 +112,7 @@ abstract class Builder {
 
 	/**
 	 * 字段名分析
-	 * @access protected
+
 	 * @param string $key
 	 * @param array  $options
 	 * @return string
@@ -123,7 +123,7 @@ abstract class Builder {
 
 	/**
 	 * value分析
-	 * @access protected
+
 	 * @param mixed     $value
 	 * @param string    $field
 	 * @return string|array
@@ -143,7 +143,7 @@ abstract class Builder {
 
 	/**
 	 * field分析
-	 * @access protected
+
 	 * @param mixed     $fields
 	 * @param array     $options
 	 * @return string
@@ -168,7 +168,7 @@ abstract class Builder {
 
 	/**
 	 * table分析
-	 * @access protected
+
 	 * @param mixed $tables
 	 * @param array $options
 	 * @return string
@@ -196,7 +196,7 @@ abstract class Builder {
 
 	/**
 	 * where分析
-	 * @access protected
+
 	 * @param mixed $where   查询条件
 	 * @param array $options 查询参数
 	 * @return string
@@ -432,7 +432,7 @@ abstract class Builder {
 
 	/**
 	 * 日期时间条件解析
-	 * @access protected
+
 	 * @param string    $value
 	 * @param string    $key
 	 * @param array     $options
@@ -474,7 +474,7 @@ abstract class Builder {
 
 	/**
 	 * limit分析
-	 * @access protected
+
 	 * @param mixed $limit
 	 * @return string
 	 */
@@ -484,7 +484,7 @@ abstract class Builder {
 
 	/**
 	 * join分析
-	 * @access protected
+
 	 * @param array $join
 	 * @param array $options 查询条件
 	 * @return string
@@ -513,7 +513,7 @@ abstract class Builder {
 
 	/**
 	 * order分析
-	 * @access protected
+
 	 * @param mixed $order
 	 * @param array $options 查询条件
 	 * @return string
@@ -546,7 +546,7 @@ abstract class Builder {
 
 	/**
 	 * group分析
-	 * @access protected
+
 	 * @param mixed $group
 	 * @return string
 	 */
@@ -556,7 +556,7 @@ abstract class Builder {
 
 	/**
 	 * having分析
-	 * @access protected
+
 	 * @param string $having
 	 * @return string
 	 */
@@ -566,7 +566,7 @@ abstract class Builder {
 
 	/**
 	 * comment分析
-	 * @access protected
+
 	 * @param string $comment
 	 * @return string
 	 */
@@ -576,7 +576,7 @@ abstract class Builder {
 
 	/**
 	 * distinct分析
-	 * @access protected
+
 	 * @param mixed $distinct
 	 * @return string
 	 */
@@ -586,7 +586,7 @@ abstract class Builder {
 
 	/**
 	 * union分析
-	 * @access protected
+
 	 * @param mixed $union
 	 * @return string
 	 */
@@ -608,7 +608,7 @@ abstract class Builder {
 
 	/**
 	 * index分析，可在操作链中指定需要强制使用的索引
-	 * @access protected
+
 	 * @param mixed $index
 	 * @return string
 	 */
@@ -626,7 +626,7 @@ abstract class Builder {
 
 	/**
 	 * 设置锁机制
-	 * @access protected
+
 	 * @param bool|string $lock
 	 * @return string
 	 */

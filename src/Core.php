@@ -1,39 +1,44 @@
 <?php
-
 namespace ezswoole;
-
 use EasySwoole\Utility\File;
 
-/**
- * App 应用管理
- */
-class App
+class Core
 {
 	private $config;
 
-
-	public function __construct()
+	public static function register()
 	{
+		define( 'EZSWOOLE_START_TIME', microtime( true ) );
+		define( 'EZSWOOLE_START_MEM', memory_get_usage() );
+		define( 'EXT', '.php' );
+		define( 'DS', DIRECTORY_SEPARATOR );
+		defined( 'EZSWOOLE_PATH' ) or define( 'EZSWOOLE_PATH', __DIR__.DS );
+		define( 'LIB_PATH', EZSWOOLE_PATH );
+		defined( 'APP_PATH' ) or define( 'APP_PATH', __DIR__.DS."..".DS."App".DS );
+		defined( 'ROOT_PATH' ) or define( 'ROOT_PATH', dirname( realpath( APP_PATH ) ).DS );
+		defined( 'RUNTIME_PATH' ) or define( 'RUNTIME_PATH', ROOT_PATH.'Runtime'.DS );
+		defined( 'LOG_PATH' ) or define( 'LOG_PATH', RUNTIME_PATH.'Log'.DS );
+		defined( 'CACHE_PATH' ) or define( 'CACHE_PATH', RUNTIME_PATH.'Cache'.DS );
+		defined( 'TEMP_PATH' ) or define( 'TEMP_PATH', RUNTIME_PATH.'Temp'.DS );
+		defined( 'CONF_PATH' ) or define( 'CONF_PATH', ROOT_PATH.'Conf'.DS ); // 配置文件目录
+
+		// 加载惯例配置文件
+		\ezswoole\Config::set( include LIB_PATH.'config/detault'.EXT );
+		// 执行应用
+		$app = new self();
+		$app->run();
 	}
 
 	public function run()
 	{
 		$this->initDir();
 		$this->initConfig();
-		$this->initApp();
-	}
-
-	static $hooks = [];
-
-
-	public function initApp()
-	{
-		date_default_timezone_set( $this->config['default_timezone'] );
-		return Config::get();
 	}
 
 	private function initConfig()
 	{
+		date_default_timezone_set( $this->config['default_timezone'] );
+
 		$server_config = \EasySwoole\EasySwoole\Config::getInstance()->getConf( "." );
 		foreach( $server_config as $key => $_config ){
 			if( isset( $_config[$key] ) && is_array( $_config[$key] ) ){
@@ -73,3 +78,5 @@ class App
 		}
 	}
 }
+
+

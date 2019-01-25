@@ -112,7 +112,7 @@ class Query
 
 	/**
 	 * 设置当前的数据库Builder对象
-	 * @access protected
+
 	 * @return void
 	 */
 	protected function setBuilder()
@@ -578,26 +578,15 @@ class Query
 	 * @access public
 	 * @param string  $field    字段名
 	 * @param integer $step     增长值
-	 * @param integer $lazyTime 延时时间(s)
 	 * @return integer|true
 	 * @throws Exception
 	 */
-	public function setInc( $field, $step = 1, $lazyTime = 0 )
+	public function setInc( $field, $step = 1 )
 	{
 		$condition = !empty( $this->options['where'] ) ? $this->options['where'] : [];
 		if( empty( $condition ) ){
 			// 没有条件不做任何更新
 			throw new Exception( 'no data to update' );
-		}
-		if( $lazyTime > 0 ){
-			// 延迟写入
-			$guid = md5( $this->getTable().'_'.$field.'_'.serialize( $condition ).serialize( $this->bind ) );
-			$step = $this->lazyWrite( 'inc', $guid, $step, $lazyTime );
-			if( false === $step ){
-				// 清空查询条件
-				$this->options = [];
-				return true;
-			}
 		}
 		return $this->setField( $field, ['exp', $field.'+'.$step] );
 	}
@@ -607,58 +596,20 @@ class Query
 	 * @access public
 	 * @param string  $field    字段名
 	 * @param integer $step     减少值
-	 * @param integer $lazyTime 延时时间(s)
 	 * @return integer|true
 	 * @throws Exception
 	 */
-	public function setDec( $field, $step = 1, $lazyTime = 0 )
+	public function setDec( $field, $step = 1 )
 	{
 		$condition = !empty( $this->options['where'] ) ? $this->options['where'] : [];
 		if( empty( $condition ) ){
 			// 没有条件不做任何更新
 			throw new Exception( 'no data to update' );
 		}
-		if( $lazyTime > 0 ){
-			// 延迟写入
-			$guid = md5( $this->getTable().'_'.$field.'_'.serialize( $condition ).serialize( $this->bind ) );
-			$step = $this->lazyWrite( 'dec', $guid, $step, $lazyTime );
-			if( false === $step ){
-				// 清空查询条件
-				$this->options = [];
-				return true;
-			}
-		}
 		return $this->setField( $field, ['exp', $field.'-'.$step] );
 	}
 
-	/**
-	 * 延时更新检查 返回false表示需要延时
-	 * 否则返回实际写入的数值
-	 * @access protected
-	 * @param string  $type     自增或者自减
-	 * @param string  $guid     写入标识
-	 * @param integer $step     写入步进值
-	 * @param integer $lazyTime 延时时间(s)
-	 * @return false|integer
-	 */
-	protected function lazyWrite( $type, $guid, $step, $lazyTime )
-	{
-		if( !Cache::getInstance()->has( $guid.'_time' ) ){
-			// 计时开始
-			Cache::getInstance()->set( $guid.'_time', $_SERVER['REQUEST_TIME'], 0 );
-			Cache::getInstance()->$type( $guid, $step );
-		} elseif( $_SERVER['REQUEST_TIME'] > Cache::getInstance()->get( $guid.'_time' ) + $lazyTime ){
-			// 删除缓存
-			$value = Cache::getInstance()->$type( $guid, $step );
-			Cache::getInstance()->delete( $guid );
-			Cache::getInstance()->delete( $guid.'_time' );
-			return 0 === $value ? false : $value;
-		} else{
-			// 更新缓存
-			Cache::getInstance()->$type( $guid, $step );
-		}
-		return false;
-	}
+
 
 	/**
 	 * 查询SQL组装 join
@@ -1793,7 +1744,7 @@ class Query
 
 	/**
 	 * 查询参数赋值
-	 * @access protected
+
 	 * @param array $options 表达式参数
 	 * @return $this
 	 */
@@ -2668,7 +2619,7 @@ class Query
 
 	/**
 	 * 分析表达式（可用于查询或者写入操作）
-	 * @access protected
+
 	 * @return array
 	 */
 	protected function parseExpress()
@@ -2771,7 +2722,7 @@ class Query
 
 	/**
 	 * 触发事件
-	 * @access protected
+
 	 * @param string $event  事件名
 	 * @param mixed  $params 额外参数
 	 * @return bool
