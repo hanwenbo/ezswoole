@@ -4,6 +4,7 @@ namespace ezswoole\db;
 
 use BadMethodCallException;
 use ezswoole\Exception;
+use ezswoole\pool\MysqlObject;
 
 abstract class Builder {
 	// connection对象实例
@@ -24,10 +25,10 @@ abstract class Builder {
 	/**
 	 * 构造函数
 	 * @access public
-	 * @param Connection    $connection 数据库连接对象实例
+	 * @param MysqlObject    $connection 数据库连接对象实例
 	 * @param Query         $query      数据库查询对象实例
 	 */
-	public function __construct(Connection $connection, Query $query) {
+	public function __construct(MysqlObject $connection, Query $query) {
 		$this->connection = $connection;
 		$this->query      = $query;
 	}
@@ -35,7 +36,7 @@ abstract class Builder {
 	/**
 	 * 获取当前的连接对象实例
 	 * @access public
-	 * @return Connection
+	 * @return MysqlObject
 	 */
 	public function getConnection() {
 		return $this->connection;
@@ -117,7 +118,7 @@ abstract class Builder {
 	 * @param array  $options
 	 * @return string
 	 */
-	protected function parseKey($key, $options = []) {
+	protected function parseKey($key) {
 		return $key;
 	}
 
@@ -432,7 +433,6 @@ abstract class Builder {
 
 	/**
 	 * 日期时间条件解析
-
 	 * @param string    $value
 	 * @param string    $key
 	 * @param array     $options
@@ -474,7 +474,6 @@ abstract class Builder {
 
 	/**
 	 * limit分析
-
 	 * @param mixed $limit
 	 * @return string
 	 */

@@ -978,12 +978,12 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	/**
 	 * 字段值(延迟)增长
 	 * @access public
-	 * @param string  $field    字段名
-	 * @param integer $step     增长值
+	 * @param string  $field 字段名
+	 * @param integer $step  增长值
 	 * @return integer|true
 	 * @throws Exception
 	 */
-	public function setInc( $field, $step = 1)
+	public function setInc( $field, $step = 1 )
 	{
 		// 更新条件
 		$where = $this->getWhere();
@@ -999,12 +999,12 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 	/**
 	 * 字段值(延迟)增长
 	 * @access public
-	 * @param string  $field    字段名
-	 * @param integer $step     增长值
+	 * @param string  $field 字段名
+	 * @param integer $step  增长值
 	 * @return integer|true
 	 * @throws Exception
 	 */
-	public function setDec( $field, $step = 1)
+	public function setDec( $field, $step = 1 )
 	{
 		// 更新条件
 		$where  = $this->getWhere();
