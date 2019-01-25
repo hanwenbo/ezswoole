@@ -3,14 +3,11 @@
 namespace ezswoole;
 
 use EasySwoole\Http\Request as EasySwooleRequest;
+use EasySwoole\Component\Singleton;
 
 class Request
 {
-	/**
-	 * @var object 对象实例
-	 */
-	private static $instance;
-
+	use Singleton;
 	protected $method;
 	/**
 	 * @var string 域名（含协议和端口）
@@ -21,7 +18,6 @@ class Request
 	 * @var string URL地址
 	 */
 	protected $url;
-
 	/**
 	 * @var string 基础URL
 	 */
@@ -48,19 +44,11 @@ class Request
 	protected $path;
 
 
-	/**
-	 * @var array 当前调度信息
-	 */
-	protected $dispatch = [];
 	protected $module;
 	protected $controller;
 	protected $action;
-	// 当前语言集
-	protected $langset;
 
-	/**
-	 * @var array 请求参数
-	 */
+	protected $langset;
 	protected $param = [];
 	protected $get = [];
 	protected $post = [];
@@ -70,11 +58,8 @@ class Request
 	protected $cookie = [];
 	protected $server = [];
 	protected $header = [];
-	protected $raw = [];
+	protected $raw;
 
-	/**
-	 * @var array 资源类型
-	 */
 	protected $mimeType
 		= [
 			'xml'   => 'application/xml,text/xml,application/x-xml',
@@ -90,8 +75,6 @@ class Request
 			'csv'   => 'text/csv',
 			'html'  => 'text/html,application/xhtml+xml,*/*',
 		];
-
-	protected $content;
 
 	// 全局过滤规则
 	protected $filter;
@@ -109,54 +92,25 @@ class Request
 		$this->server            = $request->getSwooleRequest()->server;
 	}
 
-	final public static function getInstance( EasySwooleRequest $request = null )
-	{
-		if( $request ){
-			self::$instance = new static( $request );
-		}
-		return self::$instance;
-	}
 
-	final public static function clearInstance() : void
-	{
-		self::$instance = null;
-	}
-
-	final public function getEasySwooleRequest()
+	final public function getEasySwooleRequest() : EasySwooleRequest
 	{
 		return $this->EasySwooleRequest;
 	}
 
-	/**
-	 * 设置或获取当前包含协议的域名
-	 * @access public
-	 * @param string $domain 域名
-	 * @return string
-	 */
-	public function domain( $domain = null )
+	public function domain() : string
 	{
-		if( !is_null( $domain ) ){
-			$this->domain = $domain;
-			return $this;
-		} elseif( !$this->domain ){
+		if( !$this->domain ){
 			$this->domain = $this->scheme().'://'.$this->host();
 		}
 		return $this->domain;
 	}
 
-	/**
-	 * 设置或获取当前完整URL 包括QUERY_STRING
-	 * @access public
-	 * @param string|true $url URL地址 true 带域名获取
-	 * @return string
-	 */
-	public function url( $url = null )
+
+	public function url() : string
 	{
 		$server = $this->getEasySwooleRequest()->getServerParams();
-		if( !is_null( $url ) && true !== $url ){
-			$this->url = $url;
-			return $this;
-		} elseif( !$this->url ){
+		if( !$this->url ){
 			if( isset( $server['http_x_rewrite_url'] ) ){
 				$this->url = $server['http_x_rewrite_url'];
 			} elseif( isset( $server['request_uri'] ) ){
@@ -167,34 +121,19 @@ class Request
 				$this->url = '';
 			}
 		}
-		return true === $url ? $this->domain().$this->url : $this->url;
+		return $this->url;
 	}
 
-	/**
-	 * 设置或获取当前URL 不含QUERY_STRING
-	 * @access public
-	 * @param string $url URL地址
-	 * @return string
-	 */
-	public function baseUrl( $url = null )
+	public function baseUrl() : string
 	{
-		if( !is_null( $url ) && true !== $url ){
-			$this->baseUrl = $url;
-			return $this;
-		} elseif( !$this->baseUrl ){
+		if( !$this->baseUrl ){
 			$str           = $this->url();
 			$this->baseUrl = strpos( $str, '?' ) ? strstr( $str, '?', true ) : $str;
 		}
-		return true === $url ? $this->domain().$this->baseUrl : $this->baseUrl;
+		return $this->baseUrl;
 	}
 
-
-	/**
-	 * 获取当前请求URL的pathinfo信息（含URL后缀）
-	 * @access public
-	 * @return string
-	 */
-	public function pathinfo()
+	public function pathinfo() : string
 	{
 		if( is_null( $this->pathinfo ) ){
 			$_server        = $this->getEasySwooleRequest()->getSwooleRequest()->server;
@@ -203,43 +142,22 @@ class Request
 		return $this->pathinfo;
 	}
 
-	/**
-	 * 获取当前请求URL的pathinfo信息(不含URL后缀)
-	 * @access public
-	 * @return string
-	 */
-	public function path()
+	public function path() : string
 	{
 		return $this->getEasySwooleRequest()->getUri()->getPath();
 	}
 
-	/**
-	 * 当前URL的访问后缀
-	 * @access public
-	 * @return string
-	 */
 	public function ext()
 	{
 		return pathinfo( $this->pathinfo(), PATHINFO_EXTENSION );
 	}
 
-	/**
-	 * 获取当前请求的时间
-	 * @access public
-	 * @param bool $float 是否使用浮点类型
-	 * @return integer|float
-	 */
 	public function time( $float = false )
 	{
 		$_server = $this->getEasySwooleRequest()->getServerParams();
 		return $float ? $_server['request_time_float'] : $_server['request_time'];
 	}
 
-	/**
-	 * 当前请求的资源类型
-	 * @access public
-	 * @return false|string
-	 */
 	public function type()
 	{
 		$accept = $this->server( 'http_accept' );
@@ -257,13 +175,6 @@ class Request
 		return false;
 	}
 
-	/**
-	 * 设置资源类型
-	 * @access public
-	 * @param string|array $type 资源类型名
-	 * @param string       $val  资源类型
-	 * @return void
-	 */
 	public function mimeType( $type, $val = '' )
 	{
 		if( is_array( $type ) ){
@@ -294,50 +205,7 @@ class Request
 		return $this->method;
 	}
 
-	public function isGet() : bool
-	{
-		return $this->method() == 'GET';
-	}
 
-	public function isPost() : bool
-	{
-		return $this->method() == 'POST';
-	}
-
-	public function isPut() : bool
-	{
-		return $this->method() == 'PUT';
-	}
-
-	public function isDelete() : bool
-	{
-		return $this->method() == 'DELETE';
-	}
-
-	public function isHead() : bool
-	{
-		return $this->method() == 'HEAD';
-	}
-
-	public function isPatch() : bool
-	{
-		return $this->method() == 'PATCH';
-	}
-
-	public function isOptions() : bool
-	{
-		return $this->method() == 'OPTIONS';
-	}
-
-
-	/**
-	 * 获取当前请求的参数
-	 * @access public
-	 * @param string|array $name    变量名
-	 * @param mixed        $default 默认值
-	 * @param string|array $filter  过滤方法
-	 * @return mixed
-	 */
 	public function param( $name = '', $default = null, $filter = '' )
 	{
 		if( empty( $this->param ) ){
@@ -367,15 +235,6 @@ class Request
 		return $this->input( $this->param, $name, $default, $filter );
 	}
 
-
-	/**
-	 * 设置获取GET参数
-	 * @access public
-	 * @param string|array $name    变量名
-	 * @param mixed        $default 默认值
-	 * @param string|array $filter  过滤方法
-	 * @return mixed
-	 */
 	public function get( $name = '', $default = null, $filter = '' )
 	{
 		if( is_array( $name ) ){
@@ -385,21 +244,13 @@ class Request
 		return $this->input( $this->get, $name, $default, $filter );
 	}
 
-	/**
-	 * 设置获取POST参数
-	 * @access public
-	 * @param string       $name    变量名
-	 * @param mixed        $default 默认值
-	 * @param string|array $filter  过滤方法
-	 * @return mixed
-	 */
+
 	public function post( $name = '', $default = null, $filter = '' )
 	{
-
 		if( empty( $this->post ) ){
 			$_post = $this->getEasySwooleRequest()->getParsedBody();
 			if( empty( $_post ) && false !== strpos( $this->contentType(), 'application/json' ) ){
-				$this->post = $this->raw();
+				$this->post = json_decode( $this->raw(), true );
 			} else{
 				$this->post = $_post;
 			}
@@ -411,20 +262,12 @@ class Request
 		return $this->input( $this->post, $name, $default, $filter );
 	}
 
-	/**
-	 * 设置获取PUT参数
-	 * @access public
-	 * @param string|array $name    变量名
-	 * @param mixed        $default 默认值
-	 * @param string|array $filter  过滤方法
-	 * @return mixed
-	 */
 	public function put( $name = '', $default = null, $filter = '' )
 	{
 		if( is_null( $this->put ) ){
-			$content = $this->getEasySwooleRequest()->getSwooleRequest()->rawContent();
+			$content = $this->raw();
 			if( false !== strpos( $this->contentType(), 'application/json' ) ){
-				$this->put = (array)json_decode( $content, true );
+				$this->put = json_decode( $content, true );
 			} else{
 				parse_str( $content, $this->put );
 			}
@@ -433,34 +276,7 @@ class Request
 			$this->param = [];
 			return $this->put = is_null( $this->put ) ? $name : array_merge( $this->put, $name );
 		}
-
 		return $this->input( $this->put, $name, $default, $filter );
-	}
-
-	/**
-	 * 设置获取DELETE参数
-	 * @access public
-	 * @param string|array $name    变量名
-	 * @param mixed        $default 默认值
-	 * @param string|array $filter  过滤方法
-	 * @return mixed
-	 */
-	public function delete( $name = '', $default = null, $filter = '' )
-	{
-		return $this->put( $name, $default, $filter );
-	}
-
-	/**
-	 * 设置获取PATCH参数
-	 * @access public
-	 * @param string|array $name    变量名
-	 * @param mixed        $default 默认值
-	 * @param string|array $filter  过滤方法
-	 * @return mixed
-	 */
-	public function patch( $name = '', $default = null, $filter = '' )
-	{
-		return $this->put( $name, $default, $filter );
 	}
 
 	/**
@@ -515,14 +331,6 @@ class Request
 		return $data;
 	}
 
-	/**
-	 * 获取server参数
-	 * @access public
-	 * @param string|array $name    数据名称
-	 * @param string       $default 默认值
-	 * @param string|array $filter  过滤方法
-	 * @return mixed
-	 */
 	public function server( $name = '', $default = null, $filter = '' )
 	{
 		if( is_array( $name ) ){
@@ -748,7 +556,7 @@ class Request
 	 * @param bool   $checkEmpty 是否检测空值
 	 * @return mixed
 	 */
-	public function has( $name, $type = 'param', $checkEmpty = false )
+	public function has( $name, $type = 'param', $checkEmpty = false ) : bool
 	{
 		if( empty( $this->type ) ){
 			$param = $this->$type();
@@ -764,28 +572,6 @@ class Request
 			}
 		}
 		return ($checkEmpty && '' === $param) ? false : true;
-	}
-
-	/**
-	 * 获取指定的参数
-	 * @access public
-	 * @param string|array $name 变量名
-	 * @param string       $type 变量类型
-	 * @return mixed
-	 */
-	public function only( $name, $type = 'param' )
-	{
-		$param = $this->$type();
-		if( is_string( $name ) ){
-			$name = explode( ',', $name );
-		}
-		$item = [];
-		foreach( $name as $key ){
-			if( isset( $param[$key] ) ){
-				$item[$key] = $param[$key];
-			}
-		}
-		return $item;
 	}
 
 	/**
@@ -814,7 +600,7 @@ class Request
 	 * @access public
 	 * @return bool
 	 */
-	public function isSsl()
+	public function isSsl() : bool
 	{
 		$server = $this->server;
 		$header = $this->header;
@@ -872,7 +658,7 @@ class Request
 	 * @access public
 	 * @return bool
 	 */
-	public function isMobile()
+	public function isMobile() : bool
 	{
 		$server = $this->server;
 
@@ -914,22 +700,8 @@ class Request
 		return $this->server( 'server_protocol' );
 	}
 
-	/**
-	 * 当前请求 REMOTE_PORT
-	 * @access public
-	 * @return integer
-	 */
-	public function remotePort()
-	{
-		return $this->server( 'remote_port' );
-	}
 
-	/**
-	 * 当前请求 HTTP_CONTENT_TYPE
-	 * @access public
-	 * @return string
-	 */
-	public function contentType()
+	public function contentType() : string
 	{
 		if( isset( $this->header['content-type'] ) ){
 			$contentType = $this->header['content-type'];
@@ -944,90 +716,71 @@ class Request
 		} else{
 			return '';
 		}
-
 	}
 
-	/**
-	 * 设置或者获取当前的模块名
-	 * @access public
-	 * @param string $module 模块名
-	 * @return string|Request
-	 */
-	public function module( $module = null )
+
+	public function module() : string
 	{
-		if( !is_null( $module ) ){
-			$this->module = $module;
-			return $this;
-		} else{
-			$path     = $this->path();
-			$path_arr = explode( "/", strtolower( $path ) );
-			return $path_arr[0];
-		}
+		$path     = $this->path();
+		$path_arr = explode( "/", strtolower( $path ) );
+		return $path_arr[0];
 	}
 
-	/**
-	 * 设置或者获取当前的控制器名
-	 * @access public
-	 * @param string $controller 控制器名
-	 * @return string|Request
-	 */
-	public function controller( $controller = null )
+
+	public function controller() : string
 	{
-		if( !is_null( $controller ) ){
-			$this->controller = $controller;
-			return $this;
-		} else{
-			$path     = $this->path();
-			$path_arr = explode( "/", strtolower( $path ) );
-			return $path_arr[2] ?: '';
-		}
+		$path     = $this->path();
+		$path_arr = explode( "/", strtolower( $path ) );
+		return $path_arr[2] ?: '';
 	}
 
-	/**
-	 * 设置或者获取当前的操作名
-	 * @access public
-	 * @param string $action 操作名
-	 * @return string|Request
-	 */
-	public function action( $action = null )
+	public function action() : string
 	{
-
-		if( !is_null( $action ) ){
-			$this->action = $action;
-			return $this;
-		} else{
-			$path     = $this->path();
-			$path_arr = explode( "/", strtolower( $path ) );
-			return $path_arr[3] ?: '';
-		}
+		$path     = $this->path();
+		$path_arr = explode( "/", strtolower( $path ) );
+		return $path_arr[3] ?: '';
 	}
 
-	/**
-	 * 设置或者获取当前的语言
-	 * @access public
-	 * @param string $lang 语言名
-	 * @return string|Request
-	 */
-	public function langset( $lang = null )
+
+	public function langset() : string
 	{
-		if( !is_null( $lang ) ){
-			$this->langset = $lang;
-			return $this;
-		} else{
-			return $this->langset ?: '';
-		}
+		return $this->langset ?: '';
 	}
 
-	public function getContent() : ?string
+	public function isGet() : bool
 	{
-		$content = $this->getEasySwooleRequest()->getSwooleRequest()->rawContent();
-		if( is_null( $content ) ){
-			return $content;
-		} else{
-			return null;
-		}
+		return $this->method() == 'GET';
 	}
 
+	public function isPost() : bool
+	{
+		return $this->method() == 'POST';
+	}
+
+	public function isPut() : bool
+	{
+		return $this->method() == 'PUT';
+	}
+
+	public function isDelete() : bool
+	{
+		return $this->method() == 'DELETE';
+	}
+
+	public function isHead() : bool
+	{
+		return $this->method() == 'HEAD';
+	}
+
+	public function isPatch() : bool
+	{
+		return $this->method() == 'PATCH';
+	}
+
+	public function isOptions() : bool
+	{
+		return $this->method() == 'OPTIONS';
+	}
 
 	static function clearGlobalVariables()
 	{
@@ -1052,4 +805,5 @@ class Request
 			}
 		}
 	}
+
 }
