@@ -18,4 +18,18 @@ docker run -it -p 9527:9501 -v /Volumes/dev/www/ezswoole-v3:/var/www/project --p
 
 
 ## DB
-find
+继承了ezswoole/mysqli
+
+$results = $db
+	->where('id', 1)
+	->where('login', 'admin')
+	->get('users');
+
+where支持
+[
+    'id'=>['IN',[1,2,3]],
+    'number'=>['BETWEEN',[2,5],
+    'name'=>['LIKE',[2,5],
+]
+
+exp 怎么解决
