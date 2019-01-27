@@ -1,12 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: yf
- * Date: 2018/10/26
- * Time: 4:43 PM
- */
 
-namespace ezswoole\Pool;
+namespace ezswoole\pool;
 
 use EasySwoole\Component\Pool\AbstractPool;
 use EasySwoole\EasySwoole\Config;

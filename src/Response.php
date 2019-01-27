@@ -32,9 +32,4 @@ class Response
 		return $this->response;
 	}
 
-	public static function clearInstance() : void
-	{
-		self::$instance = null;
-	}
-
 }

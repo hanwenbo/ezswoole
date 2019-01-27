@@ -1,18 +1,13 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: root
- * Date: 18-11-1
- * Time: 上午11:45
- */
 
-namespace ezswoole\Pool;
+namespace ezswoole\pool;
 
 use EasySwoole\Component\Pool\PoolObjectInterface;
 use EasySwoole\Mysqli\Mysqli;
 
 class MysqlObject extends Mysqli implements PoolObjectInterface
 {
+
     function gc()
     {
         // 重置为初始状态
