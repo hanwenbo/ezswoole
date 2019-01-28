@@ -2,12 +2,13 @@
 
 namespace ezswoole;
 
-use ezswoole\dbobject\DbObject;
 use ezswoole\pool\MysqlPool;
 use ezswoole\pool\MysqlObject;
-use EasySwoole\Spl\SplString;
+use EasySwoole\Mysqli\TpORM;
+use EasySwoole\Component\Pool\PoolManager;
+use EasySwoole\EasySwoole\Config;
 
-abstract class Model extends DbObject
+class Model extends TpORM
 {
 	protected $prefix = 'ez_';
 	protected $modelPath = '\\App\\Model';
@@ -15,91 +16,28 @@ abstract class Model extends DbObject
 	protected $limit;
 
 	/**
-	 * @throws \EasySwoole\Component\Pool\Exception\PoolEmpty
-	 * @throws \EasySwoole\Component\Pool\Exception\PoolException
-	 * @throws \Throwable
+	 * Model constructor.
+	 * @param null $data
+	 * @throws \Exception
 	 */
-	public function initialize() : void
-	{
-		$db = MysqlPool::invoke( function( MysqlObject $mysqlObject ){
-			return $mysqlObject;
-		} );
-		$this->setDb( $db );
-	}
-
 	public function __construct( $data = null )
 	{
-		if( empty( $this->dbTable ) ){
-			$split         = explode( "\\", get_class( $this ) );
-			$end           = end( $split );
-			$splString     = new SplString( $end );
-			$name          = $splString->snake( '_' )->__toString();
-			$this->dbTable = $this->prefix.$name." AS {$name}";
-		}
-		parent::__construct( $data );
-	}
-
-	/**
-	 * @param string $objectNames
-	 * @param string $joinStr
-	 * @param string $joinType
-	 * @return Model
-	 * @throws \EasySwoole\Mysqli\Exceptions\JoinFail
-	 */
-	protected function join( $objectNames, string $joinStr, string $joinType = 'LEFT' ) : Model
-	{
-		if( is_array( $objectNames ) ){
-			foreach( $objectNames as $join ){
-				$this->getDb()->join( ...$join );
-			}
+		$db = PoolManager::getInstance()->getPool( MysqlPool::class )->getObj( Config::getInstance()->getConf( 'MYSQL.POOL_TIME_OUT' ) );
+		if( $db instanceof MysqlObject ){
+			parent::__construct( $data );
+			$this->setDb( $db );
 		} else{
-			$this->getDb()->join( ...$objectNames );
+			throw new \Exception( 'mysql pool is empty' );
 		}
-
-		return $this;
 	}
 
-	protected function find() : array
+	public function __destruct()
 	{
-		$list = parent::get( 1, $this->fields );
-		return isset( $list[0] ) ? $list[0] : [];
-	}
-
-	protected function field( $field ) : Model
-	{
-		$this->fields = $field;
-		return $this;
-	}
-
-	protected function limit( $limit ) : Model
-	{
-		$this->limit = $limit;
-		return $this;
-	}
-
-	protected function page( string $page ) : Model
-	{
-		$split = explode( ",", $page );
-		$page  = $split[0] - 1;
-		$rows  = $split[1];
-		return $this->limit( "{$page},{$rows}" );
-	}
-
-	protected function select() : array
-	{
-		return parent::get( $this->limit, $this->fields );
-	}
-
-	protected function where( $whereProps, $whereValue = 'DBNULL', $operator = '=', $cond = 'AND' ) : Model
-	{
-		if( is_array( $whereProps ) ){
-			foreach( $whereProps as $whereProp ){
-				$this->getDb()->where( ...$whereProp );
-			}
-		} else{
-			$this->getDb()->where( $whereProps, $whereValue, $operator, $cond );
+		$db = $this->getDb();
+		if( $db instanceof MysqlObject ){
+			$db->gc();
+			PoolManager::getInstance()->getPool( MysqlPool::class )->recycleObj( $db );
+			$this->setDb( null );
 		}
-		return $this;
 	}
-
 }

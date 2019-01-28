@@ -4,15 +4,10 @@ use ezswoole\Cache;
 use ezswoole\Config;
 use ezswoole\Db;
 use ezswoole\Debug;
-use ezswoole\exception\HttpException;
-use ezswoole\exception\HttpResponseException;
-use ezswoole\Loader;
 use ezswoole\Log;
-use ezswoole\Model;
 use ezswoole\Request;
 use ezswoole\Cookie;
 use ezswoole\Session;
-use EasySwoole\Core\Component\Di;
 use ezswoole\Response;
 use ezswoole\WsDebug;
 use EasySwoole\Core\Swoole\ServerManager;
@@ -260,20 +255,4 @@ if( !function_exists( 'response' ) ){
 	}
 }
 
-if( !function_exists( 'collection' ) ){
-	/**
-	 * 数组转换为数据集对象
-	 * @param array $resultSet 数据集数组
-	 * @return \ezswoole\model\Collection|\ezswoole\Collection
-	 */
-	function collection( $resultSet )
-	{
-		$item = current( $resultSet );
-		if( $item instanceof Model ){
-			return \ezswoole\model\Collection::make( $resultSet );
-		} else{
-			return \ezswoole\Collection::make( $resultSet );
-		}
-	}
-}
 
