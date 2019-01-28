@@ -16,7 +16,7 @@
   ],
   "require": {
     "php": ">=7.2",
-    "easyswoole/easyswoole": "^3.0",
+    "easyswoole/easyswoole": "^3",
     "phpFastCache/phpFastCache": "^6.0",
     "easyswoole/wsdebug": "^1",
     "easyswoole/curl": "^1.0",
