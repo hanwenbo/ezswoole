@@ -10,7 +10,7 @@ use EasySwoole\EasySwoole\Config;
 
 class Model extends TpORM
 {
-	protected $prefix = 'ez_';
+	protected $prefix;
 	protected $modelPath = '\\App\\Model';
 	protected $fields = [];
 	protected $limit;
@@ -22,6 +22,7 @@ class Model extends TpORM
 	 */
 	public function __construct( $data = null )
 	{
+		$this->prefix = Config::getInstance()->getConf('MYSQL.prefix');
 		$db = PoolManager::getInstance()->getPool( MysqlPool::class )->getObj( Config::getInstance()->getConf( 'MYSQL.POOL_TIME_OUT' ) );
 		if( $db instanceof MysqlObject ){
 			parent::__construct( $data );

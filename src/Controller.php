@@ -17,7 +17,7 @@ use EasySwoole\EasySwoole\Config as AppConfig;
 use EasySwoole\Http\AbstractInterface\Controller as AbstractController;
 use EasySwoole\Http\Request as EasySwooleRequest;
 use EasySwoole\Http\Response as EasySwooleResponse;
-use ezswoole\exception\ValidateException;
+use ezswoole\exception\ValidatorException;
 use EasySwoole\Spl\SplArray;
 
 abstract class Controller extends AbstractController
@@ -32,15 +32,12 @@ abstract class Controller extends AbstractController
 	// 验证失败是否抛出异常
 	protected $failException = false;
 	// 是否批量验证
-	protected $batchValidate = false;
-	private $validate;
+	protected $batchValidator = false;
+	private $validator;
 
 	protected $view;
 
-	public function __construct( string $actionName, EasySwooleRequest $request, EasySwooleResponse $response )
-	{
-		parent::__construct( $actionName, $request, $response );
-	}
+
 
 
 	public function index()
@@ -104,7 +101,7 @@ abstract class Controller extends AbstractController
 	 * @param bool $fail
 	 * @return Controller
 	 */
-	protected function validateFailException( $fail = true ) : Controller
+	protected function validatorFailException( $fail = true ) : Controller
 	{
 		$this->failException = $fail;
 		return $this;
@@ -114,30 +111,30 @@ abstract class Controller extends AbstractController
 	 * 验证数据
 
 	 * @param mixed $data     数据
-	 * @param mixed $validate 验证器名或者验证规则数组
+	 * @param mixed $validator 验证器名或者验证规则数组
 	 * @param array $message  提示信息
 	 * @param bool  $batch    是否批量验证
 	 * @param mixed $callback 回调方法（闭包）
 	 * @return array|string|true
-	 * @throws ValidateException
+	 * @throws ValidatorException
 	 */
-	protected function validate( $data, $validate, array $message = [], bool $batch = false, $callback = null )
+	protected function validator( $data, $validator, array $message = [], bool $batch = false, $callback = null )
 	{
-		if( is_array( $validate ) ){
-			$v = new Validate();
-			$v->rule( $validate );
+		if( is_array( $validator ) ){
+			$v = new Validator();
+			$v->rule( $validator );
 		} else{
-			if( strpos( $validate, '.' ) ){
-				list( $validate, $scene ) = explode( '.', $validate );
+			if( strpos( $validator, '.' ) ){
+				list( $validator, $scene ) = explode( '.', $validator );
 			}
-			$v = new Validate( $validate );
+			$v = new Validator( $validator );
 			if( !empty( $scene ) ){
 				$v->scene( $scene );
 			}
 		}
 
 		// 是否批量验证
-		if( $batch || $this->batchValidate ){
+		if( $batch || $this->batchValidator ){
 			$v->batch( true );
 		}
 
@@ -150,9 +147,9 @@ abstract class Controller extends AbstractController
 		}
 		if( !$v->check( $data ) ){
 			if( $this->failException ){
-				throw new ValidateException( $v->getError() );
+				throw new ValidatorException( $v->getError() );
 			} else{
-				$this->setValidate( $v );
+				$this->setValidator( $v );
 				return $v->getError();
 			}
 		} else{
@@ -161,14 +158,14 @@ abstract class Controller extends AbstractController
 	}
 
 
-	protected function getValidate() : Validate
+	protected function getValidator() : Validator
 	{
-		return $this->validate;
+		return $this->validator;
 	}
 
-	protected function setValidate( Validate $instance ) : void
+	protected function setValidator( Validator $instance ) : void
 	{
-		$this->validate = $instance;
+		$this->validator = $instance;
 	}
 
 }

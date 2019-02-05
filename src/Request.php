@@ -805,5 +805,9 @@ class Request
 			}
 		}
 	}
+	final public static function clearInstance() : void
+	{
+		self::$instance = null;
+	}
 
 }

@@ -1,7 +1,8 @@
 <?php
 namespace ezswoole;
 use EasySwoole\Utility\File;
-
+use EasySwoole\Http\Request;
+use EasySwoole\Http\Response;
 class Core
 {
 	private $config;
@@ -22,8 +23,6 @@ class Core
 		defined( 'TEMP_PATH' ) or define( 'TEMP_PATH', RUNTIME_PATH.'Temp'.DS );
 		defined( 'CONF_PATH' ) or define( 'CONF_PATH', ROOT_PATH.'Conf'.DS ); // 配置文件目录
 
-		// 加载惯例配置文件
-		\ezswoole\Config::set( include LIB_PATH.'config/detault'.EXT );
 		// 执行应用
 		$app = new self();
 		$app->run();
@@ -37,22 +36,7 @@ class Core
 
 	private function initConfig()
 	{
-		date_default_timezone_set( $this->config['default_timezone'] );
 
-		$server_config = \EasySwoole\EasySwoole\Config::getInstance()->getConf( "." );
-		foreach( $server_config as $key => $_config ){
-			if( isset( $_config[$key] ) && is_array( $_config[$key] ) ){
-				foreach( $_config[$key] as $k => $v ){
-					Config::set( "{$key}.{$k}", $v );
-				}
-			} else{
-				Config::set( "{$key}", $_config );
-			}
-		}
-		if( Config::get( 'app_status' ) ){
-			Config::load( CONF_PATH.Config::get( 'app_status' ) );
-		}
-		$this->config = Config::get();
 	}
 
 	private function initDir() : void
@@ -76,6 +60,19 @@ class Core
 		if( !is_dir( CONF_PATH.'config/' ) ){
 			File::createDirectory( CONF_PATH.'config/' );
 		}
+	}
+	static function afterAction( Request $request, Response $response ) : void
+	{
+		\ezswoole\Request::clearGlobalVariables();
+//		self::callHook( self::HOOK_AFTER_ACTION );
+//		self::$hooks = [];
+	}
+	static function onRequest( Request $request, Response $response ) : void
+	{
+		\ezswoole\Request::clearGlobalVariables();
+		\ezswoole\Request::getInstance( $request );
+		\ezswoole\Response::getInstance( $response );
+		\ezswoole\Request::setGlobalVariables( $request );
 	}
 }
 
