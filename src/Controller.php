@@ -88,12 +88,12 @@ abstract class Controller extends AbstractController
 		$this->response()->write( json_encode( $content, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) );
 	}
 
-	protected function getPageLimit() : string
+	protected function getPageLimit() : array
 	{
 		$param = Request::getInstance()->param();
 		$page  = isset( $param['page'] ) ? $param['page'] : 1;
 		$rows  = isset( $param['rows'] ) ? $param['rows'] : 10;
-		return $page.','.$rows;
+		return [$page,$rows];
 	}
 
 	/**
