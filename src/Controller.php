@@ -91,9 +91,12 @@ abstract class Controller extends AbstractController
 	protected function getPageLimit() : array
 	{
 		$param = Request::getInstance()->param();
-		$page  = isset( $param['page'] ) ? $param['page'] : 1;
-		$rows  = isset( $param['rows'] ) ? $param['rows'] : 10;
-		return [$page,$rows];
+		$page  = isset( $param['page'] ) ? (int)$param['page'] : 1;
+		$rows  = isset( $param['rows'] ) ? (int)$param['rows'] : 10;
+		return [
+			'page' => $page,
+			'rows' => $rows,
+		];
 	}
 
 	/**
