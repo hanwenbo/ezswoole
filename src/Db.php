@@ -52,13 +52,136 @@ class Db extends TpDb
 	}
 
 	/**
-	 * 为了不让select报错
+	 * @param null $data
+	 * @return bool|int
+	 */
+	protected function add( $data = null )
+	{
+		try{
+			return parent::insert( $data );
+		} catch( \EasySwoole\Mysqli\Exceptions\ConnectFail $e ){
+			$this->throwable = $e;
+			return false;
+		} catch( \EasySwoole\Mysqli\Exceptions\PrepareQueryFail $e ){
+			$this->throwable = $e;
+			return false;
+		} catch( \Throwable $t ){
+			$this->throwable = $t;
+			return false;
+		}
+	}
+
+	/**
+	 * @param null $data
+	 * @return bool|mixed
+	 */
+	protected function edit( $data = null )
+	{
+		try{
+			return $this->update( $data );
+		} catch( \EasySwoole\Mysqli\Exceptions\ConnectFail $e ){
+			$this->throwable = $e;
+			return false;
+		} catch( \EasySwoole\Mysqli\Exceptions\PrepareQueryFail $e ){
+			$this->throwable = $e;
+			return false;
+		} catch( \Throwable $t ){
+			$this->throwable = $t;
+			return false;
+		}
+	}
+
+	/**
+	 * @return bool|null
+	 */
+	public function del()
+	{
+		try{
+			return parent::delete();
+		} catch( \EasySwoole\Mysqli\Exceptions\ConnectFail $e ){
+			$this->throwable = $e;
+			return false;
+		} catch( \EasySwoole\Mysqli\Exceptions\PrepareQueryFail $e ){
+			$this->throwable = $e;
+			return false;
+		} catch( \Throwable $t ){
+			$this->throwable = $t;
+			return false;
+		}
+	}
+
+	/**
 	 * @return array|bool|false|null
 	 */
-	protected function select()
+	public function select()
 	{
 		try{
 			return parent::select();
+		} catch( \EasySwoole\Mysqli\Exceptions\ConnectFail $e ){
+			$this->throwable = $e;
+			return false;
+		} catch( \EasySwoole\Mysqli\Exceptions\PrepareQueryFail $e ){
+			$this->throwable = $e;
+			return false;
+		} catch( \Throwable $t ){
+			$this->throwable = $t;
+			return false;
+		}
+	}
+
+	/**
+	 * @param string $name
+	 * @return array|bool
+	 */
+	public function column( string $name )
+	{
+		try{
+			return parent::column( $name );
+		} catch( \EasySwoole\Mysqli\Exceptions\ConnectFail $e ){
+			$this->throwable = $e;
+			return false;
+		} catch( \EasySwoole\Mysqli\Exceptions\PrepareQueryFail $e ){
+			$this->throwable = $e;
+			return false;
+		} catch( \Throwable $t ){
+			$this->throwable = $t;
+			return false;
+		}
+	}
+
+	/**
+	 * @param string $name
+	 * @return array|bool|null
+	 */
+	public function value( string $name )
+	{
+		try{
+			return parent::value( $name );
+		} catch( \EasySwoole\Mysqli\Exceptions\ConnectFail $e ){
+			$this->throwable = $e;
+			return false;
+		} catch( \EasySwoole\Mysqli\Exceptions\PrepareQueryFail $e ){
+			$this->throwable = $e;
+			return false;
+		} catch( \Throwable $t ){
+			$this->throwable = $t;
+			return false;
+		}
+	}
+
+	/**
+	 * @return array|bool|int|null
+	 */
+	public function count()
+	{
+		try{
+			return parent::count();
+		} catch( \EasySwoole\Mysqli\Exceptions\ConnectFail $e ){
+			$this->throwable = $e;
+			return false;
+		} catch( \EasySwoole\Mysqli\Exceptions\PrepareQueryFail $e ){
+			$this->throwable = $e;
+			return false;
 		} catch( \Throwable $t ){
 			$this->throwable = $t;
 			return false;
@@ -68,50 +191,19 @@ class Db extends TpDb
 	/**
 	 * @return array|bool
 	 */
-	protected function find()
+	protected function find( $id = null )
 	{
 		try{
-			return parent::find();
-		} catch( \Throwable $t ){
-			$this->throwable = $t;
+			if( $id ){
+				return $this->byId( $id );
+			} else{
+				return parent::find();
+			}
+		} catch( \EasySwoole\Mysqli\Exceptions\ConnectFail $e ){
+			$this->throwable = $e;
 			return false;
-		}
-	}
-
-	/**
-	 * todo log
-	 * @param array $data
-	 * @return bool|int
-	 */
-	protected function insert( $data = [] )
-	{
-		try{
-			return parent::insert( $data );
-		} catch( \ConnectFail $t ){
-			$this->throwable = $t;
-			return false;
-		} catch( \PrepareQueryFail $t ){
-			$this->throwable = $t;
-			return false;
-		} catch( \Throwable $t ){
-			$this->throwable = $t;
-			return false;
-		}
-	}
-
-	/**
-	 * @param array|null $data
-	 * @return bool|mixed
-	 */
-	protected function update( $data = [] )
-	{
-		try{
-			return parent::update( $data );
-		} catch( \ConnectFail $t ){
-			$this->throwable = $t;
-			return false;
-		} catch( \PrepareQueryFail $t ){
-			$this->throwable = $t;
+		} catch( \EasySwoole\Mysqli\Exceptions\PrepareQueryFail $e ){
+			$this->throwable = $e;
 			return false;
 		} catch( \Throwable $t ){
 			$this->throwable = $t;

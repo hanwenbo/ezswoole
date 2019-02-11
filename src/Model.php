@@ -181,6 +181,25 @@ class Model extends TpORM
 	}
 
 	/**
+	 * @return array|bool|int|null
+	 */
+	public function count()
+	{
+		try{
+			return parent::count();
+		} catch( \EasySwoole\Mysqli\Exceptions\ConnectFail $e ){
+			$this->throwable = $e;
+			return false;
+		} catch( \EasySwoole\Mysqli\Exceptions\PrepareQueryFail $e ){
+			$this->throwable = $e;
+			return false;
+		} catch( \Throwable $t ){
+			$this->throwable = $t;
+			return false;
+		}
+	}
+
+	/**
 	 * @return array|bool
 	 */
 	protected function find( $id = null )
