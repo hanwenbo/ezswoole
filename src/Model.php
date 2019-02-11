@@ -12,6 +12,8 @@ use EasySwoole\EasySwoole\Config;
  * Class Model
  * @package ezswoole
  * @method mixed|static where($whereProps, $whereValue = 'DBNULL', $operator = '=', $cond = 'AND')
+ * @method mixed|static group(string $groupByField)
+ * @method mixed|static order(string $orderByField, string $orderByDirection = "DESC", $customFieldsOrRegExp = null)
  * @method mixed|static field($field)
  *
  */
