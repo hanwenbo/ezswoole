@@ -24,9 +24,10 @@ class Model extends TpORM
 	protected $throwable;
 	protected $createTime = false;
 	protected $createTimeName = 'create_time';
+	protected $softDelete = false;
+	protected $softDeleteTimeName = 'delete_time';
 
 	/**
-	 * Model constructor.
 	 * @param null $data
 	 */
 	public function __construct( $data = null )
@@ -179,8 +180,10 @@ class Model extends TpORM
 		}
 	}
 
-
-	protected function find( string $id = null )
+	/**
+	 * @return array|bool
+	 */
+	protected function find( $id = null )
 	{
 		try{
 			if( $id ){
