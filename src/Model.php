@@ -301,10 +301,11 @@ class Model extends TpORM
 			return false;
 		}
 	}
+
 	/**
 	 * @return Model
 	 */
-	protected function model()
+	protected function init()
 	{
 		return new static();
 	}
