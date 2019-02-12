@@ -111,7 +111,6 @@ abstract class Controller extends AbstractController
 	 * @param bool  $batch
 	 * @param null  $callback
 	 * @return array|bool
-	 * @throws \Exception
 	 */
 	protected function validator( $data, $validator, array $message = [], bool $batch = false, $callback = null )
 	{
@@ -142,7 +141,7 @@ abstract class Controller extends AbstractController
 		}
 		if( !$v->check( $data ) ){
 			if( $this->failException ){
-				throw new \Exception( $v->getError() );
+				return $v->getError();
 			} else{
 				$this->setValidator( $v );
 				return $v->getError();
