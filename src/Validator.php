@@ -3,7 +3,7 @@
 namespace ezswoole;
 use ezswoole\exception\ClassNotFoundException;
 use ezswoole\validate\ValidateRule;
-class Validate
+class Validator
 {
 	// 实例
 	protected static $instance;

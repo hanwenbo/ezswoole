@@ -15,9 +15,6 @@ namespace ezswoole;
 
 use EasySwoole\EasySwoole\Config as AppConfig;
 use EasySwoole\Http\AbstractInterface\Controller as AbstractController;
-use EasySwoole\Http\Request as EasySwooleRequest;
-use EasySwoole\Http\Response as EasySwooleResponse;
-use ezswoole\exception\ValidatorException;
 use EasySwoole\Spl\SplArray;
 
 abstract class Controller extends AbstractController
@@ -36,8 +33,6 @@ abstract class Controller extends AbstractController
 	private $validator;
 
 	protected $view;
-
-
 
 
 	public function index()
@@ -93,10 +88,8 @@ abstract class Controller extends AbstractController
 		$param = Request::getInstance()->param();
 		$page  = isset( $param['page'] ) ? (int)$param['page'] : 1;
 		$rows  = isset( $param['rows'] ) ? (int)$param['rows'] : 10;
-		return [
-			'page' => $page,
-			'rows' => $rows,
-		];
+		return [$page, $rows];
+
 	}
 
 	/**
@@ -112,14 +105,13 @@ abstract class Controller extends AbstractController
 
 	/**
 	 * 验证数据
-
-	 * @param mixed $data     数据
-	 * @param mixed $validator 验证器名或者验证规则数组
-	 * @param array $message  提示信息
-	 * @param bool  $batch    是否批量验证
-	 * @param mixed $callback 回调方法（闭包）
-	 * @return array|string|true
-	 * @throws ValidatorException
+	 * @param       $data
+	 * @param       $validator
+	 * @param array $message
+	 * @param bool  $batch
+	 * @param null  $callback
+	 * @return array|bool
+	 * @throws \Exception
 	 */
 	protected function validator( $data, $validator, array $message = [], bool $batch = false, $callback = null )
 	{
@@ -150,7 +142,7 @@ abstract class Controller extends AbstractController
 		}
 		if( !$v->check( $data ) ){
 			if( $this->failException ){
-				throw new ValidatorException( $v->getError() );
+				throw new \Exception( $v->getError() );
 			} else{
 				$this->setValidator( $v );
 				return $v->getError();
