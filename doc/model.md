@@ -112,3 +112,16 @@ public function info()
   - 由于$pageModel是一个对象，Model类具有保留where、field等的功能，这时再去操作getPageList，那么该方法where里已经自带了id = 1。
 - 正确的做法应该是实例化两个对象。
 - 思想：每次操作都是对一个数据对象进行操作，Model不是一个查询数据的工具类(由于多数用户带有thinkphp的思想，这儿要强调一下)
+
+## join注意
+
+- 不在需要`alias`或者`__GOODS__`这样的操作，默认就给了别名，格式为goods_sku
+
+```php
+public function getGoodsImageMoreList( $condition = [], $field = '*', $order = 'id desc', $page = [1, 20])
+{
+    $data = $this->join( 'goods', 'goods_image.goods_id = goods.id', 'LEFT' )->where( $condition )->order( $order )->field( $field )->page( $page )->select();
+    return $data;
+}
+```
+
