@@ -57,6 +57,84 @@ class Model extends TpORM
 	}
 
 	/**
+	 * 批量添加
+	 * @param array $datas
+	 * @return bool|mixed
+	 */
+	public function addMulti( array $datas = [] )
+	{
+		try{
+			if( !empty( $datas ) ){
+				if( !is_array( $datas[0] ) ){
+					return false;
+				}
+				$fields    = array_keys( $datas[0] );
+				$db        = $this->getDb();
+				$tableName = $this->getDbTable();
+				$values    = [];
+				foreach( $datas as $data ){
+					$value = [];
+					foreach( $data as $key => $val ){
+						if( is_string( $val ) ){
+							$val = '"'.addslashes( $val ).'"';
+						} elseif( is_bool( $val ) ){
+							$val = $val ? '1' : '0';
+						} elseif( is_null( $val ) ){
+							$val = 'null';
+						}
+						if( is_scalar( $val ) ){
+							$value[] = $val;
+						}
+					}
+					$values[] = '('.implode( ',', $value ).')';
+				}
+				$sql = 'INSERT INTO '.$tableName.' ('.implode( ',', $fields ).') VALUES '.implode( ',', $values );
+				return $db->rawQuery( $sql );
+			} else{
+				return false;
+			}
+		}catch(\Exception $e){
+			var_dump($e->getTraceAsString());
+			return false;
+		}
+
+	}
+
+	/**
+	 * 批量修改
+	 * @param array $multipleData
+	 * @return bool
+	 */
+	public function editMulti( array $multipleData = [] )
+	{
+		try{
+			if( !empty( $multipleData ) ){
+				$db           = $this->getDb();
+				$pk           = $this->getPrimaryKey();
+				$tableName    = $this->getDbTable();
+				$updateColumn = array_keys( $multipleData[0] );
+				unset( $updateColumn[0] );
+				$sql = "UPDATE ".$tableName." SET ";
+				$pks = array_column( $multipleData, $pk );
+				foreach( $updateColumn as $uColumn ){
+					$sql .= $uColumn." = CASE ";
+					foreach( $multipleData as $data ){
+						$sql .= "WHEN ".$pk." = ".$data[$pk]." THEN '".$data[$uColumn]."' ";
+					}
+					$sql .= "ELSE ".$uColumn." END, ";
+				}
+				$sql = rtrim( $sql, ", " )." WHERE ".$pk." IN (".implode( ",", $pks ).")";
+				return $db->rawQuery( $sql ) ?? false;
+			} else{
+				return false;
+			}
+		}catch(\Exception $e){
+			var_dump($e->getTraceAsString());
+			return false;
+		}
+
+	}
+	/**
 	 * @param null $data
 	 * @return bool|int
 	 */
