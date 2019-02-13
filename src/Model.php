@@ -2,11 +2,12 @@
 
 namespace ezswoole;
 
-use ezswoole\pool\MysqlPool;
-use ezswoole\pool\MysqlObject;
 use EasySwoole\Mysqli\TpORM;
-use EasySwoole\Component\Pool\PoolManager;
 use EasySwoole\EasySwoole\Config;
+//use EasySwoole\Component\Pool\PoolManager;
+//use ezswoole\pool\MysqlPool;
+use ezswoole\pool\MysqlObject;
+use ezswoole\context\MysqlContext;
 
 /**
  * Class Model
@@ -35,26 +36,24 @@ class Model extends TpORM
 	public function __construct( $data = null )
 	{
 		$this->prefix = Config::getInstance()->getConf( 'MYSQL.prefix' );
-		$db           = PoolManager::getInstance()->getPool( MysqlPool::class )->getObj( Config::getInstance()->getConf( 'MYSQL.POOL_TIME_OUT' ) );
+		$db = \EasySwoole\Component\Context\ContextManager::getInstance()->get(MysqlContext::KEY);
 		if( $db instanceof MysqlObject ){
 			parent::__construct( $data );
 			$this->setDb( $db );
 		} else{
-			// todo log
 			return null;
-			//			throw new \Exception( 'mysql pool is empty' );
 		}
 	}
 
-	public function __destruct()
-	{
-		$db = $this->getDb();
-		if( $db instanceof MysqlObject ){
-			$db->gc();
-			PoolManager::getInstance()->getPool( MysqlPool::class )->recycleObj( $db );
-			$this->setDb( null );
-		}
-	}
+//	public function __destruct()
+//	{
+//		$db = $this->getDb();
+//		if( $db instanceof MysqlObject ){
+//			$db->gc();
+//			PoolManager::getInstance()->getPool( MysqlPool::class )->recycleObj( $db );
+//			$this->setDb( null );
+//		}
+//	}
 
 	/**
 	 * 批量添加

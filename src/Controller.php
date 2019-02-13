@@ -16,6 +16,10 @@ namespace ezswoole;
 use EasySwoole\EasySwoole\Config as AppConfig;
 use EasySwoole\Http\AbstractInterface\Controller as AbstractController;
 use EasySwoole\Spl\SplArray;
+use \ezswoole\pool\MysqlPool;
+use \ezswoole\pool\MysqlObject;
+use EasySwoole\Component\Pool\PoolManager;
+use EasySwoole\EasySwoole\Config;
 
 abstract class Controller extends AbstractController
 {
@@ -33,7 +37,10 @@ abstract class Controller extends AbstractController
 	private $validator;
 
 	protected $view;
-
+	/**
+	 * @var MysqlObject
+	 */
+	protected $mysqlPool;
 
 	public function index()
 	{
@@ -151,7 +158,6 @@ abstract class Controller extends AbstractController
 		}
 	}
 
-
 	protected function getValidator() : Validator
 	{
 		return $this->validator;
@@ -162,4 +168,20 @@ abstract class Controller extends AbstractController
 		$this->validator = $instance;
 	}
 
+	protected function getMysqlPool()
+	{
+		if( $this->mysqlPool instanceof MysqlObject ){
+			return $this->mysqlPool;
+		} else{
+			$this->prefix = Config::getInstance()->getConf( 'MYSQL.prefix' );
+			$db           = PoolManager::getInstance()->getPool( MysqlPool::class )->getObj( Config::getInstance()->getConf( 'MYSQL.POOL_TIME_OUT' ) );
+			if( $this->mysqlPool instanceof MysqlObject ){
+				$this->mysqlPool = $db;
+				return $db;
+			} else{
+				// todo log 没有pool可以用了
+				return null;
+			}
+		}
+	}
 }

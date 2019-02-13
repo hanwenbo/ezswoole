@@ -3,10 +3,9 @@ namespace ezswoole;
 use EasySwoole\Utility\File;
 use EasySwoole\Http\Request;
 use EasySwoole\Http\Response;
+use ezswoole\context\MysqlContext;
 class Core
 {
-	private $config;
-
 	public static function register()
 	{
 		define( 'EZSWOOLE_START_TIME', microtime( true ) );
@@ -30,6 +29,8 @@ class Core
 
 	public function run()
 	{
+		// 注册mysql上下文 统一链接
+		\EasySwoole\Component\Context\ContextManager::getInstance()->registerItemHandler(MysqlContext::KEY, new MysqlContext);
 		$this->initDir();
 		$this->initConfig();
 	}
