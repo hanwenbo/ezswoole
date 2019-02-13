@@ -45,15 +45,15 @@ class Model extends TpORM
 		}
 	}
 
-//	public function __destruct()
-//	{
-//		$db = $this->getDb();
-//		if( $db instanceof MysqlObject ){
-//			$db->gc();
-//			PoolManager::getInstance()->getPool( MysqlPool::class )->recycleObj( $db );
-//			$this->setDb( null );
-//		}
-//	}
+	//	public function __destruct()
+	//	{
+	//		$db = $this->getDb();
+	//		if( $db instanceof MysqlObject ){
+	//			$db->gc();
+	//			PoolManager::getInstance()->getPool( MysqlPool::class )->recycleObj( $db );
+	//			$this->setDb( null );
+	//		}
+	//	}
 
 	/**
 	 * 批量添加
@@ -179,7 +179,7 @@ class Model extends TpORM
 	/**
 	 * @return bool|null
 	 */
-	public function del()
+	protected function del()
 	{
 		try{
 			if( $this->softDelete === true ){
@@ -203,7 +203,7 @@ class Model extends TpORM
 	/**
 	 * @return array|bool|false|null
 	 */
-	public function select()
+	protected function select()
 	{
 		try{
 			return parent::select();
@@ -223,7 +223,7 @@ class Model extends TpORM
 	 * @param string $name
 	 * @return array|bool
 	 */
-	public function column( string $name )
+	protected function column( string $name )
 	{
 		try{
 			return parent::column( $name );
@@ -243,7 +243,7 @@ class Model extends TpORM
 	 * @param string $name
 	 * @return array|bool|null
 	 */
-	public function value( string $name )
+	protected function value( string $name )
 	{
 		try{
 			return parent::value( $name );
@@ -262,7 +262,7 @@ class Model extends TpORM
 	/**
 	 * @return array|bool|int|null
 	 */
-	public function count()
+	protected function count()
 	{
 		try{
 			return parent::count();

@@ -11,8 +11,9 @@ use EasySwoole\EasySwoole\Config;
 /**
  * Class Model
  * @package ezswoole
- * @method TpDb where($whereProps, $whereValue = 'DBNULL', $operator = '=', $cond = 'AND') : TpDb
- * @method TpDb field($field) : TpDb
+ * @method mixed|static name(string $name)
+ * @method mixed|static where($whereProps, $whereValue = 'DBNULL', $operator = '=', $cond = 'AND')
+ * @method mixed|static field($field)
  */
 class Db extends TpDb
 {
