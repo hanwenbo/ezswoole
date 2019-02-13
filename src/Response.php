@@ -18,21 +18,9 @@ use EasySwoole\Component\Singleton;
 
 class Response
 {
-	use Singleton;
 
-	private $response;
-
-	final public function __construct( EasySwooleResponse $response )
+	public function __construct( EasySwooleResponse $response )
 	{
 		$this->response = $response;
-	}
-
-	final public function getResponse()
-	{
-		return $this->response;
-	}
-	public static function clearInstance() : void
-	{
-		self::$instance = null;
 	}
 }

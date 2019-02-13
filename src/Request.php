@@ -3,11 +3,9 @@
 namespace ezswoole;
 
 use EasySwoole\Http\Request as EasySwooleRequest;
-use EasySwoole\Component\Singleton;
 
 class Request
 {
-	use Singleton;
 	protected $method;
 	/**
 	 * @var string 域名（含协议和端口）
@@ -81,7 +79,7 @@ class Request
 
 	private $EasySwooleRequest;
 
-	final protected function __construct( EasySwooleRequest $request )
+	function __construct( EasySwooleRequest $request )
 	{
 		$this->EasySwooleRequest = $request;
 		$this->get               = $request->getSwooleRequest()->get ? $request->getSwooleRequest()->get : [];
@@ -93,7 +91,7 @@ class Request
 	}
 
 
-	final public function getEasySwooleRequest() : EasySwooleRequest
+	public function getEasySwooleRequest() : EasySwooleRequest
 	{
 		return $this->EasySwooleRequest;
 	}
@@ -782,32 +780,5 @@ class Request
 		return $this->method() == 'OPTIONS';
 	}
 
-	static function clearGlobalVariables()
-	{
-		$_GET    = null;
-		$_POST   = null;
-		$_COOKIE = null;
-		$_FILES  = null;
-		$_SERVER = null;
-	}
-
-	static function setGlobalVariables( EasySwooleRequest $request )
-	{
-		$_GET    = isset( $request->getSwooleRequest()->get ) ? $request->getSwooleRequest()->get : [];
-		$_POST   = isset( $request->getSwooleRequest()->post ) ? $request->getSwooleRequest()->post : [];
-		$_COOKIE = isset( $request->getSwooleRequest()->cookie ) ? $request->getSwooleRequest()->cookie : [];
-		$_FILES  = isset( $request->getSwooleRequest()->files ) ? $request->getSwooleRequest()->files : [];
-		$server  = $request->getSwooleRequest()->server;
-		$_SERVER = [];
-		if( isset( $server ) ){
-			foreach( $server as $key => $value ){
-				$_SERVER[strtoupper( $key )] = $value;
-			}
-		}
-	}
-	final public static function clearInstance() : void
-	{
-		self::$instance = null;
-	}
 
 }

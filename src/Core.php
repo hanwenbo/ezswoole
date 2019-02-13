@@ -26,7 +26,6 @@ class Core
 		$app = new self();
 		$app->run();
 	}
-
 	public function run()
 	{
 		// 注册mysql上下文 统一链接
@@ -64,16 +63,12 @@ class Core
 	}
 	static function afterAction( Request $request, Response $response ) : void
 	{
-		\ezswoole\Request::clearGlobalVariables();
 //		self::callHook( self::HOOK_AFTER_ACTION );
 //		self::$hooks = [];
 	}
 	static function onRequest( Request $request, Response $response ) : void
 	{
-		\ezswoole\Request::clearGlobalVariables();
-		\ezswoole\Request::getInstance( $request );
-		\ezswoole\Response::getInstance( $response );
-		\ezswoole\Request::setGlobalVariables( $request );
+
 	}
 }
 
