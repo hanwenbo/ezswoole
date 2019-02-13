@@ -37,14 +37,6 @@ abstract class Controller extends AbstractController
 		return $this->send( - 1, [], "NOT FOUND" );
 	}
 
-	protected function afterAction( $actionName ) : void
-	{
-		// 初始化，目的清理上一次请求的static记录
-		Request::getInstance()->clearInstance();
-		Response::getInstance()->clearInstance();
-		Log::clear();
-	}
-
 	protected function onRequest( $actionName ) : ?bool
 	{
 		$this->request = new Request($this->request());
@@ -76,7 +68,7 @@ abstract class Controller extends AbstractController
 
 	protected function getPageLimit() : array
 	{
-		$param = Request::getInstance()->param();
+		$param = $this->request->param();
 		$page  = isset( $param['page'] ) ? (int)$param['page'] : 1;
 		$rows  = isset( $param['rows'] ) ? (int)$param['rows'] : 10;
 		return [$page, $rows];
