@@ -39,7 +39,7 @@ abstract class Controller extends AbstractController
 
 	protected function onRequest( $actionName ) : ?bool
 	{
-		$this->request = new Request($this->request());
+		$this->request = new Request( $this->request() );
 		$this->get     = $this->request->get() ? new SplArray( $this->request->get() ) : null;
 		$this->post    = $this->request->post() ? new SplArray( $this->request->post() ) : null;
 		return null;
@@ -49,7 +49,7 @@ abstract class Controller extends AbstractController
 	{
 		return $this->send( - 1, [], "your router not end" );
 	}
- 
+
 	protected function send( $code = 0, $data = [], $message = null )
 	{
 		// todo 废除
@@ -88,11 +88,12 @@ abstract class Controller extends AbstractController
 
 	/**
 	 * 验证数据
-	 * @param       $data
-	 * @param       $validator
-	 * @param array $message
-	 * @param bool  $batch
-	 * @param null  $callback
+	 * @param    array         $data
+	 * @param   array | string $validator
+	 * @param array            $message
+	 * @param bool             $batch
+	 * @param null             $callback
+	 * @throw null
 	 * @return array|bool
 	 */
 	protected function validator( $data, $validator, array $message = [], bool $batch = false, $callback = null )
@@ -104,7 +105,13 @@ abstract class Controller extends AbstractController
 			if( strpos( $validator, '.' ) ){
 				list( $validator, $scene ) = explode( '.', $validator );
 			}
-			$v = new Validator( $validator );
+			$class = "\App\Validator\\".str_replace( "/", "\\", $validator );
+			if( class_exists( $class ) ){
+				$v = new $class;
+			} else{
+				\EasySwoole\EasySwoole\Logger::getInstance()->log('class not exists:'.$class ,'error');
+				return false;
+			}
 			if( !empty( $scene ) ){
 				$v->scene( $scene );
 			}
@@ -118,7 +125,6 @@ abstract class Controller extends AbstractController
 		if( is_array( $message ) ){
 			$v->message( $message );
 		}
-
 		if( $callback && is_callable( $callback ) ){
 			call_user_func_array( $callback, [$v, &$data] );
 		}

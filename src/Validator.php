@@ -2,7 +2,7 @@
 
 namespace ezswoole;
 use ezswoole\exception\ClassNotFoundException;
-use ezswoole\validate\ValidateRule;
+use ezswoole\validator\ValidatorRule;
 class Validator
 {
 	// 实例
@@ -172,7 +172,7 @@ class Validator
 	 * @param array $rules   验证规则
 	 * @param array $message 验证提示信息
 	 * @param array $field   验证字段描述信息
-	 * @return Validate
+	 * @return Validator
 	 */
 	public static function make( $rules = [], $message = [], $field = [] )
 	{
@@ -187,7 +187,7 @@ class Validator
 
 	 * @param string|array $name 字段名称或者规则数组
 	 * @param mixed        $rule 验证规则
-	 * @return Validate
+	 * @return Validator
 	 */
 	public function rule( $name, $rule = '' )
 	{
@@ -239,7 +239,7 @@ class Validator
 	 * @access public
 	 * @param  string|array $name    字段名称
 	 * @param  string       $message 提示信息
-	 * @return Validate
+	 * @return Validator
 	 */
 	public function message( $name, $message = '' )
 	{
@@ -394,7 +394,7 @@ class Validator
 			// 字段验证
 			if( $rule instanceof \Closure ){
 				$result = call_user_func_array( $rule, [$value, $data] );
-			} elseif( $rule instanceof ValidateRule ){
+			} elseif( $rule instanceof ValidatorRule ){
 				//  验证因子
 				$result = $this->checkItem( $key, $value, $rule->getRule(), $data, $rule->getTitle() ?: $title, $rule->getMsg() );
 			} else{
@@ -429,7 +429,7 @@ class Validator
 	{
 		if( $rules instanceof \Closure ){
 			return call_user_func_array( $rules, [$value] );
-		} elseif( $rules instanceof ValidateRule ){
+		} elseif( $rules instanceof ValidatorRule ){
 			$rules = $rules->getRule();
 		} elseif( is_string( $rules ) ){
 			$rules = explode( '|', $rules );
@@ -439,7 +439,7 @@ class Validator
 				$result = call_user_func_array( $rule, [$value] );
 			} else{
 				// 判断验证类型
-				list( $type, $rule ) = $this->getValidateType( $key, $rule );
+				list( $type, $rule ) = $this->getValidatorType( $key, $rule );
 				$callback = isset( self::$type[$type] ) ? self::$type[$type] : [$this, $type];
 				$result   = call_user_func_array( $callback, [$value, $rule] );
 			}
@@ -483,7 +483,7 @@ class Validator
 				$info   = is_numeric( $key ) ? '' : $key;
 			} else{
 				// 判断验证类型
-				list( $type, $rule, $info ) = $this->getValidateType( $key, $rule );
+				list( $type, $rule, $info ) = $this->getValidatorType( $key, $rule );
 				if( isset( $this->append[$field] ) && in_array( $info, $this->append[$field] ) ){
 				} elseif( isset( $this->remove[$field] ) && in_array( $info, $this->remove[$field] ) ){
 					// 规则已经移除
@@ -529,7 +529,7 @@ class Validator
 	 * @param  mixed $rule
 	 * @return array
 	 */
-	protected function getValidateType( $key, $rule )
+	protected function getValidatorType( $key, $rule )
 	{
 		// 判断验证类型
 		if( !is_numeric( $key ) ){
