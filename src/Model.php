@@ -304,7 +304,7 @@ class Model extends TpORM
 	/**
 	 * @return Model
 	 */
-	protected function init()
+	static function init()
 	{
 		return new static();
 	}
