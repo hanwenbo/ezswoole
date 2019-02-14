@@ -1451,4 +1451,5 @@ class Validator
 			throw new \BadMethodCallException( 'method not exists:'.__CLASS__.'->'.$method );
 		}
 	}
+
 }
