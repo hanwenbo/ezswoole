@@ -210,9 +210,15 @@ $user = new User;
 $user->rawQuery("select distinct name from students");
 ```
 
+## 统计
 
-
-
+```php
+$user = new User;
+// 所有
+$result = $user->where(['id'=>['>',1]])->count();
+// 去重复
+$result = $user->where(['id'=>['>',1]])->count('DISTINCT user_id');
+```
 
 ## 关联
 
