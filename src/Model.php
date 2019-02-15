@@ -260,12 +260,13 @@ class Model extends TpORM
 	}
 
 	/**
+	 * @param string $column
 	 * @return array|bool|int|null
 	 */
-	protected function count()
+	protected function count( string $column = '*')
 	{
 		try{
-			return parent::count();
+			return parent::count($column);
 		} catch( \EasySwoole\Mysqli\Exceptions\ConnectFail $e ){
 			$this->throwable = $e;
 			return false;

@@ -196,6 +196,24 @@ $user->where('status',1)->avg('score');
 $user->max('score');
 ```
 
+## 查询语句获取
+
+```php
+$user = new User;
+$user->fetchSql()->where(['id'=>1])->field(['name','id'])->select();
+```
+
+## 原生查询
+
+```php
+$user = new User;
+$user->rawQuery("select distinct name from students");
+```
+
+
+
+
+
 ## 关联
 
 底层支持，但是为测试，不建议使用，因为实际项目中用不到
