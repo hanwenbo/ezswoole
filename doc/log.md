@@ -1,1 +1,3 @@
-\ezswoole\Log::write($e->getFile()."：".$e->getMessage(),'error');
+请用easyswoole的Log
+
+\EasySwoole\EasySwoole\Logger::getInstance()->xxx
