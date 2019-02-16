@@ -110,19 +110,23 @@ class Model extends TpORM
 			if( !empty( $multipleData ) ){
 				$db           = $this->getDb();
 				$pk           = $this->getPrimaryKey();
+				$isString = is_string($multipleData[0][$pk]);
 				$tableName    = $this->getDbTable();
 				$updateColumn = array_keys( $multipleData[0] );
 				unset( $updateColumn[0] );
 				$sql = "UPDATE ".$tableName." SET ";
 				$pks = array_column( $multipleData, $pk );
+				// 解决
 				foreach( $updateColumn as $uColumn ){
 					$sql .= $uColumn." = CASE ";
 					foreach( $multipleData as $data ){
-						$sql .= "WHEN ".$pk." = ".$data[$pk]." THEN '".$data[$uColumn]."' ";
+						$sql .= "WHEN `".$pk."` = '".$data[$pk]."' THEN '".$data[$uColumn]."' ";
 					}
 					$sql .= "ELSE ".$uColumn." END, ";
 				}
-				$sql = rtrim( $sql, ", " )." WHERE ".$pk." IN (".implode( ",", $pks ).")";
+				$joinStr = join(",",$pks);
+				$inStr = "'".str_replace(",","','",$joinStr)."'";
+				$sql = rtrim( $sql, ", " )." WHERE `".$pk."` IN (".$inStr.")";
 				return $db->rawQuery( $sql ) ?? false;
 			} else{
 				return false;
