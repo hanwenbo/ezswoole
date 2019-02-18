@@ -120,6 +120,16 @@ public function getGoodsImageMoreList( $condition = [], $field = '*', $order = '
     return $data;
 }
 ```
+- 当同一个model被join两次时，如何起别名？
+```php
+$result = \App\Model\OrderGoods::init()->join([
+    ['goods AS goods1', 'goods1.id = order_goods.goods_id', 'LEFT' ],
+    ['goods AS goods2', 'goods2.id = order_goods.goods_id', 'LEFT' ],
+])->field([
+    'goods1.title AS title1',
+    'goods2.title AS title2',
+])->select();
+```
 ## 删除
 
 删除模型数据，可以在实例化后调用`del`方法。
