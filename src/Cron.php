@@ -81,7 +81,7 @@ class Cron
 							}
 						}
 					} catch( \Exception $e ){
-						Log::write( $e->getTraceAsString(), 'error' );
+						\EasySwoole\EasySwoole\Logger::getInstance()->log($e->getTraceAsString(),'error');
 					}
 				}
 			} );
