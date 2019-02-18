@@ -163,6 +163,19 @@ User::init()->where(['id'=>1])->find();
 User::init()->add(['nickname'=>'韩文博','sex'=>1]);
 ```
 
+## 批量添加
+
+```php
+$data = [
+    ['name'=>1],
+    ['name'=>2],
+];
+// 第二个参数是是否转换model所约束好的格式，比如定义的jsonFields在该方法里默认是不会转化的为了效率，当为true时会帮助转换
+User::init()->addMulti( $data ,true);
+```
+
+
+
 ## 修改
 
 ```php
