@@ -1,8 +1,10 @@
 <?php
 
 namespace ezswoole;
+
 use ezswoole\exception\ClassNotFoundException;
 use ezswoole\validator\ValidatorRule;
+
 class Validator
 {
 	// 实例
@@ -184,7 +186,6 @@ class Validator
 
 	/**
 	 * 添加字段验证规则
-
 	 * @param string|array $name 字段名称或者规则数组
 	 * @param mixed        $rule 验证规则
 	 * @return Validator
@@ -250,6 +251,7 @@ class Validator
 		}
 		return $this;
 	}
+
 	/**
 	 * 设置验证场景
 	 * @access public
@@ -453,7 +455,6 @@ class Validator
 
 	/**
 	 * 验证单个字段规则
-
 	 * @param  string $field 字段名
 	 * @param  mixed  $value 字段值
 	 * @param  mixed  $rules 验证规则
@@ -476,7 +477,8 @@ class Validator
 			// 追加额外的验证规则
 			$rules = array_merge( $rules, $this->append[$field] );
 		}
-		$i = 0;
+		$lang = require_once "lang/zh-cn.php";
+		$i    = 0;
 		foreach( $rules as $key => $rule ){
 			if( $rule instanceof \Closure ){
 				$result = call_user_func_array( $rule, [$value, $data] );
@@ -504,7 +506,7 @@ class Validator
 				if( !empty( $msg[$i] ) ){
 					$message = $msg[$i];
 					if( is_string( $message ) && strpos( $message, '{%' ) === 0 ){
-						$message = Lang::get( substr( $message, 2, - 1 ) );
+						$message = $lang[substr( $message, 2, - 1 )];
 					}
 				} else{
 					$message = $this->getRuleMsg( $field, $title, $info, $rule );
@@ -703,10 +705,10 @@ class Validator
 			$result = is_array( $value );
 		break;
 		case 'file':
-			$result = isset($value['name']) && isset($value['type']) && isset($value['tmp_name']) && isset($value['error'])  && isset($value['size']);
+			$result = isset( $value['name'] ) && isset( $value['type'] ) && isset( $value['tmp_name'] ) && isset( $value['error'] ) && isset( $value['size'] );
 		break;
 		case 'image':
-			$result = isset($value['name']) && isset($value['type']) && isset($value['tmp_name']) && isset($value['error'])  && isset($value['size']) && in_array( $this->getImageType( $value->getRealPath() ), [1, 2, 3, 6] );
+			$result = isset( $value['name'] ) && isset( $value['type'] ) && isset( $value['tmp_name'] ) && isset( $value['error'] ) && isset( $value['size'] ) && in_array( $this->getImageType( $value->getRealPath() ), [1, 2, 3, 6] );
 		break;
 		case 'token':
 			$result = $this->token( $value, '__token__', $data );
@@ -719,10 +721,10 @@ class Validator
 			// 是否为json
 			$result = $this->json( $value );
 		break;
-        case 'phone':
-            $result = $this->phone( $value );
-            break;
-        //TODO email
+		case 'phone':
+			$result = $this->phone( $value );
+		break;
+			//TODO email
 		default:
 			if( isset( self::$type[$rule] ) ){
 				// 注册的验证规则
@@ -883,18 +885,6 @@ class Validator
 		}
 	}
 
-	/**
-	 * 验证请求类型
-	 * @access public
-	 * @param  mixed $value 字段值
-	 * @param  mixed $rule  验证规则
-	 * @return bool
-	 */
-	public function method( $value, $rule )
-	{
-		$method = Container::get( 'request' )->method();
-		return strtoupper( $rule ) == $method;
-	}
 
 	/**
 	 * 验证时间和日期是否符合指定格式
@@ -907,67 +897,6 @@ class Validator
 	{
 		$info = date_parse_from_format( $rule, $value );
 		return 0 == $info['warning_count'] && 0 == $info['error_count'];
-	}
-
-	/**
-	 * 验证是否唯一
-	 * @access public
-	 * @param  mixed  $value 字段值
-	 * @param  mixed  $rule  验证规则 格式：数据表,字段名,排除ID,主键名
-	 * @param  array  $data  数据
-	 * @param  string $field 验证字段名
-	 * @return bool
-	 */
-	public function unique( $value, $rule, $data, $field )
-	{
-		if( is_string( $rule ) ){
-			$rule = explode( ',', $rule );
-		}
-		if( false !== strpos( $rule[0], '\\' ) ){
-			// 指定模型类
-			$db = new $rule[0];
-		} else{
-			try{
-				$db = Container::get( 'app' )->model( $rule[0] );
-			} catch( ClassNotFoundException $e ){
-				$db = Db::name( $rule[0] );
-			}
-		}
-		$key = isset( $rule[1] ) ? $rule[1] : $field;
-		if( strpos( $key, '^' ) ){
-			// 支持多个字段验证
-			$fields = explode( '^', $key );
-			foreach( $fields as $key ){
-				$map[] = [$key, '=', $data[$key]];
-			}
-		} else{
-			$map[] = [$key, '=', $data[$field]];
-		}
-		$pk = !empty( $rule[3] ) ? $rule[3] : $db->getPk();
-		if( is_string( $pk ) ){
-			if( isset( $rule[2] ) ){
-				$map[] = [$pk, '<>', $rule[2]];
-			} elseif( isset( $data[$pk] ) ){
-				$map[] = [$pk, '<>', $data[$pk]];
-			}
-		}
-		if( $db->where( $map )->field( $pk )->find() ){
-			return false;
-		}
-		return true;
-	}
-
-	/**
-	 * 使用行为类验证
-	 * @access public
-	 * @param  mixed $value 字段值
-	 * @param  mixed $rule  验证规则
-	 * @param  array $data  数据
-	 * @return mixed
-	 */
-	public function behavior( $value, $rule, $data )
-	{
-		return Container::get( 'hook' )->exec( $rule, $data );
 	}
 
 	/**
@@ -1231,32 +1160,6 @@ class Validator
 		return 1 === preg_match( $rule, (string)$value );
 	}
 
-	/**
-	 * 验证表单令牌
-	 * @access public
-	 * @param  mixed $value 字段值
-	 * @param  mixed $rule  验证规则
-	 * @param  array $data  数据
-	 * @return bool
-	 */
-	public function token( $value, $rule, $data )
-	{
-		$rule    = !empty( $rule ) ? $rule : '__token__';
-		$session = Container::get( 'session' );
-		if( !isset( $data[$rule] ) || !$session->has( $rule ) ){
-			// 令牌数据无效
-			return false;
-		}
-		// 令牌验证
-		if( isset( $data[$rule] ) && $session->get( $rule ) === $data[$rule] ){
-			// 防止重复提交
-			$session->delete( $rule ); // 验证完成销毁session
-			return true;
-		}
-		// 开启TOKEN重置
-		$session->delete( $rule );
-		return false;
-	}
 
 	// 获取错误信息
 	public function getError()
@@ -1266,7 +1169,6 @@ class Validator
 
 	/**
 	 * 获取数据值
-
 	 * @param  array  $data 数据
 	 * @param  string $key  数据标识 支持二维
 	 * @return mixed
@@ -1287,7 +1189,6 @@ class Validator
 
 	/**
 	 * 获取验证规则的错误提示信息
-
 	 * @param  string $attribute 字段英文名
 	 * @param  string $title     字段描述名
 	 * @param  string $type      验证规则名称
@@ -1296,7 +1197,7 @@ class Validator
 	 */
 	protected function getRuleMsg( $attribute, $title, $type, $rule )
 	{
-		$lang = Container::get( 'lang' );
+		$lang = require_once "lang/zh-cn.php";
 		if( isset( $this->message[$attribute.'.'.$type] ) ){
 			$msg = $this->message[$attribute.'.'.$type];
 		} elseif( isset( $this->message[$attribute][$type] ) ){
@@ -1308,12 +1209,12 @@ class Validator
 		} elseif( 0 === strpos( $type, 'require' ) ){
 			$msg = self::$typeMsg['require'];
 		} else{
-			$msg = $title.$lang->get( 'not conform to the rules' );
+			$msg = $title.$lang['not conform to the rules'];
 		}
 		if( is_string( $msg ) && 0 === strpos( $msg, '{%' ) ){
-			$msg = $lang->get( substr( $msg, 2, - 1 ) );
-		} elseif( $lang->has( $msg ) ){
-			$msg = $lang->get( $msg );
+			$msg = $lang[substr( $msg, 2, - 1 )];
+		} elseif( isset( $lang[$msg] ) ){
+			$msg = $lang[$msg];
 		}
 		if( is_string( $msg ) && is_scalar( $rule ) && false !== strpos( $msg, ':' ) ){
 			// 变量替换
@@ -1335,7 +1236,6 @@ class Validator
 
 	/**
 	 * 获取数据验证的场景
-
 	 * @param  string $scene 验证场景
 	 * @return array
 	 */
@@ -1377,32 +1277,30 @@ class Validator
 	}
 
 
-	 /**
-	  * 手机格式
-
-	  * @param mixed $value 字段值
-	  * @param mixed $rule  验证规则
-	  * @return bool
-	  */
-	 protected function phone( $value, $rule = 'zh' )
-	 {
-	 	if( preg_match( "/^1[34578]{1}\d{9}$/", $value ) ){
-	 		return true;
-	 	} else{
-	 		return false;
-	 	}
-	 }
+	/**
+	 * 手机格式
+	 * @param mixed $value 字段值
+	 * @param mixed $rule  验证规则
+	 * @return bool
+	 */
+	protected function phone( $value, $rule = 'zh' )
+	{
+		if( preg_match( "/^1[34578]{1}\d{9}$/", $value ) ){
+			return true;
+		} else{
+			return false;
+		}
+	}
 
 	/**
 	 * 数组是否有重复值
-
 	 * @param mixed $value 字段值
 	 * @param mixed $rule  验证规则
 	 * @return bool
 	 */
 	protected function arrayUnique( $value )
 	{
-		if (count($value) === count(array_unique($value))) {
+		if( count( $value ) === count( array_unique( $value ) ) ){
 			return true;
 		} else{
 			return false;
@@ -1424,7 +1322,6 @@ class Validator
 	/**
 	 * todo 老了
 	 * 验证json
-
 	 * @param mixed $value 字段值
 	 * @return bool
 	 */
