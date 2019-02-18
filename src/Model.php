@@ -58,12 +58,18 @@ class Model extends TpORM
 	/**
 	 * 批量添加
 	 * @param array $datas
+	 * @param bool $autoConvertData 自动转换model所需要的类型
 	 * @return bool|mixed
 	 */
-	public function addMulti( array $datas = [] )
+	public function addMulti( array $datas = [], bool $convertData = false)
 	{
 		try{
 			if( !empty( $datas ) ){
+				if($convertData === true ){
+					foreach($datas as $k => $d){
+						$datas[$k] = $this->convertData($d);
+					}
+				}
 				if( !is_array( $datas[0] ) ){
 					return false;
 				}
