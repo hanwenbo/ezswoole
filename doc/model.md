@@ -4,6 +4,28 @@
 
 该模型不是必须，只是为了定义辅助注释和以便日后继承父类方法进行处理
 
+
+
+**特别要注意**： 一个请求从头到尾的Mysql类是共用的，切记不要在把where混着调用**（为了规范）**，比如：
+
+```php
+// 以下是错误示范：
+
+// 看似new了两个类，但是两个类里的mysql都是指向了统一个对象。
+$user = new $userModel;
+$goods = new $goodsModel;
+
+$user->where(['id'=>1])
+$goods->where(['id'=>2])
+// 你会发现user的where条件也被带上了
+$goods->select();
+// 为什么是这样子？因为本库是协程模式下的，要解决mysql的事务是统一链接(也就是链接一次Mysql)，如果是多链接就得多次事务操作，比较麻烦。
+
+// 什么时候where、field才会情况呢？当执行了任意select、find、count、sum等等都会被清空。
+```
+
+
+
 文件目录：App\Model\Model.php
 
 ```php
@@ -106,6 +128,17 @@ $list = $goodsModel->where(['id'=>['>',1]])->field('title,id')->withTotalCount()
 $total_number = $goodsModel->getTotalCount()
 ```
 - where等链式查询条件，在`$goodsModel`实例化后会一直存在，除非是新实例化一个对象，所以在重复利用where的时候要注意，和thinkphp不一样
+
+
+
+
+拼接原生的查询，可以用在( xxx  OR xxx) 的场景，或者更复杂的自定义查询语句，本库不存在thinkphp的exp操作
+
+```php
+->where("(username like %{$get['keywords']}% OR phone like %{$get['keywords']}%)")
+//  (username like %1% OR phone like %1%)"
+```
+
 
 
 

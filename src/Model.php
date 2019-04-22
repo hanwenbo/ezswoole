@@ -99,6 +99,7 @@ class Model extends TpORM
 				return false;
 			}
 		}catch(\Exception $e){
+			$this->throwable = $e;
 			var_dump($e->getTraceAsString());
 			return false;
 		}
@@ -139,6 +140,7 @@ class Model extends TpORM
 				return false;
 			}
 		}catch(\Exception $e){
+			$this->throwable = $e;
 			var_dump($e->getTraceAsString());
 			return false;
 		}
