@@ -122,13 +122,28 @@ class Model extends TpORM
 				unset( $updateColumn[0] );
 				$sql = "UPDATE ".$tableName." SET ";
 				$pks = array_column( $multipleData, $pk );
-				// 解决
+
 				foreach( $updateColumn as $uColumn ){
-					$sql .= $uColumn." = CASE ";
+					$sql .= "`{$uColumn}` = CASE ";
 					foreach( $multipleData as $data ){
-						$sql .= "WHEN `".$pk."` = ".$data[$pk]." THEN '".$data[$uColumn]."' ";
+						$val = $data[$pk];
+						// 判断是不是字符串
+						if( is_string( $val ) ){
+							$val = '"'.addslashes( $val ).'"';
+						}  elseif( is_null( $val ) ){
+							$val = 'NULL';
+						}
+
+						$_val = $data[$uColumn];
+						if( is_string( $val ) ){
+							$_val = '"'.addslashes( $_val ).'"';
+						}  elseif( is_null( $_val ) ){
+							$_val = 'NULL';
+						}
+
+						$sql .= "WHEN `".$pk."` = {$val} THEN {$_val} ";
 					}
-					$sql .= "ELSE ".$uColumn." END, ";
+					$sql .= "ELSE `".$uColumn."` END, ";
 				}
 
 				$joinStr = join(",",$pks);
