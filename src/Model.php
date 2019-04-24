@@ -14,7 +14,6 @@ use ezswoole\context\MysqlContext;
  * @method mixed|static group(string $groupByField)
  * @method mixed|static order(string $orderByField, string $orderByDirection = "DESC", $customFieldsOrRegExp = null)
  * @method mixed|static field($field)
- *
  */
 class Model extends TpORM
 {
@@ -27,7 +26,8 @@ class Model extends TpORM
 	protected $createTimeName = 'create_time';
 	protected $softDelete = false;
 	protected $softDeleteTimeName = 'delete_time';
-
+	// 同时也查询出来删除过的
+	protected $_withDelete = false;
 	/**
 	 * @param null $data
 	 */
@@ -331,11 +331,19 @@ class Model extends TpORM
 	 */
 	private function softDeleteSelectPreHandle(){
 		// 当查询的时候  过滤掉 delete_time !==0
-		if($this->softDelete === true){
-			parent::where($this->softDeleteTimeName,0);
+		if($this->softDelete === true && $this->_withDelete === false){
+			// TODO 优化获得别名name 而不是getTableName
+			if(strstr($this->getDbTable(),' AS ')){
+				$fieldName = "{$this->getTableName()}.{$this->softDeleteTimeName}";
+			}else{
+				$fieldName = $this->softDeleteTimeName;
+			}
+			parent::where($fieldName,0);
 		}
-		// 如果存在join怎么办？
-		// 不存在join直接上
+	}
+	protected function withDelete(){
+		$this->_withDelete = true;
+		return $this;
 	}
 	/**
 	 * @return Model
