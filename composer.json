@@ -17,7 +17,7 @@
   "require": {
     "php": ">=7.2",
     "easyswoole/easyswoole": "^3",
-    "easyswoole/mysqli": "^1.0"
+    "easyswoole/mysqli": "^1"
   },
   "require-dev": {
     "easyswoole/swoole-ide-helper": "^1.2"
