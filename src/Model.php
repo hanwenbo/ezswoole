@@ -4,8 +4,6 @@ namespace ezswoole;
 
 use EasySwoole\Mysqli\TpORM;
 use EasySwoole\EasySwoole\Config;
-//use EasySwoole\Component\Pool\PoolManager;
-//use ezswoole\pool\MysqlPool;
 use ezswoole\pool\MysqlObject;
 use ezswoole\context\MysqlContext;
 
@@ -179,6 +177,7 @@ class Model extends TpORM
 	 */
 	protected function edit( $data = null )
 	{
+		$this->selectPreHandle();
 		try{
 			return $this->update( $data );
 		} catch( \EasySwoole\Mysqli\Exceptions\ConnectFail $e ){
@@ -198,6 +197,7 @@ class Model extends TpORM
 	 */
 	protected function del()
 	{
+		$this->selectPreHandle();
 		try{
 			if( $this->softDelete === true ){
 				$data[$this->softDeleteTimeName] = time();
@@ -222,6 +222,7 @@ class Model extends TpORM
 	 */
 	protected function select()
 	{
+		$this->selectPreHandle();
 		try{
 			return parent::select();
 		} catch( \EasySwoole\Mysqli\Exceptions\ConnectFail $e ){
@@ -242,6 +243,7 @@ class Model extends TpORM
 	 */
 	protected function column( string $name )
 	{
+		$this->selectPreHandle();
 		try{
 			return parent::column( $name );
 		} catch( \EasySwoole\Mysqli\Exceptions\ConnectFail $e ){
@@ -262,6 +264,7 @@ class Model extends TpORM
 	 */
 	protected function value( string $name )
 	{
+		$this->selectPreHandle();
 		try{
 			return parent::value( $name );
 		} catch( \EasySwoole\Mysqli\Exceptions\ConnectFail $e ){
@@ -282,6 +285,7 @@ class Model extends TpORM
 	 */
 	protected function count( string $column = '*')
 	{
+		$this->selectPreHandle();
 		try{
 			return parent::count($column);
 		} catch( \EasySwoole\Mysqli\Exceptions\ConnectFail $e ){
@@ -301,6 +305,7 @@ class Model extends TpORM
 	 */
 	protected function find( $id = null )
 	{
+		$this->selectPreHandle();
 		try{
 			if( $id ){
 				return $this->byId( $id );
@@ -318,7 +323,20 @@ class Model extends TpORM
 			return false;
 		}
 	}
-
+	private function selectPreHandle(){
+		$this->softDeleteSelectPreHandle();
+	}
+	/**
+	 * 软删除查询的提前处理
+	 */
+	private function softDeleteSelectPreHandle(){
+		// 当查询的时候  过滤掉 delete_time !==0
+		if($this->softDelete === true){
+			parent::where($this->softDeleteTimeName,0);
+		}
+		// 如果存在join怎么办？
+		// 不存在join直接上
+	}
 	/**
 	 * @return Model
 	 */
