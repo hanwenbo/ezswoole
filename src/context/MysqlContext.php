@@ -24,7 +24,6 @@ class MysqlContext implements \EasySwoole\Component\Context\ContextItemHandlerIn
 	}
 	function onDestroy($context){
 		if( $context instanceof MysqlObject ){
-			$context->gc();
 			PoolManager::getInstance()->getPool( MysqlPool::class )->recycleObj( $context );
 		}
 	}
