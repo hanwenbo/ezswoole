@@ -44,17 +44,6 @@ class Model extends TpORM
 			return null;
 		}
 	}
-
-	//	public function __destruct()
-	//	{
-	//		$db = $this->getDb();
-	//		if( $db instanceof MysqlObject ){
-	//			$db->gc();
-	//			PoolManager::getInstance()->getPool( MysqlPool::class )->recycleObj( $db );
-	//			$this->setDb( null );
-	//		}
-	//	}
-
 	/**
 	 * 批量添加
 	 * @param array $datas
