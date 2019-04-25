@@ -19,7 +19,6 @@
     "easyswoole/easyswoole": "^3",
     "easyswoole/mysqli": "^1.1"
   },
-  "minimum-stability": "dev",
   "require-dev": {
     "easyswoole/swoole-ide-helper": "^1.2"
   },
