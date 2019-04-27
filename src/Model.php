@@ -181,6 +181,9 @@ class Model extends TpORM
 	{
 		$this->selectPreHandle();
 		try{
+			if( $this->updateTime === true ){
+				$data[$this->updateTime] = time();
+			}
 			return $this->update( $data );
 		} catch( \EasySwoole\Mysqli\Exceptions\ConnectFail $e ){
 			$this->throwable = $e;
