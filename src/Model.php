@@ -24,6 +24,8 @@ class Model extends TpORM
 	protected $throwable;
 	protected $createTime = false;
 	protected $createTimeName = 'create_time';
+	protected $updateTime = false;
+	protected $updateTimeName = 'update_time';
 	protected $softDelete = false;
 	protected $softDeleteTimeName = 'delete_time';
 	// 同时也查询出来删除过的
