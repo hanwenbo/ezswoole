@@ -160,6 +160,9 @@ class Model extends TpORM
 			if( $this->createTime === true ){
 				$data[$this->createTimeName] = time();
 			}
+			if( $this->updateTime === true ){
+				$data[$this->updateTime] = time();
+			}
 			return parent::insert( $data );
 		} catch( \EasySwoole\Mysqli\Exceptions\ConnectFail $e ){
 			$this->throwable = $e;
