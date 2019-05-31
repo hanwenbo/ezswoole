@@ -182,7 +182,7 @@ class Image
 		}
 
 		// 生成随机名字
-		$this->fileName = Random::randStr( $this->randNameLength );
+		$this->fileName = Random::character( $this->randNameLength );
 
 		// 目标全名
 		$target_file_name = "{$this->targetFolder}/{$this->fileName}.{$this->ext}";
@@ -220,7 +220,7 @@ class Image
 		}
 
 		// 生成随机名字
-		$this->fileName = Random::randStr( $this->randNameLength );
+		$this->fileName = Random::character( $this->randNameLength );
 
 		// 目标全名
 		$target_file_name = "{$this->targetFolder}/{$this->fileName}.{$this->ext}";
