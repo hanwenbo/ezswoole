@@ -467,8 +467,9 @@ class Request
 	 * @param mixed $key     键名
 	 * @param array $filters 过滤方法+默认值
 	 * @return mixed
+	 *              todo private temp for swoole 4.4.0
 	 */
-	private function filterValue( &$value, $key, $filters )
+	public function filterValue( &$value, $key, $filters )
 	{
 		$default = array_pop( $filters );
 		foreach( $filters as $filter ){
