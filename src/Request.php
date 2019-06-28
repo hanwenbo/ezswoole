@@ -192,7 +192,7 @@ class Request
 	public function method( $method = false ) : string
 	{
 		if( true === $method ){
-			return (isset( $this->server['request_method'] ) ?? $this->server['request_method']);
+			return isset( $this->server['request_method'] ) ? $this->server['request_method'] : '';
 		} elseif( !$this->method ){
 			if( isset( $_server['http_x_method_override'] ) ){
 				$this->method = strtoupper( $this->server['http_x_method_override'] );
@@ -467,7 +467,7 @@ class Request
 	 * @param mixed $key     键名
 	 * @param array $filters 过滤方法+默认值
 	 * @return mixed
-	 *              todo private temp for swoole 4.4.0
+	 *                       todo private temp for swoole 4.4.0
 	 */
 	public function filterValue( &$value, $key, $filters )
 	{
