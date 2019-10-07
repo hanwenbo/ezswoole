@@ -1285,7 +1285,8 @@ class Validator
 	 */
 	protected function phone( $value, $rule = 'zh' )
 	{
-		if( preg_match( "/^1[34578]{1}\d{9}$/", $value ) ){
+		// 发现一些未知手机号 不能确定
+		if( preg_match( "/^1[234567890]{1}\d{9}$/", $value ) ){
 			return true;
 		} else{
 			return false;
