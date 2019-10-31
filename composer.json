@@ -16,7 +16,7 @@
   ],
   "require": {
     "php": ">=7.2",
-    "easyswoole/easyswoole": "^3",
+    "easyswoole/easyswoole": "3.2.4",
     "easyswoole/mysqli": "^1"
   },
   "require-dev": {
@@ -30,9 +30,9 @@
   "repositories": {
     "packagist": {
       "type": "composer",
-      "url": "https://packagist.laravel-china.org"
+      "url": "https://mirrors.aliyun.com/composer/"
     },
-    "easyswoole/mysqli":{
+    "easyswoole/mysqli": {
       "type": "vcs",
       "url": "https://github.com/hanwenbo/mysqli"
     }
